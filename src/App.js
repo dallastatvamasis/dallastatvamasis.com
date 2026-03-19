@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import './App.css';
+import './output.css';
 import Navbar from './components/Navbar';
 import Banner from './components/Banner';
 import Calendar from './components/Calendar';
