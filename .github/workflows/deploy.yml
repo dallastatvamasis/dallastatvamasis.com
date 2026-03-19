@@ -24,9 +24,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Fix Tailwind PostCSS for react-scripts
-        run: |
-          sed -i "s/'tailwindcss',/require('@tailwindcss\/postcss'),/" node_modules/react-scripts/config/webpack.config.js
 
       - name: Build
         run: npm run build
