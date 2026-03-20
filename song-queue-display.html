@@ -296,7 +296,7 @@
 <!-- Cloud URL input -->
 <div class="cloud-row">
   <input class="cloud-input" type="url" id="cloudUrlInput"
-    placeholder="☁️ Paste Cloud URL here to sync across devices (from Song Queue Manager)"
+    placeholder="☁️ Paste Google Sheets CSV URL or any public CSV link to sync across devices"
     oninput="onCloudUrlInput(this.value)">
   <button class="cloud-set-btn" id="cloudSetBtn" onclick="toggleCloud()">Connect</button>
 </div>
@@ -324,7 +324,8 @@
   let dataSource = 'local'; // 'local' | 'csv' | 'cloud'
   let csvData    = null;    // raw CSV text for reload
   let queueData  = [];
-  let cloudUrl   = localStorage.getItem('cloudUrl') || '';
+  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
+  let cloudUrl   = localStorage.getItem('cloudUrl') || _DEFAULT_CSV;
   let cloudData  = null;
 
   // ── Cloud URL setup ──
@@ -355,23 +356,68 @@
     }
   }
 
+  // Detect if a URL points to a plain CSV (Google Sheets, raw GitHub, .csv link)
+  function isCsvUrl(url) {
+    return url.includes('docs.google.com/spreadsheets') ||
+           url.includes('output=csv') || url.includes('format=csv') ||
+           url.match(/\.csv(\?|$)/i);
+  }
+
+  // Parse CSV text → array of queue objects
+  function parseCsv(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (!lines.length) return [];
+    // Detect header row
+    const first = lines[0].toLowerCase();
+    const hasHeader = first.includes('name') || first.includes('song') || first.includes('status');
+    const dataLines = hasHeader ? lines.slice(1) : lines;
+    return dataLines.map((line, i) => {
+      const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+      // Support: id,name,song,status  OR  name,song,status
+      if (cols.length >= 4) {
+        return { id: cols[0] || i + 1, name: cols[1], song: cols[2], status: cols[3] || 'waiting' };
+      } else if (cols.length >= 2) {
+        return { id: i + 1, name: cols[0], song: cols[1], status: cols[2] || 'waiting' };
+      }
+      return null;
+    }).filter(Boolean);
+  }
+
   async function fetchCloud() {
     if (!cloudUrl) return;
     try {
-      const token = localStorage.getItem('sync_token') || '';
-      const sep = cloudUrl.includes('?') ? '&' : '?';
-      const headers = { 'Accept': 'application/vnd.github.v3+json' };
-      if (token) headers['Authorization'] = 'token ' + token;
-      const res = await fetch(cloudUrl + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        // GitHub Contents API returns base64-encoded content
-        cloudData = data.content
-          ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
-          : data; // fallback for plain JSON
-        if (dataSource === 'cloud') { queueData = cloudData; }
+      if (isCsvUrl(cloudUrl)) {
+        // ── Plain CSV (Google Sheets, raw GitHub, any public CSV) ──
+        const sep = cloudUrl.includes('?') ? '&' : '?';
+        const res = await fetch(cloudUrl + sep + '_t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          const text = await res.text();
+          cloudData = parseCsv(text);
+          if (dataSource === 'cloud') { queueData = cloudData; }
+        }
+      } else {
+        // ── GitHub Contents API (JSON, needs token) ──
+        const token = localStorage.getItem('sync_token') || '';
+        const sep = cloudUrl.includes('?') ? '&' : '?';
+        const headers = { 'Accept': 'application/vnd.github.v3+json' };
+        if (token) headers['Authorization'] = 'token ' + token;
+        const res = await fetch(cloudUrl + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          cloudData = data.content
+            ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
+            : data;
+          if (dataSource === 'cloud') { queueData = cloudData; }
+        }
       }
     } catch(e) { /* keep last cloud data */ }
+  }
+
+  // ── Auto-connect from URL param ?cloud=<url> (zero-config sharing) ──
+  const _urlParam = new URLSearchParams(location.search).get('cloud');
+  if (_urlParam) {
+    cloudUrl = decodeURIComponent(_urlParam);
+    localStorage.setItem('cloudUrl', cloudUrl);
   }
 
   // Restore cloud URL on load and auto-connect
