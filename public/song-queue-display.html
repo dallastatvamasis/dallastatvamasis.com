@@ -324,8 +324,8 @@
   let dataSource = 'local'; // 'local' | 'csv' | 'cloud'
   let csvData    = null;    // raw CSV text for reload
   let queueData  = [];
-  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
-  let cloudUrl   = localStorage.getItem('cloudUrl') || _DEFAULT_CSV;
+  const _DEFAULT_CLOUD = 'https://raw.githubusercontent.com/dallastatvamasis/dallastatvamasis.com/queue-data/song-queue.json';
+  let cloudUrl   = localStorage.getItem('cloudUrl') || _DEFAULT_CLOUD;
   let cloudData  = null;
 
   // ── Cloud URL setup ──

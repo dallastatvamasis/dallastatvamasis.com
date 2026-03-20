@@ -438,7 +438,7 @@
       <label>GitHub Token (repo scope)</label>
       <input type="password" id="syncTokenInput" placeholder="ghp_…" autocomplete="off">
       <div id="syncUrlSection" style="display:none">
-        <label>Cloud URL — paste this into OBS overlay &amp; Display page</label>
+        <label>📺 Display URL — open on any device, no token needed</label>
         <div class="sync-url-row">
           <input type="text" id="syncUrlDisplay" readonly>
           <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
@@ -910,7 +910,7 @@
     const sec = document.getElementById('syncUrlSection');
     if (token) {
       sec.style.display = '';
-      document.getElementById('syncUrlDisplay').value = _CLOUD_URL;
+      document.getElementById('syncUrlDisplay').value = location.origin + '/song-queue-display.html';
     } else {
       sec.style.display = 'none';
     }

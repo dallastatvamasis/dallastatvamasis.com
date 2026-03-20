@@ -362,9 +362,9 @@
   let lastHash = '', countdown = REFRESH_SEC;
 
   // ── Cloud sync: read ?cloud=URL&token=TOKEN from address bar ──
-  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
+  const _DEFAULT_CLOUD = 'https://raw.githubusercontent.com/dallastatvamasis/dallastatvamasis.com/queue-data/song-queue.json';
   const _params  = new URLSearchParams(location.search);
-  const CLOUD_URL = (_params.get('cloud') || _DEFAULT_CSV).trim();
+  const CLOUD_URL = (_params.get('cloud') || _DEFAULT_CLOUD).trim();
   const CLOUD_TOKEN = (_params.get('token') || '').trim();
   let _cloudData = null;
 
