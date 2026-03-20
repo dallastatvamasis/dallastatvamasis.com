@@ -389,25 +389,68 @@
 <div class="sync-modal-bg" id="syncModalBg" onclick="if(event.target===this)closeSyncModal()">
   <div class="sync-modal">
     <h3>☁️ Cloud Sync</h3>
-    <p class="sync-help">
-      Syncs the queue to GitHub so OBS and other devices can read it in real-time.<br>
-      Create a token at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
-      — enable the <strong>repo</strong> scope.
-    </p>
-    <label>GitHub Token (repo scope)</label>
-    <input type="password" id="syncTokenInput" placeholder="ghp_…" autocomplete="off">
-    <div id="syncUrlSection" style="display:none">
-      <label>Cloud URL — paste this into OBS overlay &amp; Display page</label>
-      <div class="sync-url-row">
-        <input type="text" id="syncUrlDisplay" readonly>
-        <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:0.4rem;margin-bottom:1rem">
+      <button id="tabGSheets" onclick="switchSyncTab('gsheets')"
+        style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--saffron);background:var(--saffron);color:#1a0a00;font-weight:700;cursor:pointer;font-size:0.82rem">
+        📊 Google Sheets
+      </button>
+      <button id="tabGitHub" onclick="switchSyncTab('github')"
+        style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
+        🐙 GitHub (advanced)
+      </button>
+    </div>
+
+    <!-- Google Sheets panel -->
+    <div id="panelGSheets">
+      <p class="sync-help">
+        1. Create a <strong>Google Sheet</strong> with columns: <code>name, song, status</code><br>
+        2. <strong>File → Share → Publish to web</strong> → Sheet1 → CSV → Publish<br>
+        3. Paste the published CSV link below. Then share the Display URL with any device — no tokens needed!
+      </p>
+      <label>Google Sheets Published CSV URL</label>
+      <input type="text" id="gsheetsUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv"
+        style="width:100%;box-sizing:border-box">
+      <div id="gsheetsShareSection" style="display:none;margin-top:0.8rem">
+        <label>📺 Shareable Display URL — open on any device, no setup needed</label>
+        <div class="sync-url-row">
+          <input type="text" id="gsheetsShareUrl" readonly>
+          <button class="copy-url-btn" onclick="copyGsheetsUrl()">Copy</button>
+        </div>
       </div>
+      <div style="margin-top:0.6rem">
+        <button class="sync-save-btn" onclick="saveGsheetsSettings()">Save &amp; Generate Link</button>
+        <button onclick="exportCsv()" style="margin-left:0.5rem;padding:0.45rem 0.9rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
+          ⬇ Download CSV
+        </button>
+      </div>
+      <div class="sync-result" id="gsheetsResult"></div>
     </div>
-    <div class="sync-modal-btns">
-      <button class="sync-save-btn" onclick="saveSyncSettings()">Save &amp; Sync Now</button>
-      <button class="sync-close-btn" onclick="closeSyncModal()">Close</button>
+
+    <!-- GitHub panel -->
+    <div id="panelGitHub" style="display:none">
+      <p class="sync-help">
+        Syncs the queue to GitHub so OBS and other devices can read it in real-time.<br>
+        Create a token at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
+        — enable the <strong>repo</strong> scope.
+      </p>
+      <label>GitHub Token (repo scope)</label>
+      <input type="password" id="syncTokenInput" placeholder="ghp_…" autocomplete="off">
+      <div id="syncUrlSection" style="display:none">
+        <label>Cloud URL — paste this into OBS overlay &amp; Display page</label>
+        <div class="sync-url-row">
+          <input type="text" id="syncUrlDisplay" readonly>
+          <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
+        </div>
+      </div>
+      <div class="sync-modal-btns">
+        <button class="sync-save-btn" onclick="saveSyncSettings()">Save &amp; Sync Now</button>
+      </div>
+      <div class="sync-result" id="syncResult"></div>
     </div>
-    <div class="sync-result" id="syncResult"></div>
+
+    <button class="sync-close-btn" onclick="closeSyncModal()" style="margin-top:0.8rem;width:100%">Close</button>
   </div>
 </div>
 
@@ -939,8 +982,93 @@
     }
   }
 
+  // ── Google Sheets tab functions ──
+  function switchSyncTab(tab) {
+    const isGS = tab === 'gsheets';
+    document.getElementById('panelGSheets').style.display = isGS ? '' : 'none';
+    document.getElementById('panelGitHub').style.display  = isGS ? 'none' : '';
+    const tabGS = document.getElementById('tabGSheets');
+    const tabGH = document.getElementById('tabGitHub');
+    if (isGS) {
+      tabGS.style.background = 'var(--saffron)'; tabGS.style.color = '#1a0a00'; tabGS.style.fontWeight = '700';
+      tabGH.style.background = 'transparent'; tabGH.style.color = 'var(--muted)'; tabGH.style.fontWeight = 'normal';
+    } else {
+      tabGH.style.background = 'var(--saffron)'; tabGH.style.color = '#1a0a00'; tabGH.style.fontWeight = '700';
+      tabGS.style.background = 'transparent'; tabGS.style.color = 'var(--muted)'; tabGS.style.fontWeight = 'normal';
+    }
+  }
+
+  function saveGsheetsSettings() {
+    const url = document.getElementById('gsheetsUrlInput').value.trim();
+    const res = document.getElementById('gsheetsResult');
+    if (!url) { res.textContent = '⚠️ Paste a Google Sheets CSV URL first'; return; }
+    if (!url.includes('docs.google.com') && !url.includes('output=csv') && !url.match(/\.csv(\?|$)/i)) {
+      res.textContent = '⚠️ URL doesn\'t look like a published CSV. Make sure to use File → Share → Publish to web → CSV.';
+      return;
+    }
+    localStorage.setItem('gsheetsUrl', url);
+    // Build shareable display URL
+    const base = location.origin + '/song-queue-display.html';
+    const shareUrl = base + '?cloud=' + encodeURIComponent(url);
+    document.getElementById('gsheetsShareUrl').value = shareUrl;
+    document.getElementById('gsheetsShareSection').style.display = '';
+    res.textContent = '✓ Saved! Copy the Display URL and open it on any device.';
+    // Also update the sync pill
+    const pill = document.getElementById('syncPill');
+    pill.textContent = '📊 Sheets Sync'; pill.className = 'sync-pill synced';
+  }
+
+  function copyGsheetsUrl() {
+    const v = document.getElementById('gsheetsShareUrl').value;
+    if (!v) return;
+    navigator.clipboard.writeText(v).then(() => {
+      const btn = document.querySelector('#gsheetsShareSection .copy-url-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }
+
+  function exportCsv() {
+    const rows = [['name', 'song', 'status']];
+    queue.forEach(e => rows.push([
+      (e.name  || '').replace(/,/g, ' '),
+      (e.song  || '').replace(/,/g, ' '),
+      (e.status|| 'waiting')
+    ]));
+    const csv = rows.map(r => r.join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = 'song-queue.csv';
+    a.click();
+  }
+
+  // ── Hardcoded default Google Sheets CSV URL ──
+  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
+  if (!localStorage.getItem('gsheetsUrl')) {
+    localStorage.setItem('gsheetsUrl', _DEFAULT_CSV);
+  }
+
+  // ── Restore Google Sheets URL on modal open ──
+  const _origOpenSyncModal = openSyncModal;
+  openSyncModal = function() {
+    _origOpenSyncModal();
+    const saved = localStorage.getItem('gsheetsUrl') || _DEFAULT_CSV;
+    document.getElementById('gsheetsUrlInput').value = saved;
+    if (saved) {
+      const base = location.origin + '/song-queue-display.html';
+      document.getElementById('gsheetsShareUrl').value = base + '?cloud=' + encodeURIComponent(saved);
+      document.getElementById('gsheetsShareSection').style.display = '';
+    }
+    switchSyncTab('gsheets');
+  };
+
   // Init cloud pill state
   refreshSyncUrlUI();
+  // Show Sheets pill if gsheetsUrl is saved
+  if (localStorage.getItem('gsheetsUrl') && !localStorage.getItem('sync_token')) {
+    const pill = document.getElementById('syncPill');
+    pill.textContent = '📊 Sheets Sync'; pill.className = 'sync-pill synced';
+  }
 
   render();
 </script>
