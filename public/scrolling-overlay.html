@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Temple Scrolling Overlay</title>
+  <meta http-equiv="refresh" content="30" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+    }
+
+    .ticker-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(to right, #3b0000, #7a2e00, #3b0000);
+      border-top: 3px solid gold;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .label {
+      flex: 0 0 auto;
+      color: white;
+      background: #8b0000;
+      border-right: 2px solid gold;
+      padding: 0 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    .ticker-container {
+      position: relative;
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker {
+      position: absolute;
+      left: 0;
+      white-space: nowrap;
+      color: #ffd700;
+      font-size: 32px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
+      will-change: transform;
+      padding-right: 200px; /* extra tail space */
+      animation: scroll-left 40s linear infinite; /* slower than before */
+    }
+
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(100%);
+      }
+      100% {
+        transform: translateX(-120%);
+      }
+    }
+
+    .debug {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      color: white;
+      font-size: 14px;
+      background: rgba(0, 0, 0, 0.80);
+      padding: 6px 10px;
+      border-radius: 6px;
+      line-height: 1.5;
+      min-width: 180px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticker-wrap">
+    <div class="label">LIVE UPDATE</div>
+    <div class="ticker-container">
+      <div class="ticker" id="tickerText">Loading message...</div>
+    </div>
+  </div>
+
+  <div class="debug">
+    <div id="clock">--:--:--</div>
+    <div id="lastUpdate">Sheet update: Loading...</div>
+  </div>
+
+  <script>
+    const sheetCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4F0kVvVX5yhIHJC8RgsMnT111OD4RNPfPSfN8DP19J48pHiOjAQ4MFvwlg0aVLGAbZIBWRgRGkSjU/pub?output=csv";
+    const macroUrl = "https://script.google.com/macros/s/AKfycbxyXTNcJLQ627R17a8fHPINfVWZeFDTt2MxSkEse0kzdlLp8KfoA9d_bZsAoRfF609N0Q/exec";
+
+    let lastMessage = "";
+
+    function cleanCSVLine(line) {
+      return line
+        .replace(/\r/g, "")
+        .trim()
+        .replace(/^"|"$/g, "")
+        .replace(/""/g, '"');
+    }
+
+    function restartTicker(message) {
+      const ticker = document.getElementById("tickerText");
+      ticker.style.animation = "none";
+      ticker.textContent = message + "   🔸   ";
+      void ticker.offsetWidth;
+      ticker.style.animation = "scroll-left 40s linear infinite";
+    }
+
+    async function loadMessages() {
+      try {
+        const response = await fetch(sheetCSVUrl + "&t=" + Date.now(), {
+          cache: "no-store"
+        });
+
+        const csvText = await response.text();
+
+        const lines = csvText
+          .split("\n")
+          .map(cleanCSVLine)
+          .filter(line => line.length > 0);
+
+        const finalMessage = lines.join("   🔸   ") || "Welcome";
+
+        if (finalMessage !== lastMessage) {
+          lastMessage = finalMessage;
+          restartTicker(finalMessage);
+        }
+      } catch (e) {
+        const errorMsg = "Google Sheet data not available";
+        if (errorMsg !== lastMessage) {
+          lastMessage = errorMsg;
+          restartTicker(errorMsg);
+        }
+        console.error("Message load error:", e);
+      }
+    }
+
+    async function loadTimestamp() {
+      try {
+        const response = await fetch(macroUrl + "?t=" + Date.now(), {
+          cache: "no-store"
+        });
+
+        const text = await response.text();
+        let ts = text.trim();
+
+        try {
+          const data = JSON.parse(text);
+          ts = data.lastUpdated || data.timestamp || data.updatedAt || ts;
+        } catch (_) {}
+
+        document.getElementById("lastUpdate").textContent =
+          "Sheet update: " + (ts || "N/A");
+      } catch (e) {
+        document.getElementById("lastUpdate").textContent =
+          "Sheet update: Not available";
+        console.error("Timestamp load error:", e);
+      }
+    }
+
+    function updateClock() {
+      document.getElementById("clock").textContent =
+        "Clock: " + new Date().toLocaleTimeString();
+    }
+
+    loadMessages();
+    loadTimestamp();
+    updateClock();
+
+    setInterval(loadMessages, 5000);
+    setInterval(loadTimestamp, 5000);
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
