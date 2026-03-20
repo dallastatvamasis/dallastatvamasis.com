@@ -362,25 +362,53 @@
   let lastHash = '', countdown = REFRESH_SEC;
 
   // ── Cloud sync: read ?cloud=URL&token=TOKEN from address bar ──
+  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
   const _params  = new URLSearchParams(location.search);
-  const CLOUD_URL = (_params.get('cloud') || '').trim();
+  const CLOUD_URL = (_params.get('cloud') || _DEFAULT_CSV).trim();
   const CLOUD_TOKEN = (_params.get('token') || '').trim();
   let _cloudData = null;
+
+  function isCsvUrl(url) {
+    return url.includes('docs.google.com/spreadsheets') ||
+           url.includes('output=csv') || url.includes('format=csv') ||
+           url.match(/\.csv(\?|$)/i);
+  }
+
+  function parseCsv(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (!lines.length) return [];
+    const first = lines[0].toLowerCase();
+    const hasHeader = first.includes('name') || first.includes('song') || first.includes('status');
+    const dataLines = hasHeader ? lines.slice(1) : lines;
+    return dataLines.map((line, i) => {
+      const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+      if (cols.length >= 4) {
+        return { id: cols[0] || i + 1, name: cols[1], song: cols[2], status: cols[3] || 'waiting' };
+      } else if (cols.length >= 2) {
+        return { id: i + 1, name: cols[0], song: cols[1], status: cols[2] || 'waiting' };
+      }
+      return null;
+    }).filter(Boolean);
+  }
 
   async function fetchCloud() {
     if (!CLOUD_URL) return;
     try {
-      const token = CLOUD_TOKEN || localStorage.getItem('sync_token') || '';
       const sep = CLOUD_URL.includes('?') ? '&' : '?';
-      const headers = { 'Accept': 'application/vnd.github.v3+json' };
-      if (token) headers['Authorization'] = 'token ' + token;
-      const res = await fetch(CLOUD_URL + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        // GitHub Contents API returns base64-encoded content
-        _cloudData = data.content
-          ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
-          : data; // fallback for plain JSON
+      if (isCsvUrl(CLOUD_URL)) {
+        const res = await fetch(CLOUD_URL + sep + '_t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) { _cloudData = parseCsv(await res.text()); }
+      } else {
+        const token = CLOUD_TOKEN || localStorage.getItem('sync_token') || '';
+        const headers = { 'Accept': 'application/vnd.github.v3+json' };
+        if (token) headers['Authorization'] = 'token ' + token;
+        const res = await fetch(CLOUD_URL + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          _cloudData = data.content
+            ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
+            : data;
+        }
       }
     } catch(e) { /* keep last data on failure */ }
   }
