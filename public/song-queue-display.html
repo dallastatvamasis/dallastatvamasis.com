@@ -324,7 +324,7 @@
   let dataSource = 'local'; // 'local' | 'csv' | 'cloud'
   let csvData    = null;    // raw CSV text for reload
   let queueData  = [];
-  const _DEFAULT_CLOUD = 'https://raw.githubusercontent.com/dallastatvamasis/dallastatvamasis.com/queue-data/song-queue.json';
+  const _DEFAULT_CLOUD = 'https://api.github.com/repos/dallastatvamasis/dallastatvamasis.com/contents/song-queue.json?ref=queue-data';
   let cloudUrl   = localStorage.getItem('cloudUrl') || _DEFAULT_CLOUD;
   let cloudData  = null;
 
