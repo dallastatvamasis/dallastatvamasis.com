@@ -1,9 +1,8 @@
 <script>
-  // ── Cloud Sync (GitHub repo queue-data branch) ──
-  const _REPO       = 'dallastatvamasis/dallastatvamasis.com';
-  const _BRANCH     = 'queue-data';
-  const _JSON_FILE  = 'song-queue.json';
-  const _CSV_FILE   = 'song-queue.csv';
+  const _REPO = 'dallastatvamasis/dallastatvamasis.com';
+  const _BRANCH = 'queue-data';
+  const _JSON_FILE = 'song-queue.json';
+  const _CSV_FILE = 'song-queue.csv';
 
   function getJsonRawUrl() {
     return `https://raw.githubusercontent.com/${_REPO}/${_BRANCH}/${_JSON_FILE}`;
@@ -13,20 +12,111 @@
     return `https://raw.githubusercontent.com/${_REPO}/${_BRANCH}/${_CSV_FILE}`;
   }
 
-  function openSyncModal() {
-    document.getElementById('syncTokenInput').value = localStorage.getItem('sync_token') || '';
-    document.getElementById('syncResult').textContent = '';
-    refreshSyncUrlUI();
-    document.getElementById('syncModalBg').classList.add('open');
+  function queueToCsv(rows) {
+    const header = ['id','name','song','status'];
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const lines = [header.join(',')];
+    rows.forEach(e => {
+      lines.push([
+        e.id ?? '',
+        esc(e.name),
+        esc(e.song),
+        esc(e.status || 'waiting')
+      ].join(','));
+    });
+    return lines.join('\n');
   }
 
-  function closeSyncModal() {
-    document.getElementById('syncModalBg').classList.remove('open');
+  async function getFileSha(token, path) {
+    const res = await fetch(`https://api.github.com/repos/${_REPO}/contents/${path}?ref=${_BRANCH}&_t=${Date.now()}`, {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json'
+      }
+    });
+
+    if (res.status === 404) return null;
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'SHA fetch failed');
+    return data.sha || null;
+  }
+
+  async function putFile(token, path, text, message) {
+    const sha = await getFileSha(token, path);
+
+    const body = {
+      message,
+      content: btoa(unescape(encodeURIComponent(text))),
+      branch: _BRANCH
+    };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${_REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || `Failed to update ${path}`);
+    return data;
+  }
+
+  async function syncToRepo() {
+    const token = localStorage.getItem('sync_token');
+    if (!token) return { ok: false, msg: 'No token configured' };
+
+    setPillStatus('syncing');
+
+    try {
+      const jsonText = JSON.stringify(queue, null, 2);
+      const csvText = queueToCsv(queue);
+
+      await putFile(token, _JSON_FILE, jsonText, 'Update song queue JSON');
+      await putFile(token, _CSV_FILE, csvText, 'Update song queue CSV');
+
+      setPillStatus('ok');
+      return { ok: true };
+    } catch (e) {
+      setPillStatus('error');
+      return { ok: false, msg: e.message };
+    }
+  }
+
+  async function loadFromGitHubJson() {
+    try {
+      const res = await fetch(getJsonRawUrl() + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('JSON not found');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        queue = data;
+        localStorage.setItem('songQueue', JSON.stringify(queue));
+        render();
+        return true;
+      }
+    } catch (e) {
+      console.log('GitHub JSON load skipped:', e.message);
+    }
+    return false;
+  }
+
+  async function initData() {
+    const loaded = await loadFromGitHubJson();
+    if (!loaded) {
+      queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
+      render();
+    }
   }
 
   function refreshSyncUrlUI() {
     const token = localStorage.getItem('sync_token');
     const sec = document.getElementById('syncUrlSection');
+
     if (token) {
       sec.style.display = '';
       document.getElementById('syncUrlDisplay').value = getJsonRawUrl();
@@ -44,144 +134,25 @@
     }
   }
 
-  function copyCloudUrl() {
-    const v = document.getElementById('syncUrlDisplay').value;
-    if (!v) return;
-    navigator.clipboard.writeText(v).then(() => {
-      const btn = document.querySelector('.copy-url-btn');
-      if (!btn) return;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
-    });
-  }
-
   async function saveSyncSettings() {
     const token = document.getElementById('syncTokenInput').value.trim();
-    const resultEl = document.getElementById('syncResult');
-
     if (!token) {
-      resultEl.textContent = '⚠️ Enter a GitHub token';
+      document.getElementById('syncResult').textContent = '⚠️ Enter a GitHub token';
       return;
     }
 
     localStorage.setItem('sync_token', token);
-    resultEl.textContent = 'Syncing JSON + CSV...';
+    document.getElementById('syncResult').textContent = 'Syncing JSON + CSV...';
 
     const r = await syncToRepo();
     if (r.ok) {
-      resultEl.textContent = '✓ Synced JSON + CSV to GitHub';
+      document.getElementById('syncResult').textContent = '✓ Synced JSON + CSV to GitHub';
       refreshSyncUrlUI();
     } else {
-      resultEl.textContent = '✗ Failed: ' + r.msg;
+      document.getElementById('syncResult').textContent = '✗ Failed: ' + r.msg;
     }
   }
 
-  function setPillStatus(s) {
-    const pill = document.getElementById('syncPill');
-    if (s === 'syncing') {
-      pill.className = 'sync-pill syncing';
-      pill.textContent = '⏳ Syncing…';
-    } else if (s === 'ok') {
-      pill.className = 'sync-pill synced';
-      pill.textContent = '✓ Synced';
-      setTimeout(() => refreshSyncUrlUI(), 2500);
-    } else if (s === 'error') {
-      pill.className = 'sync-pill error';
-      pill.textContent = '✗ Sync Error';
-    }
-  }
-
-  function queueToCsv(rows) {
-    const header = ['id', 'name', 'song', 'status'];
-
-    const escapeCsv = (value) => {
-      const s = String(value ?? '');
-      return `"${s.replace(/"/g, '""')}"`;
-    };
-
-    const lines = [header.join(',')];
-    rows.forEach(e => {
-      lines.push([
-        e.id ?? '',
-        escapeCsv(e.name),
-        escapeCsv(e.song),
-        escapeCsv(e.status || 'waiting')
-      ].join(','));
-    });
-
-    return lines.join('\n');
-  }
-
-  async function getFileSha(token, path) {
-    const url = `https://api.github.com/repos/${_REPO}/contents/${path}?ref=${_BRANCH}&_t=${Date.now()}`;
-    const res = await fetch(url, {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/vnd.github+json'
-      }
-    });
-
-    if (res.status === 404) return null;
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.message || `Failed to read SHA for ${path}`);
-    }
-
-    return data.sha || null;
-  }
-
-  async function putFileToGitHub(token, path, textContent, commitMessage) {
-    const sha = await getFileSha(token, path);
-
-    const body = {
-      message: commitMessage,
-      content: btoa(unescape(encodeURIComponent(textContent))),
-      branch: _BRANCH
-    };
-
-    if (sha) body.sha = sha;
-
-    const res = await fetch(`https://api.github.com/repos/${_REPO}/contents/${path}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.message || `Failed to update ${path}`);
-    }
-
-    return data;
-  }
-
-  async function syncToRepo() {
-    const token = localStorage.getItem('sync_token');
-    if (!token) return { ok: false, msg: 'No token configured' };
-
-    setPillStatus('syncing');
-
-    try {
-      const jsonText = JSON.stringify(queue, null, 2);
-      const csvText = queueToCsv(queue);
-
-      await putFileToGitHub(token, _JSON_FILE, jsonText, 'Update song queue JSON');
-      await putFileToGitHub(token, _CSV_FILE, csvText, 'Update song queue CSV');
-
-      setPillStatus('ok');
-      return {
-        ok: true,
-        jsonUrl: getJsonRawUrl(),
-        csvUrl: getCsvRawUrl()
-      };
-    } catch (e) {
-      setPillStatus('error');
-      return { ok: false, msg: e.message };
-    }
-  }
+  refreshSyncUrlUI();
+  initData();
 </script>
