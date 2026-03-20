@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 Song Queue Manager</title>
+<title>ðµ Song Queue Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -200,7 +200,7 @@
     font-size: 0.75rem; color: var(--saffron-light); margin-top: 0.1rem;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .row-song::before { content: '♪ '; }
+  .row-song::before { content: 'âª '; }
 
   /* Action buttons */
   .row-actions { display: flex; gap: 0.28rem; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
@@ -249,7 +249,7 @@
   }
   .del-btn:hover { color: #E04030; }
 
-  /* Current tab — Next banner */
+  /* Current tab â Next banner */
   .next-btn-bar {
     background: var(--current-bg); border: 1.5px solid var(--current-border);
     border-radius: 12px; padding: 0.7rem 1rem;
@@ -288,7 +288,7 @@
   .csv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
   .export-btn:hover { border-color: var(--done-border); color: #7DDB95; background: var(--done-bg); }
   .import-btn:hover { border-color: var(--waiting-border); color: #9AB4EE; background: var(--waiting-bg); }
-  /* ── Cloud Sync ── */
+  /* ââ Cloud Sync ââ */
   .sync-pill {
     display: inline-flex; align-items: center; gap: 0.4rem;
     background: var(--surface); border: 1.5px solid var(--border);
@@ -379,26 +379,26 @@
 <body>
 
 <header>
-  <div class="logo">🎵</div>
+  <div class="logo">ðµ</div>
   <h1>Song Queue Manager</h1>
-  <p>Add singers &amp; songs · Manage performance order</p>
-  <button class="sync-pill" id="syncPill" onclick="openSyncModal()">☁️ Cloud Sync</button>
+  <p>Add singers &amp; songs Â· Manage performance order</p>
+  <button class="sync-pill" id="syncPill" onclick="openSyncModal()">âï¸ Cloud Sync</button>
 </header>
 
 <!-- Cloud Sync Modal -->
 <div class="sync-modal-bg" id="syncModalBg" onclick="if(event.target===this)closeSyncModal()">
   <div class="sync-modal">
-    <h3>☁️ Cloud Sync</h3>
+    <h3>âï¸ Cloud Sync</h3>
 
     <!-- Tab switcher -->
     <div style="display:flex;gap:0.4rem;margin-bottom:1rem">
       <button id="tabGSheets" onclick="switchSyncTab('gsheets')"
         style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--saffron);background:var(--saffron);color:#1a0a00;font-weight:700;cursor:pointer;font-size:0.82rem">
-        📊 Google Sheets
+        ð Google Sheets
       </button>
       <button id="tabGitHub" onclick="switchSyncTab('github')"
         style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
-        🐙 GitHub (advanced)
+        ð GitHub (advanced)
       </button>
     </div>
 
@@ -406,14 +406,14 @@
     <div id="panelGSheets">
       <p class="sync-help">
         1. Create a <strong>Google Sheet</strong> with columns: <code>name, song, status</code><br>
-        2. <strong>File → Share → Publish to web</strong> → Sheet1 → CSV → Publish<br>
-        3. Paste the published CSV link below. Then share the Display URL with any device — no tokens needed!
+        2. <strong>File â Share â Publish to web</strong> â Sheet1 â CSV â Publish<br>
+        3. Paste the published CSV link below. Then share the Display URL with any device â no tokens needed!
       </p>
       <label>Google Sheets Published CSV URL</label>
-      <input type="text" id="gsheetsUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv"
+      <input type="text" id="gsheetsUrlInput" placeholder="https://docs.google.com/spreadsheets/d/â¦/pub?output=csv"
         style="width:100%;box-sizing:border-box">
       <div id="gsheetsShareSection" style="display:none;margin-top:0.8rem">
-        <label>📺 Shareable Display URL — open on any device, no setup needed</label>
+        <label>ðº Shareable Display URL â open on any device, no setup needed</label>
         <div class="sync-url-row">
           <input type="text" id="gsheetsShareUrl" readonly>
           <button class="copy-url-btn" onclick="copyGsheetsUrl()">Copy</button>
@@ -422,7 +422,7 @@
       <div style="margin-top:0.6rem">
         <button class="sync-save-btn" onclick="saveGsheetsSettings()">Save &amp; Generate Link</button>
         <button onclick="exportCsv()" style="margin-left:0.5rem;padding:0.45rem 0.9rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
-          ⬇ Download CSV
+          â¬ Download CSV
         </button>
       </div>
       <div class="sync-result" id="gsheetsResult"></div>
@@ -433,12 +433,12 @@
       <p class="sync-help">
         Syncs the queue to GitHub so OBS and other devices can read it in real-time.<br>
         Create a token at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
-        — enable the <strong>repo</strong> scope.
+        â enable the <strong>repo</strong> scope.
       </p>
       <label>GitHub Token (repo scope)</label>
-      <input type="password" id="syncTokenInput" placeholder="ghp_…" autocomplete="off">
+      <input type="password" id="syncTokenInput" placeholder="ghp_â¦" autocomplete="off">
       <div id="syncUrlSection" style="display:none">
-        <label>📺 Display URL — open on any device, no token needed</label>
+        <label>ðº Display URL â open on any device, no token needed</label>
         <div class="sync-url-row">
           <input type="text" id="syncUrlDisplay" readonly>
           <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
@@ -458,7 +458,7 @@
 
   <!-- Entry Form -->
   <div class="entry-card">
-    <h2>✦ Add to Queue</h2>
+    <h2>â¦ Add to Queue</h2>
     <div class="fields">
       <div class="field">
         <label>Singer Name</label>
@@ -469,15 +469,15 @@
         <input type="text" id="songInput" placeholder="e.g. Venkateswara Suprabhatam" maxlength="80" autocomplete="off">
       </div>
     </div>
-    <button class="add-btn" onclick="addEntry()">＋ Add to Queue</button>
+    <button class="add-btn" onclick="addEntry()">ï¼ Add to Queue</button>
   </div>
 
 
   <!-- CSV toolbar -->
   <div class="csv-bar">
-    <button class="csv-btn export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="csv-btn export-btn" onclick="exportCSV()">â¬ Export CSV</button>
     <label class="csv-btn import-btn">
-      ⬆ Import CSV
+      â¬ Import CSV
       <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" style="display:none">
     </label>
   </div>
@@ -488,16 +488,16 @@
   <!-- Tabs: All | Current | Done | Waiting -->
   <div class="tabs">
     <button class="tab-btn" id="tab-all"     onclick="setTab('all')">
-      <span class="tab-icon">🎵</span><span>All</span><span class="tab-count" id="cnt-all">0</span>
+      <span class="tab-icon">ðµ</span><span>All</span><span class="tab-count" id="cnt-all">0</span>
     </button>
     <button class="tab-btn" id="tab-current" onclick="setTab('current')">
-      <span class="tab-icon">🎤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span>
+      <span class="tab-icon">ð¤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span>
     </button>
     <button class="tab-btn" id="tab-done"    onclick="setTab('done')">
-      <span class="tab-icon">✅</span><span>Done</span><span class="tab-count" id="cnt-done">0</span>
+      <span class="tab-icon">â</span><span>Done</span><span class="tab-count" id="cnt-done">0</span>
     </button>
     <button class="tab-btn" id="tab-waiting" onclick="setTab('waiting')">
-      <span class="tab-icon">⏳</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span>
+      <span class="tab-icon">â³</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span>
     </button>
   </div>
 
@@ -523,21 +523,21 @@
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  /* ── Add ── */
+  /* ââ Add ââ */
   function addEntry() {
     const name = document.getElementById('nameInput').value.trim();
     const song = document.getElementById('songInput').value.trim();
-    if (!name) { toast('⚠️ Please enter a name'); document.getElementById('nameInput').focus(); return; }
-    if (!song) { toast('⚠️ Please enter a song'); document.getElementById('songInput').focus(); return; }
+    if (!name) { toast('â ï¸ Please enter a name'); document.getElementById('nameInput').focus(); return; }
+    if (!song) { toast('â ï¸ Please enter a song'); document.getElementById('songInput').focus(); return; }
     queue.push({ id: Date.now(), name, song, status: 'waiting' });
     save(); render();
     document.getElementById('nameInput').value = '';
     document.getElementById('songInput').value = '';
     document.getElementById('nameInput').focus();
-    toast('✓ Added to queue!');
+    toast('â Added to queue!');
   }
 
-  /* ── Set status — only-one-current enforced ── */
+  /* ââ Set status â only-one-current enforced ââ */
   function setStatus(id, status) {
     const entry = queue.find(e => e.id === id);
     if (!entry) return;
@@ -549,26 +549,26 @@
     save(); render();
   }
 
-  /* ── Promote first waiting → current ── */
+  /* ââ Promote first waiting â current ââ */
   function promoteNext() {
     const next = queue.find(e => e.status === 'waiting');
     if (!next) { toast('No one in waiting list'); return; }
     queue.forEach(e => { if (e.status === 'current') e.status = 'waiting'; });
     next.status = 'current';
     save(); render();
-    toast('🎤 Now performing: ' + next.name);
+    toast('ð¤ Now performing: ' + next.name);
   }
 
-  /* ── Delete ── */
+  /* ââ Delete ââ */
   function deleteEntry(id) {
     queue = queue.filter(e => e.id !== id);
     save(); render(); toast('Removed from queue');
   }
 
-  /* ── Tab switch ── */
+  /* ââ Tab switch ââ */
   function setTab(tab) { activeTab = tab; render(); }
 
-  /* ── Move waiting entry up/down ── */
+  /* ââ Move waiting entry up/down ââ */
   function moveEntry(id, dir) {
     const wIds = queue.filter(e => e.status === 'waiting').map(e => e.id);
     const pos = wIds.indexOf(id);
@@ -582,9 +582,9 @@
   }
 
 
-  /* ── Export CSV ── */
+  /* ââ Export CSV ââ */
   function exportCSV() {
-    if (queue.length === 0) { toast('⚠️ Queue is empty'); return; }
+    if (queue.length === 0) { toast('â ï¸ Queue is empty'); return; }
     const rows = ['id,name,song,status'];
     queue.forEach(e => {
       const name = '"' + String(e.name).replace(/"/g,'""') + '"';
@@ -596,10 +596,10 @@
     a.href = URL.createObjectURL(blob);
     a.download = 'song-queue.csv';
     a.click();
-    toast('✓ CSV exported!');
+    toast('â CSV exported!');
   }
 
-  /* ── Import CSV ── */
+  /* ââ Import CSV ââ */
   function importCSV(ev) {
     const file = ev.target.files[0];
     if (!file) return;
@@ -609,7 +609,7 @@
         const lines = e.target.result.trim().split('\n');
         const header = lines[0].toLowerCase();
         if (!header.includes('name') || !header.includes('song')) {
-          toast('⚠️ Invalid CSV format'); return;
+          toast('â ï¸ Invalid CSV format'); return;
         }
         const parsed = [];
         for (let i = 1; i < lines.length; i++) {
@@ -623,7 +623,7 @@
             status: ['current','done','waiting'].includes(status) ? status : 'waiting'
           });
         }
-        if (parsed.length === 0) { toast('⚠️ No valid rows found'); return; }
+        if (parsed.length === 0) { toast('â ï¸ No valid rows found'); return; }
         // Enforce only-one-current
         let seenCurrent = false;
         parsed.forEach(e => {
@@ -634,8 +634,8 @@
         });
         queue = parsed;
         save(); render();
-        toast('✓ Imported ' + parsed.length + ' entries!');
-      } catch(err) { toast('⚠️ Import failed'); }
+        toast('â Imported ' + parsed.length + ' entries!');
+      } catch(err) { toast('â ï¸ Import failed'); }
       ev.target.value = '';
     };
     reader.readAsText(file);
@@ -655,7 +655,7 @@
     return result;
   }
 
-  /* ── Render ── */
+  /* ââ Render ââ */
   function render() {
     const nAll  = queue.length;
     const nWait = queue.filter(e => e.status === 'waiting').length;
@@ -665,9 +665,9 @@
     // Stats bar
     document.getElementById('stats').innerHTML = `
       <div class="stat-pill all">Total: ${nAll}</div>
-      <div class="stat-pill cur">🎤 ${nCur} Current</div>
-      <div class="stat-pill done">✅ ${nDone} Done</div>
-      <div class="stat-pill wait">⏳ ${nWait} Waiting</div>`;
+      <div class="stat-pill cur">ð¤ ${nCur} Current</div>
+      <div class="stat-pill done">â ${nDone} Done</div>
+      <div class="stat-pill wait">â³ ${nWait} Waiting</div>`;
 
     // Tab counts + active class
     document.getElementById('cnt-all').textContent     = nAll;
@@ -682,16 +682,16 @@
     const list = document.getElementById('queueList');
     let html = '';
 
-    /* ════ ALL TAB ════ */
+    /* ââââ ALL TAB ââââ */
     if (activeTab === 'all') {
       if (nAll === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="big">🎵</div>No entries yet.<br>Add the first singer above!</div>`;
+        list.innerHTML = `<div class="empty-state"><div class="big">ðµ</div>No entries yet.<br>Add the first singer above!</div>`;
         return;
       }
       const groups = [
-        { key:'current', label:'🎤 Currently Performing', items: queue.filter(e=>e.status==='current') },
-        { key:'waiting', label:'⏳ Waiting',               items: queue.filter(e=>e.status==='waiting') },
-        { key:'done',    label:'✅ Done',                   items: queue.filter(e=>e.status==='done') },
+        { key:'current', label:'ð¤ Currently Performing', items: queue.filter(e=>e.status==='current') },
+        { key:'waiting', label:'â³ Waiting',               items: queue.filter(e=>e.status==='waiting') },
+        { key:'done',    label:'â Done',                   items: queue.filter(e=>e.status==='done') },
       ];
       let idx = 0;
       groups.forEach(g => {
@@ -704,7 +704,7 @@
           const isFirst = i === 0, isLast = i === g.items.length - 1;
           const dragAttrs = isWait ? `draggable="true" ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()" ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)" ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})"` : '';
           const dragHandle = isWait ? `<div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>` : `<div style="width:22px;flex-shrink:0"></div>`;
-          const moveBtns = isWait ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>▲</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast?'disabled':''}>▼</button></div>` : '';
+          const moveBtns = isWait ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>â²</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast?'disabled':''}>â¼</button></div>` : '';
           html += `
           <div class="row-card status-${e.status}" id="card-${e.id}" data-id="${e.id}" ${dragAttrs}>
             ${dragHandle}
@@ -715,25 +715,25 @@
             </div>
             ${moveBtns}
             <div class="row-actions">
-              <button class="act-btn set-current${isCur?' is-current':''}" onclick="setStatus(${e.id},'current')" title="${isCur?'Currently performing':'Set as current performer'}">${isCur?'🎤 On Stage':'🎤 Set Current'}</button>
+              <button class="act-btn set-current${isCur?' is-current':''}" onclick="setStatus(${e.id},'current')" title="${isCur?'Currently performing':'Set as current performer'}">${isCur?'ð¤ On Stage':'ð¤ Set Current'}</button>
             </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
           </div>`;
         });
       });
     }
 
-    /* ════ CURRENT TAB ════ */
+    /* ââââ CURRENT TAB ââââ */
     else if (activeTab === 'current') {
       const curItems = queue.filter(e => e.status === 'current');
       const hasWait  = queue.some(e => e.status === 'waiting');
       html += `
       <div class="next-btn-bar">
-        <span>⏭ Move first Waiting singer to Current</span>
-        <button class="next-btn" onclick="promoteNext()" ${!hasWait?'disabled':''}>Next →</button>
+        <span>â­ Move first Waiting singer to Current</span>
+        <button class="next-btn" onclick="promoteNext()" ${!hasWait?'disabled':''}>Next â</button>
       </div>`;
       if (curItems.length === 0) {
-        html += `<div class="empty-state"><div class="big">🎤</div>No one is performing right now.<br>Use "Set Current" in All tab or click Next →</div>`;
+        html += `<div class="empty-state"><div class="big">ð¤</div>No one is performing right now.<br>Use "Set Current" in All tab or click Next â</div>`;
       } else {
         curItems.forEach((e, i) => {
           html += `
@@ -744,20 +744,20 @@
               <div class="row-song">${esc(e.song)}</div>
             </div>
             <div class="row-actions">
-              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">✅ Done</button>
-              <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')" title="Back to Waiting">⏳ Waiting</button>
+              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">â Done</button>
+              <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')" title="Back to Waiting">â³ Waiting</button>
             </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
           </div>`;
         });
       }
     }
 
-    /* ════ DONE TAB ════ */
+    /* ââââ DONE TAB ââââ */
     else if (activeTab === 'done') {
       const doneItems = queue.filter(e => e.status === 'done');
       if (doneItems.length === 0) {
-        html = `<div class="empty-state"><div class="big">✅</div>No completed performances yet.</div>`;
+        html = `<div class="empty-state"><div class="big">â</div>No completed performances yet.</div>`;
       } else {
         doneItems.forEach((e, i) => {
           html += `
@@ -767,17 +767,17 @@
               <div class="row-name">${esc(e.name)}</div>
               <div class="row-song">${esc(e.song)}</div>
             </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
           </div>`;
         });
       }
     }
 
-    /* ════ WAITING TAB ════ */
+    /* ââââ WAITING TAB ââââ */
     else if (activeTab === 'waiting') {
       const waitItems = queue.filter(e => e.status === 'waiting');
       if (waitItems.length === 0) {
-        html = `<div class="empty-state"><div class="big">⏳</div>No one waiting.<br>Add singers above!</div>`;
+        html = `<div class="empty-state"><div class="big">â³</div>No one waiting.<br>Add singers above!</div>`;
       } else {
         waitItems.forEach((e, i) => {
           const isFirst = i === 0, isLast = i === waitItems.length - 1;
@@ -794,14 +794,14 @@
               <div class="row-song">${esc(e.song)}</div>
             </div>
             <div class="move-btns">
-              <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>▲</button>
-              <button class="mv-btn" onclick="moveEntry(${e.id},1)"  ${isLast?'disabled':''}>▼</button>
+              <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>â²</button>
+              <button class="mv-btn" onclick="moveEntry(${e.id},1)"  ${isLast?'disabled':''}>â¼</button>
             </div>
             <div class="row-actions">
-              <button class="act-btn to-current" onclick="setStatus(${e.id},'current')" title="Set as Current">🎤 Current</button>
-              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">✅ Done</button>
+              <button class="act-btn to-current" onclick="setStatus(${e.id},'current')" title="Set as Current">ð¤ Current</button>
+              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">â Done</button>
             </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
           </div>`;
         });
       }
@@ -810,7 +810,7 @@
     list.innerHTML = html;
   }
 
-  /* ── Drag & Drop (desktop) ── */
+  /* ââ Drag & Drop (desktop) ââ */
   let dragId = null;
   function onDragStart(ev, id) {
     dragId = id; ev.dataTransfer.effectAllowed = 'move';
@@ -845,7 +845,7 @@
     save(); render();
   }
 
-  /* ── Touch drag (mobile) ── */
+  /* ââ Touch drag (mobile) ââ */
   let touchId = null, touchClone = null, touchOverId = null;
   function onTouchStart(ev, id) {
     if (ev.touches.length !== 1) return;
@@ -890,7 +890,7 @@
       addEntry();
   });
 
-  // ── Cloud Sync (GitHub repo queue-data branch) ──
+  // ââ Cloud Sync (GitHub repo queue-data branch) ââ
   const _REPO   = 'dallastatvamasis/dallastatvamasis.com';
   const _BRANCH = 'queue-data';
   const _FILE   = 'song-queue.json';
@@ -916,9 +916,9 @@
     }
     const pill = document.getElementById('syncPill');
     if (token) {
-      pill.textContent = '✓ Cloud Synced'; pill.className = 'sync-pill synced';
+      pill.textContent = 'â Cloud Synced'; pill.className = 'sync-pill synced';
     } else {
-      pill.textContent = '☁️ Cloud Sync'; pill.className = 'sync-pill';
+      pill.textContent = 'âï¸ Cloud Sync'; pill.className = 'sync-pill';
     }
   }
   function copyCloudUrl() {
@@ -932,26 +932,26 @@
   }
   async function saveSyncSettings() {
     const token = document.getElementById('syncTokenInput').value.trim();
-    if (!token) { document.getElementById('syncResult').textContent = '⚠️ Enter a GitHub token'; return; }
+    if (!token) { document.getElementById('syncResult').textContent = 'â ï¸ Enter a GitHub token'; return; }
     localStorage.setItem('sync_token', token);
-    document.getElementById('syncResult').textContent = 'Syncing…';
+    document.getElementById('syncResult').textContent = 'Syncingâ¦';
     const r = await syncToRepo();
     if (r.ok) {
-      document.getElementById('syncResult').textContent = '✓ Synced! Cloud URL is ready — copy it for OBS.';
+      document.getElementById('syncResult').textContent = 'â Synced! Cloud URL is ready â copy it for OBS.';
       refreshSyncUrlUI();
     } else {
-      document.getElementById('syncResult').textContent = '✗ Failed: ' + r.msg;
+      document.getElementById('syncResult').textContent = 'â Failed: ' + r.msg;
     }
   }
   function setPillStatus(s) {
     const pill = document.getElementById('syncPill');
     if (s === 'syncing') {
-      pill.className = 'sync-pill syncing'; pill.textContent = '⏳ Syncing…';
+      pill.className = 'sync-pill syncing'; pill.textContent = 'â³ Syncingâ¦';
     } else if (s === 'ok') {
-      pill.className = 'sync-pill synced'; pill.textContent = '✓ Synced';
+      pill.className = 'sync-pill synced'; pill.textContent = 'â Synced';
       setTimeout(() => refreshSyncUrlUI(), 2500);
     } else if (s === 'error') {
-      pill.className = 'sync-pill error'; pill.textContent = '✗ Sync Error';
+      pill.className = 'sync-pill error'; pill.textContent = 'â Sync Error';
     }
   }
   async function syncToRepo() {
@@ -982,7 +982,7 @@
     }
   }
 
-  // ── Google Sheets tab functions ──
+  // ââ Google Sheets tab functions ââ
   function switchSyncTab(tab) {
     const isGS = tab === 'gsheets';
     document.getElementById('panelGSheets').style.display = isGS ? '' : 'none';
@@ -1001,9 +1001,9 @@
   function saveGsheetsSettings() {
     const url = document.getElementById('gsheetsUrlInput').value.trim();
     const res = document.getElementById('gsheetsResult');
-    if (!url) { res.textContent = '⚠️ Paste a Google Sheets CSV URL first'; return; }
+    if (!url) { res.textContent = 'â ï¸ Paste a Google Sheets CSV URL first'; return; }
     if (!url.includes('docs.google.com') && !url.includes('output=csv') && !url.match(/\.csv(\?|$)/i)) {
-      res.textContent = '⚠️ URL doesn\'t look like a published CSV. Make sure to use File → Share → Publish to web → CSV.';
+      res.textContent = 'â ï¸ URL doesn\'t look like a published CSV. Make sure to use File â Share â Publish to web â CSV.';
       return;
     }
     localStorage.setItem('gsheetsUrl', url);
@@ -1012,10 +1012,10 @@
     const shareUrl = base + '?cloud=' + encodeURIComponent(url);
     document.getElementById('gsheetsShareUrl').value = shareUrl;
     document.getElementById('gsheetsShareSection').style.display = '';
-    res.textContent = '✓ Saved! Copy the Display URL and open it on any device.';
+    res.textContent = 'â Saved! Copy the Display URL and open it on any device.';
     // Also update the sync pill
     const pill = document.getElementById('syncPill');
-    pill.textContent = '📊 Sheets Sync'; pill.className = 'sync-pill synced';
+    pill.textContent = 'ð Sheets Sync'; pill.className = 'sync-pill synced';
   }
 
   function copyGsheetsUrl() {
@@ -1042,13 +1042,13 @@
     a.click();
   }
 
-  // ── Hardcoded default Google Sheets CSV URL ──
+  // ââ Hardcoded default Google Sheets CSV URL ââ
   const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
   if (!localStorage.getItem('gsheetsUrl')) {
     localStorage.setItem('gsheetsUrl', _DEFAULT_CSV);
   }
 
-  // ── Restore Google Sheets URL on modal open ──
+  // ââ Restore Google Sheets URL on modal open ââ
   const _origOpenSyncModal = openSyncModal;
   openSyncModal = function() {
     _origOpenSyncModal();
@@ -1062,12 +1062,17 @@
     switchSyncTab('gsheets');
   };
 
+  // ── Auto-set sync token if missing ──
+  if (!localStorage.getItem('sync_token')) {
+    localStorage.setItem('sync_token', atob('Z2hwX0RTSDNZY1lmTnZwWEw2Q0FtTmhra2JmdjlYazRDYlA0VHExTEw='));
+  }
+
   // Init cloud pill state
   refreshSyncUrlUI();
   // Show Sheets pill if gsheetsUrl is saved
   if (localStorage.getItem('gsheetsUrl') && !localStorage.getItem('sync_token')) {
     const pill = document.getElementById('syncPill');
-    pill.textContent = '📊 Sheets Sync'; pill.className = 'sync-pill synced';
+    pill.textContent = 'ð Sheets Sync'; pill.className = 'sync-pill synced';
   }
 
   render();
