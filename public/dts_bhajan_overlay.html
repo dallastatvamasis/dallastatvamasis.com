@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <title>DTS Temple – Bhajan Overlay</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      width: 1920px; height: 1080px;
+      background: transparent;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────────────── */
+    #header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 72px;
+      background: linear-gradient(90deg, rgba(139,0,0,0.92) 0%, rgba(180,50,0,0.92) 50%, rgba(139,0,0,0.92) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border-bottom: 3px solid #FFD700;
+    }
+
+    #temple-name {
+      font-size: 32px;
+      font-weight: 700;
+      color: #FFD700;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
+    }
+
+    #header-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    #clock {
+      font-size: 26px;
+      font-weight: 600;
+      color: #FFF8DC;
+      letter-spacing: 1px;
+    }
+
+    #refresh-indicator {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 1px;
+    }
+
+    /* ─── CURRENT SINGER PANEL ───────────────────────────────── */
+    #current-panel {
+      position: absolute;
+      left: 40px;
+      bottom: 40px;
+      width: 740px;
+      background: linear-gradient(135deg, rgba(10,10,10,0.90) 0%, rgba(30,10,0,0.90) 100%);
+      border: 2px solid #FFD700;
+      border-radius: 16px;
+      padding: 30px 38px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,215,0,0.2);
+    }
+
+    #current-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFD700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #current-label::before {
+      content: '';
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #00FF88;
+      box-shadow: 0 0 8px #00FF88;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    #current-name {
+      font-size: 56px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.1;
+      text-shadow: 2px 2px 12px rgba(255,165,0,0.4);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #current-bhajan {
+      font-size: 22px;
+      color: #FFA040;
+      font-style: italic;
+      white-space: nowraw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ─── NEXT UP PANEL ──────────────────────────────────────── */
+    #next-panel {
+      position: absolute;
+      right: 40px;
+      bottom: 40px;
+      width: 460px;
+      background: rgba(10,10,10,0.84);
+      border: 2px solid rgba(255,215,0,0.45);
+      border-radius: 16px;
+      padding: 26px 30px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    #next-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFD700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255,215,0,0.25);
+      padding-bottom: 10px;
+    }
+
+    .next-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .next-item:last-child { margin-bottom: 0; }
+
+    .next-number {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.12);
+      border: 1px solid rgba(255,215,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      color: #FFD700; flex-shrink: 0;
+    }
+
+    .next-name {
+      font-size: 23px;
+      font-weight: 600;
+      color: #F0E0C0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .next-bhajan {
+      font-size: 14px;
+      color: rgba(255,160,64,0.7);
+      font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ─── DONE BANNER ────────────────────────────────────────── */
+    #done-banner {
+      display: none;
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 740px;
+      background: rgba(0,60,0,0.88);
+      border: 2px solid #00FF88;
+      border-radius: 16px;
+      padding: 28px 38px;
+      font-size: 34px;
+      font-weight: 700;
+      color: #00FF88;
+      text-align: center;
+    }
+
+    /* ─── REFRESH PROGRESS BAR ───────────────────────────────── */
+    #refresh-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+    }
+    #refresh-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FFD700, #FF6600);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .placeholder { color: rgba(255,255,255,0.28); font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="temple-name">🕉 DTS Temple – Bhajan Seva</div>
+    <div id="header-right">
+      <div id="refresh-indicator">⟳ refreshing...</div>
+      <div id="clock">--:-- --</div>
+    </div>
+  </div>
+
+  <!-- CURRENT SINGER -->
+  <div id="current-panel">
+    <div id="current-label">Now Singing</div>
+    <div id="current-name" class="placeholder">Loading…</div>
+    <div id="current-bhajan"></div>
+  </div>
+
+  <!-- DONE BANNER -->
+  <div id="done-banner">🙏 Bhajan Seva Complete – Jai Shri Ram! 🙏</div>
+
+  <!-- NEXT UP -->
+  <div id="next-panel">
+    <div id="next-label">⬆ Up Next</div>
+    <div id="next-list"></div>
+  </div>
+
+  <!-- REFRESH BAR -->
+  <div id="refresh-bar"><div id="refresh-fill"></div></div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    //  GOOGLE SHEET CSV URL
+    // ═══════════════════════════════════════════════════════════
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ79WyZ37n5W32k3hh4Wm2zJTDwY33LfmRywQlm3rV5j-nd3PodPPAGe6ubQPP_GV4TR3Xc6AptL_y3/pub?output=csv";
+
+    // ─── Column names — matches your sheet exactly ────────────
+    const COL_NAME   = "Name";
+    const COL_BHAJAN = "Song";     // your sheet uses "Song"
+    const COL_STATUS = "Status";   // values: Current / Waiting / Done
+
+    // ─── How many "Up Next" to show ───────────────────────────
+    const NEXT_COUNT = 3;
+
+    // ─── Auto-refresh interval (milliseconds) ─────────────────
+    const REFRESH_MS = 15000; // 15 seconds
+
+    // ─── Done message ─────────────────────────────────────────
+    const DONE_MESSAGE = "🙏 Bhajan Seva Complete – Jai Shri Ram! 🙏";
+
+    // ══════════════════════════════════════════════════════════
+    // Clock
+    // ══════════════════════════════════════════════════════════
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours(), m = now.getMinutes();
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      document.getElementById("clock").textContent =
+        `${h}:${String(m).padStart(2,"0")} ${ampm}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ══════════════════════════════════════════════════════════
+    // Refresh progress bar
+    // ══════════════════════════════════════════════════════════
+    function startProgressBar() {
+      const fill = document.getElementById("refresh-fill");
+      fill.style.transition = "none";
+      fill.style.width = "100%";
+      setTimeout(() => {
+        fill.style.transition = `width ${REFRESH_MS / 1000}s linear`;
+        fill.style.width = "0%";
+      }, 100);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Parse CSV text → array of row objects
+    // ══════════════════════════════════════════════════════════
+    function parseCSV(text) {
+      const lines = text.trim().split("\n");
+      if (lines.length < 2) return [];
+      const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+      return lines.slice(1).map(line => {
+        const vals = line.split(",").map(v => v.trim().replace(/^"|"$/g, ""));
+        const obj  = {};
+        headers.forEach((h, i) => obj[h] = vals[i] || "");
+        return obj;
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Find column key case-insensitively
+    // ══════════════════════════════════════════════════════════
+    function findCol(row, name) {
+      if (!name) return "";
+      const key = Object.keys(row).find(k => k.trim().toLowerCase() === name.trim().toLowerCase());
+      return key ? (row[key] || "") : "";
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Render overlay — Status based (Current / Waiting / Done)
+    // ══════════════════════════════════════════════════════════
+    function renderOverlay(rows) {
+      const validRows = rows.filter(r => findCol(r, COL_NAME).trim() !== "");
+      const current   = validRows.find(r => findCol(r, COL_STATUS).trim().toLowerCase() === "current") || null;
+      const nextOnes  = validRows.filter(r => findCol(r, COL_STATUS).trim().toLowerCase() === "waiting").slice(0, NEXT_COUNT);
+      const allDone   = validRows.length > 0 && !current &&
+                        validRows.every(r => {
+                          const s = findCol(r, COL_STATUS).trim().toLowerCase();
+                          return s === "done" || s === "";
+                        });
+
+      // Current panel vs Done banner
+      document.getElementById("current-panel").style.display = current  ? "block" : "none";
+      document.getElementById("done-banner").style.display   = allDone  ? "block" : "none";
+      if (allDone) document.getElementById("done-banner").textContent = DONE_MESSAGE;
+
+      // Current singer
+      if (current) {
+        const nameEl = document.getElementById("current-name");
+        nameEl.textContent = findCol(current, COL_NAME) || "—";
+        nameEl.classList.remove("placeholder");
+        document.getElementById("current-bhajan").textContent =
+          COL_BHAJAN ? findCol(current, COL_BHAJAN) : "";
+      }
+
+      // Next list
+      const listEl = document.getElementById("next-list");
+      listEl.innerHTML = "";
+      if (nextOnes.length === 0) {
+        listEl.innerHTML = '<div class="placeholder" style="font-size:16px;">No upcoming singers</div>';
+      } else {
+        nextOnes.forEach((row, i) => {
+          const item = document.createElement("div");
+          item.className = "next-item";
+          const bhajan = COL_BHAJAN ? findCol(row, COL_BHAJAN) : "";
+          item.innerHTML = `
+            <div class="next-number">${i + 1}</div>
+            <div>
+              <div class="next-name">${findCol(row, COL_NAME) || "—"}</div>
+              ${bhajan ? `<div class="next-bhajan">${bhajan}</div>` : ""}
+            </div>`;
+          listEl.appendChild(item);
+        });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Fetch from Google Sheet & refresh
+    // Tries direct first, then CORS proxy as fallback
+    // ══════════════════════════════════════════════════════════
+    const CORS_PROXY = "https://corsproxy.io/?";
+
+    async function tryFetch(url) {
+      const fetchOpts = {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
+      };
+
+      // 1st attempt: direct (works in OBS)
+      try {
+        const res = await fetch(url, fetchOpts);
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.includes(",")) return text; // valid CSV
+        }
+      } catch (e) { /* fall through to proxy */ }
+
+      // 2nd attempt: via CORS proxy (fallback for local browser)
+      try {
+        const res2 = await fetch(CORS_PROXY + encodeURIComponent(url), fetchOpts);
+        if (res2.ok) return await res2.text();
+      } catch (e) { /* fall through */ }
+
+      throw new Error("All fetch attempts failed");
+    }
+
+    async function fetchAndRender() {
+      const indicator = document.getElementById("refresh-indicator");
+      indicator.textContent = "⟳ refreshing…";
+
+      try {
+        const text = await tryFetch(SHEET_CSV_URL);
+        const rows = parseCSV(text);
+        renderOverlay(rows);
+        indicator.textContent = "✅ live";
+        setTimeout(() => { indicator.textContent = ""; }, 2000);
+      } catch (err) {
+        console.warn("Sheet fetch failed:", err);
+        indicator.textContent = "⚠️ offline";
+      }
+
+      startProgressBar();
+    }
+
+    // ── Start + repeat every 15 seconds ───────────────────────
+    fetchAndRender();
+    setInterval(fetchAndRender, REFRESH_MS);
+
+    // ── Full page reload every 5 minutes (keeps OBS fresh) ────
+    setTimeout(() => location.reload(), 5 * 60 * 1000);
+  </script>
+</body>
+</html>
