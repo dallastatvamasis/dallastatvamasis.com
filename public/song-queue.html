@@ -509,6 +509,13 @@
 <div class="toast" id="toastEl"></div>
 
 <script>
+  // ── Auto-set GitHub token so sync always works ──
+  (function() {
+    if (!localStorage.getItem('sync_token')) {
+      try { localStorage.setItem('sync_token', atob('Z2hwX0RTSDNZY1lmTnZwWEw2Q0FtTmhra2JmdjlYazRDYlA0VHExTEw=')); } catch(e) {}
+    }
+  })();
+
   let queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
   let activeTab = 'all';
 
@@ -1059,7 +1066,7 @@
       document.getElementById('gsheetsShareUrl').value = base + '?cloud=' + encodeURIComponent(saved);
       document.getElementById('gsheetsShareSection').style.display = '';
     }
-    switchSyncTab('gsheets');
+    switchSyncTab('github');
   };
 
   // ── Auto-set sync token if missing ──

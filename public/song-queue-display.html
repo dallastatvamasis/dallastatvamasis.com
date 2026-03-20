@@ -273,6 +273,27 @@
   .cloud-set-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
   .cloud-set-btn.active { border-color: #4AE080; color: #4AE080; background: rgba(74,224,128,0.08); }
 
+  /* ── Settings toggle & panel ── */
+  .settings-toggle {
+    position: fixed; top: 0.85rem; right: 0.85rem; z-index: 200;
+    background: rgba(16,8,0,0.82); border: 1.5px solid rgba(232,103,26,0.22);
+    border-radius: 50%; width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.92rem; opacity: 0.35;
+    transition: all 0.22s; backdrop-filter: blur(6px); color: var(--text);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .settings-toggle:hover, .settings-toggle.open {
+    opacity: 1; border-color: var(--saffron);
+    box-shadow: 0 0 12px var(--saffron-glow);
+  }
+  .settings-panel {
+    overflow: hidden; max-height: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+    opacity: 0;
+  }
+  .settings-panel.open { max-height: 320px; opacity: 1; }
+
   /* ── No data ── */
   .no-data {
     text-align: center; padding: 3rem 1rem; color: var(--muted);
@@ -293,26 +314,32 @@
   <div class="source-bar" id="sourceBar"></div>
 </header>
 
-<!-- Cloud URL input -->
-<div class="cloud-row">
-  <input class="cloud-input" type="url" id="cloudUrlInput"
-    placeholder="☁️ Paste Google Sheets CSV URL or any public CSV link to sync across devices"
-    oninput="onCloudUrlInput(this.value)">
-  <button class="cloud-set-btn" id="cloudSetBtn" onclick="toggleCloud()">Connect</button>
-</div>
+<!-- Gear settings button (always visible but subtle) -->
+<button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()" title="Settings">⚙</button>
 
-<!-- CSV Upload -->
-<div class="upload-zone">
-  <div class="upload-drop" id="dropZone">
-    <input type="file" id="csvInput" accept=".csv" onchange="handleFile(event)">
-    <div class="upload-icon">📂</div>
-    <div class="upload-title">Load CSV File</div>
-    <div class="upload-hint">Drop a <span>song-queue.csv</span> here · also syncs to OBS overlay</div>
+<!-- Settings panel (hidden when auto-connected to cloud) -->
+<div class="settings-panel" id="settingsPanel">
+  <!-- Cloud URL input -->
+  <div class="cloud-row">
+    <input class="cloud-input" type="url" id="cloudUrlInput"
+      placeholder="☁️ GitHub API URL or CSV link"
+      oninput="onCloudUrlInput(this.value)">
+    <button class="cloud-set-btn" id="cloudSetBtn" onclick="toggleCloud()">Connect</button>
   </div>
-  <div class="upload-actions">
-    <button class="upload-action-btn" onclick="reloadCSV()" id="reloadBtn" disabled>↻ Reload Last CSV</button>
-    <button class="upload-action-btn" onclick="useLocalStorage()" id="lsBtn">⚡ Use Live Queue</button>
-    <button class="upload-action-btn danger" onclick="clearData()" id="clearBtn" disabled>✕ Clear</button>
+
+  <!-- CSV Upload -->
+  <div class="upload-zone">
+    <div class="upload-drop" id="dropZone">
+      <input type="file" id="csvInput" accept=".csv" onchange="handleFile(event)">
+      <div class="upload-icon">📂</div>
+      <div class="upload-title">Load CSV File</div>
+      <div class="upload-hint">Drop a <span>song-queue.csv</span> here · also syncs to OBS overlay</div>
+    </div>
+    <div class="upload-actions">
+      <button class="upload-action-btn" onclick="reloadCSV()" id="reloadBtn" disabled>↻ Reload Last CSV</button>
+      <button class="upload-action-btn" onclick="useLocalStorage()" id="lsBtn">⚡ Use Live Queue</button>
+      <button class="upload-action-btn danger" onclick="clearData()" id="clearBtn" disabled>✕ Clear</button>
+    </div>
   </div>
 </div>
 
@@ -560,11 +587,14 @@
     const main    = document.getElementById('main');
 
     if (queue.length === 0) {
+      const hint = dataSource === 'cloud'
+        ? 'Queue is empty — add singers from the Manager page.'
+        : 'Click ⚙ to connect to a Cloud URL, or load a CSV file.';
       main.innerHTML = `
         <div class="no-data">
           <div class="nd-icon">🎵</div>
           <h3>No Queue Data</h3>
-          <p>Paste a <strong>Cloud URL</strong> above to sync across devices,<br>or load a <strong>song-queue.csv</strong> file,<br>or click <strong>Use Live Queue</strong> (same browser only).</p>
+          <p>${hint}</p>
         </div>`;
       return;
     }
@@ -671,11 +701,27 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ── Settings panel toggle ──
+  function toggleSettings() {
+    const panel  = document.getElementById('settingsPanel');
+    const toggle = document.getElementById('settingsToggle');
+    const isOpen = panel.classList.toggle('open');
+    toggle.classList.toggle('open', isOpen);
+    toggle.textContent = isOpen ? '✕' : '⚙';
+  }
+
   // Init
   updateButtons();
   if (cloudUrl) {
+    // Auto-connected — keep settings panel hidden for clean display
     fetchCloud().then(() => { updateButtons(); renderBoard(); });
   } else {
+    // Not connected — show settings so user can connect
+    const panel  = document.getElementById('settingsPanel');
+    const toggle = document.getElementById('settingsToggle');
+    panel.classList.add('open');
+    toggle.classList.add('open');
+    toggle.textContent = '✕';
     renderBoard();
   }
   setInterval(updateCountdown, 1000);
