@@ -34,3 +34,452 @@
 
   /* ── PANEL ── */
   .panel { position: absolute; bottom: 0; left: 0; right: 0; }
+
+  /* fade from transparent */
+  .panel-fade {
+    height: 60px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+  }
+
+  /* ── MAIN INFO ROW ── */
+  .main-row {
+    background: rgba(0, 0, 0, 0.88);
+    border-top: 3px solid #FF6B1A;
+    padding: 22px 60px;
+    display: flex; align-items: center; gap: 0;
+  }
+
+  /* LEFT – current singer */
+  .singer-block {
+    flex: 0 0 580px;
+    display: flex; align-items: center; gap: 18px;
+    padding-right: 48px;
+    border-right: 2px solid rgba(255,107,26,0.4);
+  }
+  .s-icon {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0;
+  }
+  .s-mic { font-size: 34px; }
+  .s-tag {
+    font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; color: #FF8C42;
+    white-space: nowrap;
+  }
+  .s-divider {
+    width: 1px; height: 64px; flex-shrink: 0;
+    background: linear-gradient(180deg, transparent, rgba(255,107,26,0.5), transparent);
+  }
+  .s-text { flex: 1; min-width: 0; }
+  .s-name {
+    font-family: 'Cinzel', serif; font-size: 50px; font-weight: 700;
+    color: #FFFFFF;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.1; letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .s-name.anim { animation: nameIn 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes nameIn { from{opacity:0;transform:translateX(-14px)} to{opacity:1;transform:translateX(0)} }
+  .s-song {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 24px; font-weight: 500;
+    color: #FFB366;
+    margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .s-song::before { content: '♪  '; font-style: normal; font-size: 18px; }
+  .s-empty {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 28px; color: rgba(255,255,255,0.3);
+  }
+
+  /* CENTER – event title */
+  .event-block {
+    flex: 1; text-align: center; padding: 0 44px; min-width: 0;
+  }
+  .e-eyebrow {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.32em; text-transform: uppercase;
+    color: rgba(255,179,102,0.7); margin-bottom: 7px;
+  }
+  .e-title {
+    font-family: 'Cinzel', serif; font-size: 40px; font-weight: 700;
+    letter-spacing: 0.06em; color: #FFD166;
+    line-height: 1.1; white-space: nowrap;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+  }
+  .e-month {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 22px; font-weight: 500;
+    color: rgba(255,209,102,0.65); margin-top: 5px; letter-spacing: 0.1em;
+  }
+
+  /* RIGHT – date & time */
+  .dt-block {
+    flex: 0 0 320px;
+    text-align: right;
+    padding-left: 48px;
+    border-left: 2px solid rgba(255,107,26,0.4);
+  }
+  .dt-time-row { display: flex; align-items: baseline; justify-content: flex-end; gap: 6px; }
+  .dt-time {
+    font-family: 'Cinzel', serif; font-size: 46px; font-weight: 700;
+    color: #FFFFFF; letter-spacing: 0.04em; line-height: 1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .dt-ampm {
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600;
+    color: #FF8C42; letter-spacing: 0.12em; padding-bottom: 5px;
+  }
+  .dt-sep { height: 1px; margin: 6px 0 5px; background: rgba(255,107,26,0.4); }
+  .dt-date {
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    color: #FFB366; letter-spacing: 0.08em;
+  }
+
+  /* ── DIVIDER RULE ── */
+  .rule {
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,107,26,0.4) 8%,
+      #FF6B1A 22%,
+      #FFD166 50%,
+      #FF6B1A 78%,
+      rgba(255,107,26,0.4) 92%,
+      transparent 100%);
+    position: relative;
+  }
+  .rule::before {
+    content: '◆'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 9px; color: #FFD166;
+    text-shadow: 0 0 8px rgba(255,200,80,0.9);
+  }
+
+  /* ── UP NEXT ROW ── */
+  .up-row {
+    background: rgba(0,0,0,0.92);
+    padding: 10px 60px 12px;
+    display: flex; align-items: center; min-height: 74px; overflow: hidden;
+  }
+  .up-label {
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: #FF8C42; white-space: nowrap;
+    margin-right: 26px; flex-shrink: 0;
+  }
+  .up-list { display: flex; align-items: center; flex: 1; min-width: 0; }
+  .up-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 30px 0 0;
+    animation: upFade 0.4s ease both;
+  }
+  @keyframes upFade { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  .up-item + .up-item {
+    border-left: 1px solid rgba(255,107,26,0.3);
+    padding-left: 30px;
+  }
+  .up-num {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+    width: 22px; text-align: center; flex-shrink: 0;
+  }
+  .up-item.first  .up-num { color: #FFD166; }
+  .up-item.second .up-num { color: rgba(255,180,80,0.6); }
+  .up-info { min-width: 0; }
+  .up-name {
+    font-family: 'Cinzel', serif; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
+  }
+  .up-item.first  .up-name { color: #FFFFFF; font-size: 28px; }
+  .up-item.second .up-name { color: rgba(255,255,255,0.65); font-size: 23px; }
+  .up-song {
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px;
+    margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .up-song::before { content: '♪ '; font-style: normal; font-size: 12px; }
+  .up-item.first  .up-song { color: #FFB366; }
+  .up-item.second .up-song { color: rgba(255,150,80,0.55); }
+  .up-more {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+    color: rgba(255,140,50,0.5); letter-spacing: 0.06em;
+    margin-left: 22px; white-space: nowrap; flex-shrink: 0;
+  }
+  .up-empty {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 16px; color: rgba(255,255,255,0.25);
+  }
+
+  /* ── UP-ROW STATS (right side of up-next row) ── */
+  .up-stats {
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0; margin-left: 24px;
+    border-left: 1px solid rgba(255,107,26,0.2);
+    padding-left: 24px;
+  }
+  .ustat {
+    display: flex; align-items: center; gap: 7px;
+    padding: 0 20px 0 0; margin-right: 20px;
+    border-right: 1px solid rgba(255,107,26,0.18);
+  }
+  .ustat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+  .ustat-icon  { font-size: 14px; line-height: 1; }
+  .ustat-label {
+    font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,150,60,0.5); white-space: nowrap;
+  }
+  .ustat-val {
+    font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;
+    white-space: nowrap; line-height: 1;
+  }
+  .ustat-of {
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.35);
+  }
+  .ustat.done    .ustat-val { color: #4AE080; }
+  .ustat.waiting .ustat-val { color: #FFB366; }
+
+  /* refresh mini inside up-stats */
+  .ustat.refresh { gap: 8px; }
+  .br-track {
+    width: 70px; height: 4px; border-radius: 4px;
+    background: rgba(255,255,255,0.08); overflow: hidden;
+  }
+  .br-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, #FF6B1A, #FFD166);
+    transition: width 0.9s linear; width: 100%;
+  }
+  .br-sec {
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    color: #FF8C42; min-width: 18px; text-align: right;
+  }
+
+  /* ── BOTTOM BAR (just watermark + progress line) ── */
+  .bottom-bar {
+    background: rgba(0,0,0,0.97);
+    border-top: 1px solid rgba(255,107,26,0.15);
+    padding: 0 60px;
+    display: flex; align-items: center;
+    height: 28px; overflow: hidden;
+    position: relative;
+  }
+  .prog-line {
+    position: absolute; top: 0; left: 0; height: 2px;
+    background: linear-gradient(90deg, #FF6B1A, #FFD166);
+    transition: width 0.9s linear; width: 100%;
+  }
+  .bar-center {
+    flex: 1; text-align: center;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(255,150,60,0.38); white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- Watermark -->
+<div class="watermark">
+  <div class="wm-main">DTS Media Live</div>
+  <div class="wm-sub">Dallas Tatvamasi Sangam</div>
+</div>
+
+<!-- Panel -->
+<div class="panel">
+  <div class="panel-fade"></div>
+
+  <!-- Main row: Singer | Event | DateTime -->
+  <div class="main-row">
+
+    <!-- LEFT: Current singer (only shown once here) -->
+    <div class="singer-block">
+      <div class="s-icon">
+        <div class="s-mic">🎤</div>
+        <div class="s-tag">Now</div>
+      </div>
+      <div class="s-divider"></div>
+      <div class="s-text" id="singerText">
+        <div class="s-empty">Waiting to begin…</div>
+      </div>
+    </div>
+
+    <!-- CENTER: Event title -->
+    <div class="event-block">
+      <div class="e-eyebrow">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
+      <div class="e-title">Ayyappan Monthly Poojai</div>
+      <div class="e-month" id="eventMonth"></div>
+    </div>
+
+    <!-- RIGHT: Date & time -->
+    <div class="dt-block">
+      <div class="dt-time-row">
+        <div class="dt-time" id="dtTime">--:--</div>
+        <div class="dt-ampm" id="dtAmPm">--</div>
+      </div>
+      <div class="dt-sep"></div>
+      <div class="dt-date" id="dtDate">--- --, ----</div>
+    </div>
+
+  </div>
+
+  <!-- Divider -->
+  <div class="rule"></div>
+
+  <!-- Up Next row — with stats pills and refresh on right -->
+  <div class="up-row">
+    <div class="up-label">Up Next</div>
+    <div class="up-list" id="upList">
+      <div class="up-empty">Queue is empty</div>
+    </div>
+    <div class="up-stats">
+      <div class="ustat done">
+        <span class="ustat-icon">✅</span>
+        <span class="ustat-label">Done</span>
+        <span class="ustat-val"><span id="statDone">0</span><span class="ustat-of" id="statDoneOf">/0</span></span>
+      </div>
+      <div class="ustat waiting">
+        <span class="ustat-icon">⏳</span>
+        <span class="ustat-label">Waiting</span>
+        <span class="ustat-val" id="statWait">0</span>
+      </div>
+      <div class="ustat refresh">
+        <div class="br-track"><div class="br-fill" id="progFill"></div></div>
+        <span class="br-sec" id="refreshSec">10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom strip -->
+  <div class="bottom-bar">
+    <div class="prog-line" id="progLine"></div>
+    <div class="bar-center">DTS Media Live &nbsp;·&nbsp; Swamy Saranam</div>
+  </div>
+
+</div>
+
+<script>
+  const REFRESH_SEC = 10;
+  let lastHash = '', countdown = REFRESH_SEC;
+
+  // ── Cloud sync: read ?cloud=URL&token=TOKEN from address bar ──
+  const _params  = new URLSearchParams(location.search);
+  const CLOUD_URL = (_params.get('cloud') || '').trim();
+  const CLOUD_TOKEN = (_params.get('token') || '').trim();
+  let _cloudData = null;
+
+  async function fetchCloud() {
+    if (!CLOUD_URL) return;
+    try {
+      const token = CLOUD_TOKEN || localStorage.getItem('sync_token') || '';
+      const sep = CLOUD_URL.includes('?') ? '&' : '?';
+      const headers = { 'Accept': 'application/vnd.github.v3+json' };
+      if (token) headers['Authorization'] = 'token ' + token;
+      const res = await fetch(CLOUD_URL + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        // GitHub Contents API returns base64-encoded content
+        _cloudData = data.content
+          ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
+          : data; // fallback for plain JSON
+      }
+    } catch(e) { /* keep last data on failure */ }
+  }
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const WDAYS  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  function updateClock() {
+    const n = new Date();
+    let h = n.getHours(), m = n.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('dtTime').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    document.getElementById('dtAmPm').textContent = ap;
+    document.getElementById('dtDate').textContent =
+      WDAYS[n.getDay()] + ', ' + MONTHS[n.getMonth()] + ' ' + n.getDate() + ', ' + n.getFullYear();
+    document.getElementById('eventMonth').textContent =
+      MONTHS[n.getMonth()] + ' ' + n.getFullYear();
+  }
+
+  function loadQueue() {
+    if (CLOUD_URL && _cloudData !== null) return _cloudData;
+    try { return JSON.parse(localStorage.getItem('songQueue') || '[]'); }
+    catch { return []; }
+  }
+
+  function refresh() {
+    const q = loadQueue();
+    const cur   = q.filter(e => e.status === 'current');
+    const wait  = q.filter(e => e.status === 'waiting');
+    const done  = q.filter(e => e.status === 'done');
+    const total = q.length;
+    // Always update stats (no early return)
+    document.getElementById('statDone').textContent   = done.length;
+    document.getElementById('statDoneOf').textContent = '/' + total;
+    document.getElementById('statWait').textContent   = wait.length;
+    // Only re-render queue if data changed
+    const h = JSON.stringify(q);
+    if (h === lastHash) return;
+    lastHash = h;
+    renderSinger(cur[0] || null);
+    renderUpcoming(wait.slice(0, 2), wait.length);
+  }
+
+  function renderSinger(e) {
+    const el = document.getElementById('singerText');
+    if (!e) {
+      el.innerHTML = '<div class="s-empty">Waiting to begin\u2026</div>';
+      return;
+    }
+    el.innerHTML =
+      '<div class="s-name anim">' + esc(e.name) + '</div>' +
+      '<div class="s-song">' + esc(e.song) + '</div>';
+  }
+
+  function renderUpcoming(up, total) {
+    const el = document.getElementById('upList');
+    if (!up.length) {
+      el.innerHTML = '<div class="up-empty">No one queued</div>';
+      return;
+    }
+    let html = up.map((e, i) =>
+      '<div class="up-item ' + (i === 0 ? 'first' : 'second') + '" style="animation-delay:' + (i * 0.1) + 's">' +
+        '<div class="up-num">' + (i + 1) + '</div>' +
+        '<div class="up-info">' +
+          '<div class="up-name">' + esc(e.name) + '</div>' +
+          '<div class="up-song">' + esc(e.song) + '</div>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+    const more = total - up.length;
+    if (more > 0) html += '<div class="up-more">+' + more + ' more</div>';
+    el.innerHTML = html;
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function tick() {
+    updateClock();
+    countdown--;
+    if (countdown <= 0) {
+      countdown = REFRESH_SEC;
+      if (CLOUD_URL) { fetchCloud().then(refresh); } else { refresh(); }
+    }
+    const pct = Math.max(0, (countdown / REFRESH_SEC) * 100);
+    document.getElementById('progFill').style.width  = pct + '%';
+    document.getElementById('progLine').style.width  = pct + '%';
+    document.getElementById('refreshSec').textContent = countdown;
+  }
+
+  updateClock();
+  if (CLOUD_URL) { fetchCloud().then(refresh); } else { refresh(); }
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
