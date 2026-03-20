@@ -26,6 +26,7 @@
     --waiting-border: #7090D0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     background: var(--deep);
     color: var(--text);
@@ -35,6 +36,7 @@
       radial-gradient(ellipse 80% 40% at 50% -10%, rgba(232,103,26,0.20) 0%, transparent 70%),
       radial-gradient(ellipse 40% 30% at 90% 80%, rgba(212,160,23,0.08) 0%, transparent 60%);
   }
+
   header {
     text-align: center;
     padding: 1.6rem 1rem 1rem;
@@ -56,7 +58,10 @@
     background-clip: text;
   }
   header p { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
+
   .main { max-width: 680px; margin: 0 auto; padding: 1.2rem 0.9rem 4rem; }
+
+  /* Entry Form */
   .entry-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -86,18 +91,20 @@
   }
   .field input::placeholder { color: var(--muted); opacity: 0.55; }
   .field input:focus { border-color: var(--saffron); box-shadow: 0 0 0 3px var(--saffron-glow); }
-  .add-btn, .sync-save-btn, .next-btn {
-    background: linear-gradient(135deg, var(--saffron), var(--gold));
-    color: #1A0F00; border: none; font-family: 'DM Sans', sans-serif; font-weight: 700;
-    cursor: pointer; transition: opacity 0.18s, transform 0.12s;
-  }
   .add-btn {
-    width: 100%; margin-top: 0.85rem; font-size: 0.92rem;
+    width: 100%; margin-top: 0.85rem;
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: #1A0F00; font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem; font-weight: 700; border: none;
     border-radius: 11px; padding: 0.75rem 1rem;
+    cursor: pointer; letter-spacing: 0.03em;
+    transition: opacity 0.18s, transform 0.12s;
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
   }
-  .add-btn:hover, .sync-save-btn:hover, .next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-  .add-btn:active, .sync-save-btn:active, .next-btn:active { transform: translateY(0); }
+  .add-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .add-btn:active { transform: translateY(0); }
+
+  /* Stats */
   .stats { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
   .stat-pill {
     flex: 1; min-width: 65px; border-radius: 30px;
@@ -105,9 +112,11 @@
     font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; border: 1.5px solid;
   }
   .stat-pill.all  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
-  .stat-pill.cur  { background: var(--current-bg); border-color: var(--current-border); color: var(--gold-light); }
-  .stat-pill.done { background: var(--done-bg); border-color: var(--done-border); color: #7DDB95; }
-  .stat-pill.wait { background: var(--waiting-bg); border-color: var(--waiting-border); color: #9AB4EE; }
+  .stat-pill.cur  { background: var(--current-bg);   border-color: var(--current-border); color: var(--gold-light); }
+  .stat-pill.done { background: var(--done-bg);       border-color: var(--done-border); color: #7DDB95; }
+  .stat-pill.wait { background: var(--waiting-bg);    border-color: var(--waiting-border); color: #9AB4EE; }
+
+  /* Tabs */
   .tabs {
     display: grid; grid-template-columns: repeat(4, 1fr);
     background: var(--surface); border-radius: 12px;
@@ -115,10 +124,13 @@
     margin-bottom: 1.1rem;
   }
   .tab-btn {
-    background: transparent; border: none; color: var(--muted);
-    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
-    padding: 0.6rem 0.2rem; cursor: pointer; transition: all 0.18s; letter-spacing: 0.02em;
-    border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: transparent; border: none;
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem; font-weight: 600;
+    padding: 0.6rem 0.2rem; cursor: pointer;
+    transition: all 0.18s; letter-spacing: 0.02em;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
   }
   .tab-btn:last-child { border-right: none; }
   .tab-btn .tab-icon { font-size: 1rem; }
@@ -126,37 +138,59 @@
     font-size: 0.62rem; background: rgba(255,255,255,0.08);
     border-radius: 10px; padding: 0 5px; min-width: 16px; text-align: center;
   }
-  .tab-btn.active-all { background: var(--saffron-glow); color: var(--saffron-light); }
-  .tab-btn.active-current { background: var(--current-bg); color: var(--gold-light); }
-  .tab-btn.active-done { background: var(--done-bg); color: #7DDB95; }
-  .tab-btn.active-waiting { background: var(--waiting-bg); color: #9AB4EE; }
+  .tab-btn.active-all     { background: var(--saffron-glow); color: var(--saffron-light); }
+  .tab-btn.active-current { background: var(--current-bg);   color: var(--gold-light); }
+  .tab-btn.active-done    { background: var(--done-bg);       color: #7DDB95; }
+  .tab-btn.active-waiting { background: var(--waiting-bg);    color: #9AB4EE; }
+
+  /* Queue list */
   .queue-list { display: flex; flex-direction: column; gap: 0.55rem; }
+
   .empty-state {
-    text-align: center; padding: 2.5rem 1rem; color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+    text-align: center; padding: 2.5rem 1rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
   }
   .empty-state .big { font-size: 2.2rem; margin-bottom: 0.4rem; }
+
   .section-label {
-    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted); padding: 0.3rem 0; margin-top: 0.3rem; display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 0.3rem 0; margin-top: 0.3rem;
+    display: flex; align-items: center; gap: 0.5rem;
   }
   .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Row card */
   .row-card {
-    background: var(--card); border: 1.5px solid var(--border); border-radius: 13px;
-    padding: 0.75rem 0.85rem; display: flex; align-items: center; gap: 0.6rem;
-    transition: border-color 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+    padding: 0.75rem 0.85rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.22s ease;
+    position: relative; overflow: hidden;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
   .row-card::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 4px 0 0 4px;
-    background: var(--waiting-border); transition: background 0.3s;
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    border-radius: 4px 0 0 4px; background: var(--waiting-border); transition: background 0.3s;
   }
   .row-card.status-current::before { background: var(--gold); }
-  .row-card.status-done::before { background: var(--done-border); }
+  .row-card.status-done::before    { background: var(--done-border); }
   .row-card.status-current {
     border-color: rgba(212,160,23,0.4);
     background: linear-gradient(to right, var(--current-bg), var(--card));
   }
-  .row-card.status-done { border-color: rgba(76,175,106,0.25); opacity: 0.78; }
-  .row-num { font-size: 0.68rem; color: var(--muted); font-weight: 700; min-width: 18px; text-align: center; }
+  .row-card.status-done { border-color: rgba(76,175,106,0.25); opacity: 0.72; }
+  .row-card.dragging    { opacity: 0.38; border-color: var(--saffron) !important; }
+  .row-card.drag-over   { border-color: var(--gold) !important; box-shadow: 0 -3px 0 0 var(--gold); }
+
+  .row-num { font-size: 0.68rem; color: var(--muted); font-weight: 700; min-width: 18px; text-align: center; flex-shrink: 0; }
+
   .row-info { flex: 1; min-width: 0; }
   .row-name {
     font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--text);
@@ -167,136 +201,262 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .row-song::before { content: '♪ '; }
+
+  /* Action buttons */
   .row-actions { display: flex; gap: 0.28rem; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
   .act-btn {
-    border: 1.5px solid; border-radius: 8px; background: transparent; font-size: 0.66rem; font-weight: 700;
-    letter-spacing: 0.02em; padding: 0.27rem 0.48rem; cursor: pointer; transition: all 0.15s;
+    border: 1.5px solid; border-radius: 8px; background: transparent;
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 0.27rem 0.48rem; cursor: pointer; transition: all 0.15s;
     font-family: 'DM Sans', sans-serif; white-space: nowrap;
   }
-  .act-btn.to-current, .act-btn.set-current { border-color: var(--current-border); color: var(--gold-light); }
-  .act-btn.to-current:hover, .act-btn.set-current:hover { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
-  .act-btn.to-done { border-color: var(--done-border); color: #7DDB95; }
+  .act-btn.to-current { border-color: var(--current-border); color: var(--gold-light); }
+  .act-btn.to-current:hover { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
+  .act-btn.to-done    { border-color: var(--done-border); color: #7DDB95; }
   .act-btn.to-done:hover { background: var(--done-border); color: #1A0F00; }
   .act-btn.to-waiting { border-color: var(--waiting-border); color: #9AB4EE; }
   .act-btn.to-waiting:hover { background: var(--waiting-border); color: #1A0F00; }
+
+  /* All-tab set-current toggle */
+  .act-btn.set-current { border-color: var(--current-border); color: var(--gold-light); padding: 0.27rem 0.6rem; }
   .act-btn.set-current.is-current { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
-  .move-btns { display: flex; flex-direction: column; gap: 2px; }
+  .act-btn.set-current:hover:not(.is-current) { background: var(--saffron-glow); }
+
+  /* Drag handle */
+  .drag-handle {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 0.22rem 0.15rem;
+    cursor: grab; flex-shrink: 0; opacity: 0.35; transition: opacity 0.15s; touch-action: none;
+  }
+  .drag-handle:hover { opacity: 0.85; }
+  .drag-handle span { display: block; width: 15px; height: 2px; background: var(--saffron-light); border-radius: 2px; }
+
+  /* Move up/down */
+  .move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
   .mv-btn {
-    background: var(--surface); border: 1.5px solid var(--border); color: var(--muted);
-    font-size: 0.62rem; border-radius: 5px; padding: 0.14rem 0.35rem; cursor: pointer; line-height: 1;
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); font-size: 0.62rem; border-radius: 5px;
+    padding: 0.14rem 0.35rem; cursor: pointer; line-height: 1; transition: all 0.15s;
   }
   .mv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
   .mv-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
+
+  /* Del */
   .del-btn {
-    background: none; border: none; color: #7a3a2a; font-size: 0.88rem; cursor: pointer; padding: 0.2rem;
-    border-radius: 6px; transition: color 0.15s;
+    background: none; border: none; color: #7a3a2a;
+    font-size: 0.88rem; cursor: pointer; padding: 0.2rem;
+    border-radius: 6px; transition: color 0.15s; flex-shrink: 0;
   }
   .del-btn:hover { color: #E04030; }
+
+  /* Current tab — Next banner */
   .next-btn-bar {
-    background: var(--current-bg); border: 1.5px solid var(--current-border); border-radius: 12px;
-    padding: 0.7rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    background: var(--current-bg); border: 1.5px solid var(--current-border);
+    border-radius: 12px; padding: 0.7rem 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
     margin-bottom: 0.7rem;
   }
   .next-btn-bar span { font-size: 0.78rem; color: var(--gold-light); }
-  .next-btn { border-radius: 9px; font-size: 0.78rem; padding: 0.48rem 0.9rem; white-space: nowrap; }
+  .next-btn {
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: #1A0F00; border: none; border-radius: 9px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
+    padding: 0.48rem 0.9rem; cursor: pointer; white-space: nowrap;
+    transition: opacity 0.15s, transform 0.1s; flex-shrink: 0;
+  }
+  .next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
   .next-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
-  .csv-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+
+  @media (max-width: 380px) {
+    .act-btn { font-size: 0.6rem; padding: 0.22rem 0.35rem; }
+    .row-card { gap: 0.4rem; padding: 0.65rem 0.55rem; }
+  }
+
+
+  /* CSV toolbar */
+  .csv-bar {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem;
+  }
   .csv-btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: var(--surface);
-    border: 1.5px solid var(--border); color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem; font-weight: 600; border-radius: 10px; padding: 0.52rem 0.7rem; cursor: pointer;
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600; border-radius: 10px;
+    padding: 0.52rem 0.7rem; cursor: pointer; letter-spacing: 0.03em;
+    transition: all 0.18s;
   }
   .csv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .export-btn:hover { border-color: var(--done-border); color: #7DDB95; background: var(--done-bg); }
+  .import-btn:hover { border-color: var(--waiting-border); color: #9AB4EE; background: var(--waiting-bg); }
+  /* ── Cloud Sync ── */
   .sync-pill {
-    display: inline-flex; align-items: center; gap: 0.4rem; background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 20px; padding: 0.28rem 0.8rem; font-size: 0.7rem; font-weight: 600; cursor: pointer;
-    color: var(--muted); transition: all 0.2s; margin-top: 0.45rem; font-family: 'DM Sans', sans-serif;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 0.28rem 0.8rem;
+    font-size: 0.7rem; font-weight: 600; cursor: pointer;
+    color: var(--muted); transition: all 0.2s; margin-top: 0.45rem;
+    font-family: 'DM Sans', sans-serif;
   }
   .sync-pill:hover { border-color: var(--saffron); color: var(--saffron-light); }
   .sync-pill.synced { border-color: #4AE080; color: #4AE080; }
   .sync-pill.syncing { border-color: var(--gold); color: var(--gold-light); animation: syncPulse 1s infinite; }
   .sync-pill.error { border-color: #E04030; color: #E04030; }
   @keyframes syncPulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+
   .sync-modal-bg {
-    display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(4px); align-items: center; justify-content: center;
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
   }
   .sync-modal-bg.open { display: flex; }
   .sync-modal {
-    background: var(--card); border: 1.5px solid var(--border); border-radius: 18px;
-    padding: 1.5rem; max-width: 460px; width: calc(100% - 2rem); box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 18px; padding: 1.5rem; max-width: 420px; width: calc(100% - 2rem);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
   }
-  .sync-modal h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--saffron-light); margin-bottom: 0.3rem; }
-  .sync-help { font-size: 0.72rem; color: var(--muted); line-height: 1.55; margin-bottom: 0.9rem; }
+  .sync-modal h3 {
+    font-family: 'Playfair Display', serif; font-size: 1.05rem;
+    color: var(--saffron-light); margin-bottom: 0.3rem;
+  }
+  .sync-modal .sync-help {
+    font-size: 0.72rem; color: var(--muted); line-height: 1.55; margin-bottom: 0.9rem;
+  }
+  .sync-modal .sync-help a { color: var(--saffron-light); }
   .sync-modal label {
-    display: block; font-size: 0.67rem; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 0.28rem; margin-top: 0.8rem;
+    display: block; font-size: 0.67rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.28rem; margin-top: 0.8rem;
   }
-  .sync-modal input[type="password"], .sync-modal input[type="text"] {
-    width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 9px;
-    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; padding: 0.52rem 0.8rem; outline: none;
+  .sync-modal input[type="password"],
+  .sync-modal input[type="text"] {
+    width: 100%; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 9px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; padding: 0.52rem 0.8rem; outline: none;
+    transition: border-color 0.2s;
   }
   .sync-modal input:focus { border-color: var(--saffron); }
   .sync-url-row { display: flex; gap: 0.4rem; margin-top: 0.35rem; }
   .sync-url-row input { font-size: 0.72rem; color: var(--saffron-light); flex: 1; }
-  .copy-url-btn, .sync-close-btn {
-    background: var(--surface); border: 1.5px solid var(--border); color: var(--muted); border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+  .copy-url-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem; padding: 0 0.75rem; cursor: pointer; white-space: nowrap;
+    transition: all 0.15s;
   }
-  .copy-url-btn { font-size: 0.72rem; padding: 0 0.75rem; white-space: nowrap; }
-  .sync-close-btn { font-size: 0.88rem; font-weight: 600; padding: 0.62rem 1rem; width: 100%; margin-top: 0.8rem; }
-  .copy-url-btn:hover, .sync-close-btn:hover { border-color: var(--saffron); color: var(--saffron-light); }
+  .copy-url-btn:hover { border-color: var(--saffron); color: var(--saffron-light); }
   .sync-modal-btns { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
-  .sync-save-btn { flex: 1; border-radius: 10px; font-size: 0.88rem; padding: 0.62rem; }
+  .sync-save-btn {
+    flex: 1; background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: #1A0F00; border: none; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700;
+    padding: 0.62rem; cursor: pointer; transition: opacity 0.15s;
+  }
+  .sync-save-btn:hover { opacity: 0.88; }
+  .sync-close-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 600; padding: 0.62rem 1rem; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sync-close-btn:hover { border-color: var(--saffron); color: var(--saffron-light); }
   .sync-result { font-size: 0.73rem; color: var(--muted); margin-top: 0.55rem; min-height: 1.1rem; }
+
+  /* Toast */
   .toast {
-    position: fixed; bottom: 1.4rem; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--saffron); color: #1A0F00; font-weight: 700; font-size: 0.82rem; padding: 0.58rem 1.2rem;
-    border-radius: 30px; box-shadow: 0 4px 20px rgba(232,103,26,0.4); opacity: 0;
-    transition: opacity 0.22s, transform 0.22s; pointer-events: none; z-index: 9999; white-space: nowrap;
+    position: fixed; bottom: 1.4rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--saffron); color: #1A0F00;
+    font-weight: 700; font-size: 0.82rem;
+    padding: 0.58rem 1.2rem; border-radius: 30px;
+    box-shadow: 0 4px 20px rgba(232,103,26,0.4);
+    opacity: 0; transition: opacity 0.22s, transform 0.22s;
+    pointer-events: none; z-index: 9999; white-space: nowrap;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
+
 <header>
   <div class="logo">🎵</div>
   <h1>Song Queue Manager</h1>
-  <p>Add singers &amp; songs · Load and sync with GitHub JSON + CSV</p>
-  <button class="sync-pill" id="syncPill" onclick="openSyncModal()">☁️ GitHub Sync</button>
+  <p>Add singers &amp; songs · Manage performance order</p>
+  <button class="sync-pill" id="syncPill" onclick="openSyncModal()">☁️ Cloud Sync</button>
 </header>
 
+<!-- Cloud Sync Modal -->
 <div class="sync-modal-bg" id="syncModalBg" onclick="if(event.target===this)closeSyncModal()">
   <div class="sync-modal">
-    <h3>☁️ GitHub Sync</h3>
-    <p class="sync-help">
-      This version loads queue data from GitHub raw JSON on page open and saves both JSON and CSV back to GitHub.<br>
-      Repo: <strong>dallastatvamasis/dallastatvamasis.com</strong><br>
-      Branch: <strong>queue-data</strong>
-    </p>
-    <label>GitHub Token</label>
-    <input type="password" id="syncTokenInput" placeholder="Fine-grained token with Contents: Read and write" autocomplete="off">
-    <div id="syncUrlSection" style="display:none">
-      <label>Raw JSON URL</label>
-      <div class="sync-url-row">
-        <input type="text" id="syncUrlDisplay" readonly>
-        <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
-      </div>
-      <label>Raw CSV URL</label>
-      <div class="sync-url-row">
-        <input type="text" id="syncCsvUrlDisplay" readonly>
-        <button class="copy-url-btn" onclick="copyCsvUrl()">Copy</button>
-      </div>
+    <h3>☁️ Cloud Sync</h3>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:0.4rem;margin-bottom:1rem">
+      <button id="tabGSheets" onclick="switchSyncTab('gsheets')"
+        style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--saffron);background:var(--saffron);color:#1a0a00;font-weight:700;cursor:pointer;font-size:0.82rem">
+        📊 Google Sheets
+      </button>
+      <button id="tabGitHub" onclick="switchSyncTab('github')"
+        style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
+        🐙 GitHub (advanced)
+      </button>
     </div>
-    <div class="sync-modal-btns">
-      <button class="sync-save-btn" onclick="saveSyncSettings()">Save Token &amp; Sync Now</button>
+
+    <!-- Google Sheets panel -->
+    <div id="panelGSheets">
+      <p class="sync-help">
+        1. Create a <strong>Google Sheet</strong> with columns: <code>name, song, status</code><br>
+        2. <strong>File → Share → Publish to web</strong> → Sheet1 → CSV → Publish<br>
+        3. Paste the published CSV link below. Then share the Display URL with any device — no tokens needed!
+      </p>
+      <label>Google Sheets Published CSV URL</label>
+      <input type="text" id="gsheetsUrlInput" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv"
+        style="width:100%;box-sizing:border-box">
+      <div id="gsheetsShareSection" style="display:none;margin-top:0.8rem">
+        <label>📺 Shareable Display URL — open on any device, no setup needed</label>
+        <div class="sync-url-row">
+          <input type="text" id="gsheetsShareUrl" readonly>
+          <button class="copy-url-btn" onclick="copyGsheetsUrl()">Copy</button>
+        </div>
+      </div>
+      <div style="margin-top:0.6rem">
+        <button class="sync-save-btn" onclick="saveGsheetsSettings()">Save &amp; Generate Link</button>
+        <button onclick="exportCsv()" style="margin-left:0.5rem;padding:0.45rem 0.9rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
+          ⬇ Download CSV
+        </button>
+      </div>
+      <div class="sync-result" id="gsheetsResult"></div>
     </div>
-    <div class="sync-result" id="syncResult"></div>
-    <button class="sync-close-btn" onclick="closeSyncModal()">Close</button>
+
+    <!-- GitHub panel -->
+    <div id="panelGitHub" style="display:none">
+      <p class="sync-help">
+        Syncs the queue to GitHub so OBS and other devices can read it in real-time.<br>
+        Create a token at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
+        — enable the <strong>repo</strong> scope.
+      </p>
+      <label>GitHub Token (repo scope)</label>
+      <input type="password" id="syncTokenInput" placeholder="ghp_…" autocomplete="off">
+      <div id="syncUrlSection" style="display:none">
+        <label>📺 Display URL — open on any device, no token needed</label>
+        <div class="sync-url-row">
+          <input type="text" id="syncUrlDisplay" readonly>
+          <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
+        </div>
+      </div>
+      <div class="sync-modal-btns">
+        <button class="sync-save-btn" onclick="saveSyncSettings()">Save &amp; Sync Now</button>
+      </div>
+      <div class="sync-result" id="syncResult"></div>
+    </div>
+
+    <button class="sync-close-btn" onclick="closeSyncModal()" style="margin-top:0.8rem;width:100%">Close</button>
   </div>
 </div>
 
 <div class="main">
+
+  <!-- Entry Form -->
   <div class="entry-card">
     <h2>✦ Add to Queue</h2>
     <div class="fields">
@@ -312,204 +472,103 @@
     <button class="add-btn" onclick="addEntry()">＋ Add to Queue</button>
   </div>
 
+
+  <!-- CSV toolbar -->
   <div class="csv-bar">
-    <button class="csv-btn" onclick="exportCSV()">⬇ Export CSV</button>
-    <label class="csv-btn">
+    <button class="csv-btn export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <label class="csv-btn import-btn">
       ⬆ Import CSV
       <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" style="display:none">
     </label>
   </div>
 
+  <!-- Stats -->
   <div class="stats" id="stats"></div>
 
+  <!-- Tabs: All | Current | Done | Waiting -->
   <div class="tabs">
-    <button class="tab-btn" id="tab-all" onclick="setTab('all')"><span class="tab-icon">🎵</span><span>All</span><span class="tab-count" id="cnt-all">0</span></button>
-    <button class="tab-btn" id="tab-current" onclick="setTab('current')"><span class="tab-icon">🎤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span></button>
-    <button class="tab-btn" id="tab-done" onclick="setTab('done')"><span class="tab-icon">✅</span><span>Done</span><span class="tab-count" id="cnt-done">0</span></button>
-    <button class="tab-btn" id="tab-waiting" onclick="setTab('waiting')"><span class="tab-icon">⏳</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span></button>
+    <button class="tab-btn" id="tab-all"     onclick="setTab('all')">
+      <span class="tab-icon">🎵</span><span>All</span><span class="tab-count" id="cnt-all">0</span>
+    </button>
+    <button class="tab-btn" id="tab-current" onclick="setTab('current')">
+      <span class="tab-icon">🎤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span>
+    </button>
+    <button class="tab-btn" id="tab-done"    onclick="setTab('done')">
+      <span class="tab-icon">✅</span><span>Done</span><span class="tab-count" id="cnt-done">0</span>
+    </button>
+    <button class="tab-btn" id="tab-waiting" onclick="setTab('waiting')">
+      <span class="tab-icon">⏳</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span>
+    </button>
   </div>
 
+  <!-- Queue -->
   <div class="queue-list" id="queueList"></div>
+
 </div>
 
 <div class="toast" id="toastEl"></div>
 
 <script>
-  const _REPO = 'dallastatvamasis/dallastatvamasis.com';
-  const _BRANCH = 'queue-data';
-  const _JSON_FILE = 'song-queue.json';
-  const _CSV_FILE = 'song-queue.csv';
-
-  let queue = [];
+  let queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
   let activeTab = 'all';
 
-  function getJsonRawUrl() {
-    return `https://raw.githubusercontent.com/${_REPO}/${_BRANCH}/${_JSON_FILE}`;
-  }
-
-  function getCsvRawUrl() {
-    return `https://raw.githubusercontent.com/${_REPO}/${_BRANCH}/${_CSV_FILE}`;
+  function save() {
+    localStorage.setItem('songQueue', JSON.stringify(queue));
+    if (localStorage.getItem('sync_token')) syncToRepo();
   }
 
   function toast(msg) {
     const t = document.getElementById('toastEl');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  function esc(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function setPillStatus(s) {
-    const pill = document.getElementById('syncPill');
-    if (s === 'syncing') {
-      pill.className = 'sync-pill syncing';
-      pill.textContent = '⏳ Syncing…';
-    } else if (s === 'ok') {
-      pill.className = 'sync-pill synced';
-      pill.textContent = '✓ Synced';
-      setTimeout(() => refreshSyncUrlUI(), 2500);
-    } else if (s === 'error') {
-      pill.className = 'sync-pill error';
-      pill.textContent = '✗ Sync Error';
-    } else {
-      refreshSyncUrlUI();
-    }
-  }
-
-  function refreshSyncUrlUI() {
-    const token = localStorage.getItem('sync_token');
-    const sec = document.getElementById('syncUrlSection');
-    if (token) {
-      sec.style.display = '';
-      document.getElementById('syncUrlDisplay').value = getJsonRawUrl();
-      document.getElementById('syncCsvUrlDisplay').value = getCsvRawUrl();
-    } else {
-      sec.style.display = 'none';
-    }
-    const pill = document.getElementById('syncPill');
-    if (token) {
-      pill.textContent = '✓ GitHub Ready';
-      pill.className = 'sync-pill synced';
-    } else {
-      pill.textContent = '☁️ GitHub Sync';
-      pill.className = 'sync-pill';
-    }
-  }
-
-  function openSyncModal() {
-    document.getElementById('syncTokenInput').value = localStorage.getItem('sync_token') || '';
-    document.getElementById('syncResult').textContent = '';
-    refreshSyncUrlUI();
-    document.getElementById('syncModalBg').classList.add('open');
-  }
-
-  function closeSyncModal() {
-    document.getElementById('syncModalBg').classList.remove('open');
-  }
-
-  function copyCloudUrl() {
-    const v = document.getElementById('syncUrlDisplay').value;
-    if (!v) return;
-    navigator.clipboard.writeText(v).then(() => toast('Copied JSON URL'));
-  }
-
-  function copyCsvUrl() {
-    const v = document.getElementById('syncCsvUrlDisplay').value;
-    if (!v) return;
-    navigator.clipboard.writeText(v).then(() => toast('Copied CSV URL'));
-  }
-
-  function queueToCsv(rows) {
-    const header = ['id', 'name', 'song', 'status'];
-    const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
-    const lines = [header.join(',')];
-    rows.forEach(e => {
-      lines.push([
-        e.id ?? '',
-        escapeCsv(e.name),
-        escapeCsv(e.song),
-        escapeCsv(e.status || 'waiting')
-      ].join(','));
-    });
-    return lines.join('\n');
-  }
-
-  function parseCSVLine(line) {
-    const result = [];
-    let cur = '';
-    let inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (c === '"') {
-        if (inQ && line[i + 1] === '"') {
-          cur += '"';
-          i++;
-        } else {
-          inQ = !inQ;
-        }
-      } else if (c === ',' && !inQ) {
-        result.push(cur);
-        cur = '';
-      } else {
-        cur += c;
-      }
-    }
-    result.push(cur);
-    return result;
-  }
-
-  function save() {
-    localStorage.setItem('songQueue', JSON.stringify(queue));
-    if (localStorage.getItem('sync_token')) {
-      syncToRepo();
-    }
-  }
-
+  /* ── Add ── */
   function addEntry() {
     const name = document.getElementById('nameInput').value.trim();
     const song = document.getElementById('songInput').value.trim();
     if (!name) { toast('⚠️ Please enter a name'); document.getElementById('nameInput').focus(); return; }
     if (!song) { toast('⚠️ Please enter a song'); document.getElementById('songInput').focus(); return; }
     queue.push({ id: Date.now(), name, song, status: 'waiting' });
-    save();
-    render();
+    save(); render();
     document.getElementById('nameInput').value = '';
     document.getElementById('songInput').value = '';
     document.getElementById('nameInput').focus();
-    toast('✓ Added to queue');
+    toast('✓ Added to queue!');
   }
 
+  /* ── Set status — only-one-current enforced ── */
   function setStatus(id, status) {
     const entry = queue.find(e => e.id === id);
     if (!entry) return;
     if (status === 'current') {
+      // Move any existing current back to waiting
       queue.forEach(e => { if (e.id !== id && e.status === 'current') e.status = 'waiting'; });
     }
     entry.status = status;
-    save();
-    render();
+    save(); render();
   }
 
+  /* ── Promote first waiting → current ── */
   function promoteNext() {
     const next = queue.find(e => e.status === 'waiting');
     if (!next) { toast('No one in waiting list'); return; }
     queue.forEach(e => { if (e.status === 'current') e.status = 'waiting'; });
     next.status = 'current';
-    save();
-    render();
+    save(); render();
     toast('🎤 Now performing: ' + next.name);
   }
 
+  /* ── Delete ── */
   function deleteEntry(id) {
     queue = queue.filter(e => e.id !== id);
-    save();
-    render();
-    toast('Removed from queue');
+    save(); render(); toast('Removed from queue');
   }
 
+  /* ── Tab switch ── */
+  function setTab(tab) { activeTab = tab; render(); }
+
+  /* ── Move waiting entry up/down ── */
   function moveEntry(id, dir) {
     const wIds = queue.filter(e => e.status === 'waiting').map(e => e.id);
     const pos = wIds.indexOf(id);
@@ -519,49 +578,53 @@
     const iA = queue.findIndex(e => e.id === wIds[pos]);
     const iB = queue.findIndex(e => e.id === wIds[np]);
     [queue[iA], queue[iB]] = [queue[iB], queue[iA]];
-    save();
-    render();
+    save(); render();
   }
 
-  function setTab(tab) {
-    activeTab = tab;
-    render();
-  }
 
+  /* ── Export CSV ── */
   function exportCSV() {
     if (queue.length === 0) { toast('⚠️ Queue is empty'); return; }
-    const blob = new Blob([queueToCsv(queue)], { type: 'text/csv' });
+    const rows = ['id,name,song,status'];
+    queue.forEach(e => {
+      const name = '"' + String(e.name).replace(/"/g,'""') + '"';
+      const song = '"' + String(e.song).replace(/"/g,'""') + '"';
+      rows.push([e.id, name, song, e.status].join(','));
+    });
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'song-queue.csv';
     a.click();
-    toast('✓ CSV exported');
+    toast('✓ CSV exported!');
   }
 
+  /* ── Import CSV ── */
   function importCSV(ev) {
     const file = ev.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const lines = e.target.result.trim().split(/\r?\n/);
-        const header = (lines[0] || '').toLowerCase();
+        const lines = e.target.result.trim().split('\n');
+        const header = lines[0].toLowerCase();
         if (!header.includes('name') || !header.includes('song')) {
-          toast('⚠️ Invalid CSV format');
-          return;
+          toast('⚠️ Invalid CSV format'); return;
         }
         const parsed = [];
         for (let i = 1; i < lines.length; i++) {
           const cols = parseCSVLine(lines[i]);
           if (cols.length < 3) continue;
-          const status = String(cols[3] || 'waiting').trim().toLowerCase();
+          const status = (cols[3] || 'waiting').trim().toLowerCase();
           parsed.push({
-            id: parseInt(cols[0], 10) || Date.now() + i,
-            name: String(cols[1] || '').trim(),
-            song: String(cols[2] || '').trim(),
-            status: ['current', 'done', 'waiting'].includes(status) ? status : 'waiting'
+            id: parseInt(cols[0]) || Date.now() + i,
+            name: cols[1].trim(),
+            song: cols[2].trim(),
+            status: ['current','done','waiting'].includes(status) ? status : 'waiting'
           });
         }
+        if (parsed.length === 0) { toast('⚠️ No valid rows found'); return; }
+        // Enforce only-one-current
         let seenCurrent = false;
         parsed.forEach(e => {
           if (e.status === 'current') {
@@ -570,50 +633,65 @@
           }
         });
         queue = parsed;
-        save();
-        render();
-        toast('✓ Imported ' + parsed.length + ' entries');
-      } catch (err) {
-        toast('⚠️ Import failed');
-      }
+        save(); render();
+        toast('✓ Imported ' + parsed.length + ' entries!');
+      } catch(err) { toast('⚠️ Import failed'); }
       ev.target.value = '';
     };
     reader.readAsText(file);
   }
 
-  function render() {
-    const nAll = queue.length;
-    const nCur = queue.filter(e => e.status === 'current').length;
-    const nDone = queue.filter(e => e.status === 'done').length;
-    const nWait = queue.filter(e => e.status === 'waiting').length;
+  function parseCSVLine(line) {
+    const result = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+      else cur += c;
+    }
+    result.push(cur);
+    return result;
+  }
 
+  /* ── Render ── */
+  function render() {
+    const nAll  = queue.length;
+    const nWait = queue.filter(e => e.status === 'waiting').length;
+    const nCur  = queue.filter(e => e.status === 'current').length;
+    const nDone = queue.filter(e => e.status === 'done').length;
+
+    // Stats bar
     document.getElementById('stats').innerHTML = `
       <div class="stat-pill all">Total: ${nAll}</div>
       <div class="stat-pill cur">🎤 ${nCur} Current</div>
       <div class="stat-pill done">✅ ${nDone} Done</div>
       <div class="stat-pill wait">⏳ ${nWait} Waiting</div>`;
 
-    document.getElementById('cnt-all').textContent = nAll;
+    // Tab counts + active class
+    document.getElementById('cnt-all').textContent     = nAll;
     document.getElementById('cnt-current').textContent = nCur;
-    document.getElementById('cnt-done').textContent = nDone;
+    document.getElementById('cnt-done').textContent    = nDone;
     document.getElementById('cnt-waiting').textContent = nWait;
-
     ['all','current','done','waiting'].forEach(t => {
-      document.getElementById('tab-' + t).className = 'tab-btn' + (activeTab === t ? ' active-' + t : '');
+      document.getElementById('tab-'+t).className =
+        'tab-btn' + (activeTab === t ? ' active-'+t : '');
     });
 
     const list = document.getElementById('queueList');
     let html = '';
 
+    /* ════ ALL TAB ════ */
     if (activeTab === 'all') {
       if (nAll === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="big">🎵</div>No entries yet.<br>Add the first singer above.</div>`;
+        list.innerHTML = `<div class="empty-state"><div class="big">🎵</div>No entries yet.<br>Add the first singer above!</div>`;
         return;
       }
       const groups = [
-        { label: '🎤 Currently Performing', items: queue.filter(e => e.status === 'current') },
-        { label: '⏳ Waiting', items: queue.filter(e => e.status === 'waiting') },
-        { label: '✅ Done', items: queue.filter(e => e.status === 'done') }
+        { key:'current', label:'🎤 Currently Performing', items: queue.filter(e=>e.status==='current') },
+        { key:'waiting', label:'⏳ Waiting',               items: queue.filter(e=>e.status==='waiting') },
+        { key:'done',    label:'✅ Done',                   items: queue.filter(e=>e.status==='done') },
       ];
       let idx = 0;
       groups.forEach(g => {
@@ -621,97 +699,110 @@
         html += `<div class="section-label">${g.label}</div>`;
         g.items.forEach((e, i) => {
           idx++;
-          const isCur = e.status === 'current';
+          const isCur  = e.status === 'current';
           const isWait = e.status === 'waiting';
-          const isFirst = i === 0;
-          const isLast = i === g.items.length - 1;
-          const moveBtns = isWait
-            ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst ? 'disabled' : ''}>▲</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast ? 'disabled' : ''}>▼</button></div>`
-            : '';
+          const isFirst = i === 0, isLast = i === g.items.length - 1;
+          const dragAttrs = isWait ? `draggable="true" ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()" ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)" ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})"` : '';
+          const dragHandle = isWait ? `<div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>` : `<div style="width:22px;flex-shrink:0"></div>`;
+          const moveBtns = isWait ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>▲</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast?'disabled':''}>▼</button></div>` : '';
           html += `
-            <div class="row-card status-${e.status}">
-              <div class="row-num">${idx}</div>
-              <div class="row-info">
-                <div class="row-name">${esc(e.name)}</div>
-                <div class="row-song">${esc(e.song)}</div>
-              </div>
-              ${moveBtns}
-              <div class="row-actions">
-                <button class="act-btn set-current${isCur ? ' is-current' : ''}" onclick="setStatus(${e.id},'current')">${isCur ? '🎤 On Stage' : '🎤 Set Current'}</button>
-              </div>
-              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
-            </div>`;
+          <div class="row-card status-${e.status}" id="card-${e.id}" data-id="${e.id}" ${dragAttrs}>
+            ${dragHandle}
+            <div class="row-num">${idx}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            ${moveBtns}
+            <div class="row-actions">
+              <button class="act-btn set-current${isCur?' is-current':''}" onclick="setStatus(${e.id},'current')" title="${isCur?'Currently performing':'Set as current performer'}">${isCur?'🎤 On Stage':'🎤 Set Current'}</button>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
         });
       });
-    } else if (activeTab === 'current') {
+    }
+
+    /* ════ CURRENT TAB ════ */
+    else if (activeTab === 'current') {
       const curItems = queue.filter(e => e.status === 'current');
-      const hasWait = queue.some(e => e.status === 'waiting');
+      const hasWait  = queue.some(e => e.status === 'waiting');
       html += `
-        <div class="next-btn-bar">
-          <span>⏭ Move first Waiting singer to Current</span>
-          <button class="next-btn" onclick="promoteNext()" ${!hasWait ? 'disabled' : ''}>Next →</button>
-        </div>`;
-      if (!curItems.length) {
-        html += `<div class="empty-state"><div class="big">🎤</div>No one is performing right now.</div>`;
+      <div class="next-btn-bar">
+        <span>⏭ Move first Waiting singer to Current</span>
+        <button class="next-btn" onclick="promoteNext()" ${!hasWait?'disabled':''}>Next →</button>
+      </div>`;
+      if (curItems.length === 0) {
+        html += `<div class="empty-state"><div class="big">🎤</div>No one is performing right now.<br>Use "Set Current" in All tab or click Next →</div>`;
       } else {
         curItems.forEach((e, i) => {
           html += `
-            <div class="row-card status-current">
-              <div class="row-num">${i + 1}</div>
-              <div class="row-info">
-                <div class="row-name">${esc(e.name)}</div>
-                <div class="row-song">${esc(e.song)}</div>
-              </div>
-              <div class="row-actions">
-                <button class="act-btn to-done" onclick="setStatus(${e.id},'done')">✅ Done</button>
-                <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')">⏳ Waiting</button>
-              </div>
-              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
-            </div>`;
+          <div class="row-card status-current" id="card-${e.id}" data-id="${e.id}">
+            <div class="row-num">${i+1}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            <div class="row-actions">
+              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">✅ Done</button>
+              <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')" title="Back to Waiting">⏳ Waiting</button>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
         });
       }
-    } else if (activeTab === 'done') {
+    }
+
+    /* ════ DONE TAB ════ */
+    else if (activeTab === 'done') {
       const doneItems = queue.filter(e => e.status === 'done');
-      if (!doneItems.length) {
+      if (doneItems.length === 0) {
         html = `<div class="empty-state"><div class="big">✅</div>No completed performances yet.</div>`;
       } else {
         doneItems.forEach((e, i) => {
           html += `
-            <div class="row-card status-done">
-              <div class="row-num">${i + 1}</div>
-              <div class="row-info">
-                <div class="row-name">${esc(e.name)}</div>
-                <div class="row-song">${esc(e.song)}</div>
-              </div>
-              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
-            </div>`;
+          <div class="row-card status-done" id="card-${e.id}" data-id="${e.id}">
+            <div class="row-num">${i+1}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
         });
       }
-    } else if (activeTab === 'waiting') {
+    }
+
+    /* ════ WAITING TAB ════ */
+    else if (activeTab === 'waiting') {
       const waitItems = queue.filter(e => e.status === 'waiting');
-      if (!waitItems.length) {
-        html = `<div class="empty-state"><div class="big">⏳</div>No one waiting.</div>`;
+      if (waitItems.length === 0) {
+        html = `<div class="empty-state"><div class="big">⏳</div>No one waiting.<br>Add singers above!</div>`;
       } else {
         waitItems.forEach((e, i) => {
-          const isFirst = i === 0;
-          const isLast = i === waitItems.length - 1;
+          const isFirst = i === 0, isLast = i === waitItems.length - 1;
           html += `
-            <div class="row-card status-waiting">
-              <div class="row-num">${i + 1}</div>
-              <div class="row-info">
-                <div class="row-name">${esc(e.name)}</div>
-                <div class="row-song">${esc(e.song)}</div>
-              </div>
-              <div class="move-btns">
-                <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst ? 'disabled' : ''}>▲</button>
-                <button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast ? 'disabled' : ''}>▼</button>
-              </div>
-              <div class="row-actions">
-                <button class="act-btn to-current" onclick="setStatus(${e.id},'current')">🎤 Current</button>
-                <button class="act-btn to-done" onclick="setStatus(${e.id},'done')">✅ Done</button>
-              </div>
-              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
-            </div>`;
+          <div class="row-card status-waiting" id="card-${e.id}" data-id="${e.id}"
+            draggable="true"
+            ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()"
+            ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)"
+            ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})">
+            <div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>
+            <div class="row-num">${i+1}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            <div class="move-btns">
+              <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>▲</button>
+              <button class="mv-btn" onclick="moveEntry(${e.id},1)"  ${isLast?'disabled':''}>▼</button>
+            </div>
+            <div class="row-actions">
+              <button class="act-btn to-current" onclick="setStatus(${e.id},'current')" title="Set as Current">🎤 Current</button>
+              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">✅ Done</button>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
         });
       }
     }
@@ -719,129 +810,267 @@
     list.innerHTML = html;
   }
 
-  async function loadFromGitHubJson() {
-    try {
-      const res = await fetch(getJsonRawUrl() + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) throw new Error('GitHub JSON not found');
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('JSON is not an array');
-
-      let seenCurrent = false;
-      queue = data.map((row, i) => {
-        const status = ['current','done','waiting'].includes(String(row.status || '').toLowerCase())
-          ? String(row.status).toLowerCase()
-          : 'waiting';
-        let fixedStatus = status;
-        if (fixedStatus === 'current') {
-          if (seenCurrent) fixedStatus = 'waiting';
-          seenCurrent = true;
-        }
-        return {
-          id: row.id || (Date.now() + i),
-          name: String(row.name || '').trim(),
-          song: String(row.song || '').trim(),
-          status: fixedStatus
-        };
-      });
-
-      localStorage.setItem('songQueue', JSON.stringify(queue));
-      render();
-      return true;
-    } catch (e) {
-      console.log('GitHub load skipped:', e.message);
-      return false;
-    }
+  /* ── Drag & Drop (desktop) ── */
+  let dragId = null;
+  function onDragStart(ev, id) {
+    dragId = id; ev.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => { const el = document.getElementById('card-'+id); if(el) el.classList.add('dragging'); }, 0);
+  }
+  function onDragEnd() {
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('dragging','drag-over'));
+    dragId = null;
+  }
+  function onDragOver(ev, overId) {
+    ev.preventDefault();
+    if (dragId === overId) return;
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over'));
+    const el = document.getElementById('card-'+overId);
+    if (el) el.classList.add('drag-over');
+  }
+  function onDragLeave(ev) { ev.currentTarget.classList.remove('drag-over'); }
+  function onDrop(ev, overId) {
+    ev.preventDefault();
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over','dragging'));
+    if (!dragId || dragId === overId) return;
+    reorderWaiting(dragId, overId); dragId = null;
   }
 
-  async function getFileSha(token, path) {
-    const url = `https://api.github.com/repos/${_REPO}/contents/${path}?ref=${_BRANCH}&_t=${Date.now()}`;
-    const res = await fetch(url, {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/vnd.github+json'
-      }
-    });
-    if (res.status === 404) return null;
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to read file SHA');
-    return data.sha || null;
+  function reorderWaiting(fromId, toId) {
+    const fi = queue.findIndex(e => e.id === fromId);
+    const ti = queue.findIndex(e => e.id === toId);
+    if (fi < 0 || ti < 0) return;
+    const item = queue.splice(fi, 1)[0];
+    const newTi = queue.findIndex(e => e.id === toId);
+    queue.splice(newTi, 0, item);
+    save(); render();
   }
 
-  async function putFileToGitHub(token, path, textContent, commitMessage) {
-    const sha = await getFileSha(token, path);
-    const body = {
-      message: commitMessage,
-      content: btoa(unescape(encodeURIComponent(textContent))),
-      branch: _BRANCH
-    };
-    if (sha) body.sha = sha;
-
-    const res = await fetch(`https://api.github.com/repos/${_REPO}/contents/${path}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `Failed to update ${path}`);
-    return data;
+  /* ── Touch drag (mobile) ── */
+  let touchId = null, touchClone = null, touchOverId = null;
+  function onTouchStart(ev, id) {
+    if (ev.touches.length !== 1) return;
+    touchId = id;
+    const card = document.getElementById('card-'+id);
+    card.classList.add('dragging');
+    const rect = card.getBoundingClientRect();
+    touchClone = card.cloneNode(true);
+    touchClone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.82;z-index:9999;pointer-events:none;border-radius:13px;`;
+    document.body.appendChild(touchClone);
+  }
+  function onTouchMove(ev) {
+    if (!touchId || !touchClone) return;
+    ev.preventDefault();
+    const t = ev.touches[0];
+    const w = parseFloat(touchClone.style.width);
+    touchClone.style.left = (t.clientX - w/2) + 'px';
+    touchClone.style.top  = (t.clientY - 28) + 'px';
+    touchClone.style.display = 'none';
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    touchClone.style.display = '';
+    const card = el ? el.closest('.row-card[data-id]') : null;
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over'));
+    if (card && card.dataset.id && parseInt(card.dataset.id) !== touchId) {
+      card.classList.add('drag-over');
+      touchOverId = parseInt(card.dataset.id);
+    } else { touchOverId = null; }
+  }
+  function onTouchEnd(ev, id) {
+    if (touchClone) { touchClone.remove(); touchClone = null; }
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('dragging','drag-over'));
+    if (touchId && touchOverId && touchId !== touchOverId) reorderWaiting(touchId, touchOverId);
+    touchId = null; touchOverId = null;
   }
 
-  async function syncToRepo() {
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && (document.activeElement.id === 'nameInput' || document.activeElement.id === 'songInput'))
+      addEntry();
+  });
+
+  // ── Cloud Sync (GitHub repo queue-data branch) ──
+  const _REPO   = 'dallastatvamasis/dallastatvamasis.com';
+  const _BRANCH = 'queue-data';
+  const _FILE   = 'song-queue.json';
+  const _CLOUD_URL = 'https://api.github.com/repos/' + _REPO + '/contents/' + _FILE + '?ref=' + _BRANCH;
+
+  function openSyncModal() {
+    document.getElementById('syncTokenInput').value = localStorage.getItem('sync_token') || '';
+    document.getElementById('syncResult').textContent = '';
+    refreshSyncUrlUI();
+    document.getElementById('syncModalBg').classList.add('open');
+  }
+  function closeSyncModal() {
+    document.getElementById('syncModalBg').classList.remove('open');
+  }
+  function refreshSyncUrlUI() {
     const token = localStorage.getItem('sync_token');
-    if (!token) return { ok: false, msg: 'No token configured' };
-
-    setPillStatus('syncing');
-    try {
-      const jsonText = JSON.stringify(queue, null, 2);
-      const csvText = queueToCsv(queue);
-      await putFileToGitHub(token, _JSON_FILE, jsonText, 'Update song queue JSON');
-      await putFileToGitHub(token, _CSV_FILE, csvText, 'Update song queue CSV');
-      setPillStatus('ok');
-      return { ok: true };
-    } catch (e) {
-      setPillStatus('error');
-      return { ok: false, msg: e.message };
+    const sec = document.getElementById('syncUrlSection');
+    if (token) {
+      sec.style.display = '';
+      document.getElementById('syncUrlDisplay').value = location.origin + '/song-queue-display.html';
+    } else {
+      sec.style.display = 'none';
+    }
+    const pill = document.getElementById('syncPill');
+    if (token) {
+      pill.textContent = '✓ Cloud Synced'; pill.className = 'sync-pill synced';
+    } else {
+      pill.textContent = '☁️ Cloud Sync'; pill.className = 'sync-pill';
     }
   }
-
+  function copyCloudUrl() {
+    const v = document.getElementById('syncUrlDisplay').value;
+    if (!v) return;
+    navigator.clipboard.writeText(v).then(() => {
+      const btn = document.querySelector('.copy-url-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }
   async function saveSyncSettings() {
     const token = document.getElementById('syncTokenInput').value.trim();
-    if (!token) {
-      document.getElementById('syncResult').textContent = '⚠️ Enter a GitHub token';
-      return;
-    }
+    if (!token) { document.getElementById('syncResult').textContent = '⚠️ Enter a GitHub token'; return; }
     localStorage.setItem('sync_token', token);
-    document.getElementById('syncResult').textContent = 'Syncing JSON + CSV…';
+    document.getElementById('syncResult').textContent = 'Syncing…';
     const r = await syncToRepo();
     if (r.ok) {
-      document.getElementById('syncResult').textContent = '✓ Synced JSON + CSV to GitHub';
+      document.getElementById('syncResult').textContent = '✓ Synced! Cloud URL is ready — copy it for OBS.';
       refreshSyncUrlUI();
     } else {
       document.getElementById('syncResult').textContent = '✗ Failed: ' + r.msg;
     }
   }
-
-  async function initData() {
-    refreshSyncUrlUI();
-    const loaded = await loadFromGitHubJson();
-    if (!loaded) {
-      queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
-      render();
+  function setPillStatus(s) {
+    const pill = document.getElementById('syncPill');
+    if (s === 'syncing') {
+      pill.className = 'sync-pill syncing'; pill.textContent = '⏳ Syncing…';
+    } else if (s === 'ok') {
+      pill.className = 'sync-pill synced'; pill.textContent = '✓ Synced';
+      setTimeout(() => refreshSyncUrlUI(), 2500);
+    } else if (s === 'error') {
+      pill.className = 'sync-pill error'; pill.textContent = '✗ Sync Error';
+    }
+  }
+  async function syncToRepo() {
+    const token = localStorage.getItem('sync_token');
+    if (!token) return { ok: false, msg: 'No token configured' };
+    setPillStatus('syncing');
+    try {
+      // Get current SHA of the file (needed for updates)
+      const shaRes = await fetch('https://api.github.com/repos/' + _REPO + '/contents/' + _FILE + '?ref=' + _BRANCH + '&_t=' + Date.now(), {
+        headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+      });
+      const sha = shaRes.ok ? (await shaRes.json()).sha : null;
+      // Encode queue as base64
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(queue))));
+      const body = { message: 'Queue update', content, branch: _BRANCH };
+      if (sha) body.sha = sha;
+      const res = await fetch('https://api.github.com/repos/' + _REPO + '/contents/' + _FILE, {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (res.ok) { setPillStatus('ok'); return { ok: true }; }
+      else { setPillStatus('error'); return { ok: false, msg: data.message || 'API error ' + res.status }; }
+    } catch(e) {
+      setPillStatus('error');
+      return { ok: false, msg: e.message };
     }
   }
 
-  document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter' && (document.activeElement.id === 'nameInput' || document.activeElement.id === 'songInput')) {
-      addEntry();
+  // ── Google Sheets tab functions ──
+  function switchSyncTab(tab) {
+    const isGS = tab === 'gsheets';
+    document.getElementById('panelGSheets').style.display = isGS ? '' : 'none';
+    document.getElementById('panelGitHub').style.display  = isGS ? 'none' : '';
+    const tabGS = document.getElementById('tabGSheets');
+    const tabGH = document.getElementById('tabGitHub');
+    if (isGS) {
+      tabGS.style.background = 'var(--saffron)'; tabGS.style.color = '#1a0a00'; tabGS.style.fontWeight = '700';
+      tabGH.style.background = 'transparent'; tabGH.style.color = 'var(--muted)'; tabGH.style.fontWeight = 'normal';
+    } else {
+      tabGH.style.background = 'var(--saffron)'; tabGH.style.color = '#1a0a00'; tabGH.style.fontWeight = '700';
+      tabGS.style.background = 'transparent'; tabGS.style.color = 'var(--muted)'; tabGS.style.fontWeight = 'normal';
     }
-  });
+  }
 
-  initData();
+  function saveGsheetsSettings() {
+    const url = document.getElementById('gsheetsUrlInput').value.trim();
+    const res = document.getElementById('gsheetsResult');
+    if (!url) { res.textContent = '⚠️ Paste a Google Sheets CSV URL first'; return; }
+    if (!url.includes('docs.google.com') && !url.includes('output=csv') && !url.match(/\.csv(\?|$)/i)) {
+      res.textContent = '⚠️ URL doesn\'t look like a published CSV. Make sure to use File → Share → Publish to web → CSV.';
+      return;
+    }
+    localStorage.setItem('gsheetsUrl', url);
+    // Build shareable display URL
+    const base = location.origin + '/song-queue-display.html';
+    const shareUrl = base + '?cloud=' + encodeURIComponent(url);
+    document.getElementById('gsheetsShareUrl').value = shareUrl;
+    document.getElementById('gsheetsShareSection').style.display = '';
+    res.textContent = '✓ Saved! Copy the Display URL and open it on any device.';
+    // Also update the sync pill
+    const pill = document.getElementById('syncPill');
+    pill.textContent = '📊 Sheets Sync'; pill.className = 'sync-pill synced';
+  }
+
+  function copyGsheetsUrl() {
+    const v = document.getElementById('gsheetsShareUrl').value;
+    if (!v) return;
+    navigator.clipboard.writeText(v).then(() => {
+      const btn = document.querySelector('#gsheetsShareSection .copy-url-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }
+
+  function exportCsv() {
+    const rows = [['name', 'song', 'status']];
+    queue.forEach(e => rows.push([
+      (e.name  || '').replace(/,/g, ' '),
+      (e.song  || '').replace(/,/g, ' '),
+      (e.status|| 'waiting')
+    ]));
+    const csv = rows.map(r => r.join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = 'song-queue.csv';
+    a.click();
+  }
+
+  // ── Hardcoded default Google Sheets CSV URL ──
+  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
+  if (!localStorage.getItem('gsheetsUrl')) {
+    localStorage.setItem('gsheetsUrl', _DEFAULT_CSV);
+  }
+
+  // ── Restore Google Sheets URL on modal open ──
+  const _origOpenSyncModal = openSyncModal;
+  openSyncModal = function() {
+    _origOpenSyncModal();
+    const saved = localStorage.getItem('gsheetsUrl') || _DEFAULT_CSV;
+    document.getElementById('gsheetsUrlInput').value = saved;
+    if (saved) {
+      const base = location.origin + '/song-queue-display.html';
+      document.getElementById('gsheetsShareUrl').value = base + '?cloud=' + encodeURIComponent(saved);
+      document.getElementById('gsheetsShareSection').style.display = '';
+    }
+    switchSyncTab('gsheets');
+  };
+
+  // Init cloud pill state
+  refreshSyncUrlUI();
+  // Show Sheets pill if gsheetsUrl is saved
+  if (localStorage.getItem('gsheetsUrl') && !localStorage.getItem('sync_token')) {
+    const pill = document.getElementById('syncPill');
+    pill.textContent = '📊 Sheets Sync'; pill.className = 'sync-pill synced';
+  }
+
+  render();
 </script>
 </body>
 </html>
