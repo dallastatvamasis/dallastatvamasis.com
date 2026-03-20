@@ -4,3 +4,635 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎵 Performance Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --saffron: #E8671A;
+    --saffron-light: #F5A04A;
+    --saffron-glow: rgba(232,103,26,0.18);
+    --gold: #D4A017;
+    --gold-light: #F7D87C;
+    --deep: #100800;
+    --surface: #1E1000;
+    --card: #271500;
+    --border: rgba(232,103,26,0.18);
+    --text: #F5E8D0;
+    --muted: #9A7A55;
+    --current-bg: rgba(212,160,23,0.12);
+    --current-border: rgba(212,160,23,0.5);
+    --done-bg: rgba(50,130,65,0.10);
+    --done-border: rgba(76,175,106,0.4);
+    --waiting-bg: rgba(60,80,140,0.10);
+    --waiting-border: rgba(100,130,200,0.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 90% 50% at 50% -5%, rgba(232,103,26,0.16) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 85% 90%, rgba(212,160,23,0.08) 0%, transparent 60%);
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    padding: 2rem 1rem 1.4rem;
+    position: relative;
+  }
+  .header-ornament {
+    font-size: 0.68rem; letter-spacing: 0.3em;
+    color: var(--saffron); text-transform: uppercase;
+    margin-bottom: 0.5rem; opacity: 0.7;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    background: linear-gradient(135deg, var(--saffron-light) 0%, var(--gold-light) 50%, var(--saffron-light) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; letter-spacing: 0.02em; line-height: 1.15;
+  }
+  .subtitle { color: var(--muted); font-size: 0.78rem; margin-top: 0.4rem; letter-spacing: 0.05em; }
+  .divider { width: 100px; height: 1px; margin: 0.9rem auto 0; background: linear-gradient(90deg, transparent, var(--saffron), transparent); }
+  .divider-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--saffron); margin: -3px auto 0; }
+
+  /* ── Source bar ── */
+  .source-bar {
+    display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 1rem 0; margin: 0.5rem auto 0;
+    max-width: 560px;
+  }
+  .source-badge {
+    display: flex; align-items: center; gap: 0.35rem;
+    padding: 0.35rem 0.9rem; border-radius: 30px;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+    border: 1.5px solid;
+  }
+  .source-badge.local  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
+  .source-badge.csv    { background: var(--done-bg);       border-color: var(--done-border); color: #7DDB95; }
+  .source-badge.none   { background: rgba(255,255,255,0.04); border-color: var(--border); color: var(--muted); }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #E8671A; animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+  /* ── CSV Upload area ── */
+  .upload-zone {
+    max-width: 560px; margin: 1rem auto 0;
+    padding: 0 1rem;
+  }
+  .upload-drop {
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.02);
+    position: relative;
+  }
+  .upload-drop:hover, .upload-drop.drag-over {
+    border-color: var(--saffron);
+    background: var(--saffron-glow);
+  }
+  .upload-drop input[type=file] {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer;
+  }
+  .upload-icon { font-size: 1.6rem; margin-bottom: 0.35rem; }
+  .upload-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+  .upload-hint { font-size: 0.72rem; color: var(--muted); }
+  .upload-hint span { color: var(--saffron-light); }
+
+  .upload-actions {
+    display: flex; gap: 0.5rem; margin-top: 0.6rem;
+  }
+  .upload-action-btn {
+    flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem; font-weight: 600; border-radius: 9px;
+    padding: 0.45rem 0.7rem; cursor: pointer; transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+  }
+  .upload-action-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .upload-action-btn.danger:hover { border-color: #E04030; color: #E04030; background: rgba(224,64,48,0.08); }
+  .upload-action-btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+  /* ── Main ── */
+  .main { max-width: 560px; margin: 0 auto; padding: 1.4rem 1rem 3rem; }
+
+  /* ── Spotlight ── */
+  .spotlight {
+    background: linear-gradient(135deg, var(--current-bg), rgba(212,160,23,0.06));
+    border: 1.5px solid var(--current-border);
+    border-radius: 16px; padding: 1.3rem 1.2rem 1.1rem;
+    margin-bottom: 1.5rem; text-align: center;
+    position: relative; overflow: hidden;
+    box-shadow: 0 0 40px rgba(212,160,23,0.10);
+  }
+  .spotlight::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 180px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .spotlight-label {
+    font-size: 0.63rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  }
+  .spotlight-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    color: var(--gold-light); line-height: 1.2; margin-bottom: 0.35rem;
+  }
+  .spotlight-song { font-size: 0.85rem; color: var(--saffron-light); opacity: 0.9; }
+  .spotlight-song::before { content: '♪  '; }
+  .no-current {
+    background: var(--surface); border: 1.5px dashed var(--border);
+    border-radius: 16px; padding: 1.5rem; text-align: center;
+    color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem;
+  }
+  .no-current .icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 1.6rem; }
+  .section-head {
+    display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem;
+  }
+  .section-icon { font-size: 1.1rem; flex-shrink: 0; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1rem; letter-spacing: 0.02em; }
+  .section-head.waiting .section-title { color: #9AB4EE; }
+  .section-head.done    .section-title { color: #7DDB95; }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-count {
+    font-size: 0.65rem; font-weight: 700; padding: 0.12rem 0.5rem;
+    border-radius: 20px; flex-shrink: 0;
+  }
+  .section-head.waiting .section-count { background: var(--waiting-bg); color: #9AB4EE; border: 1px solid var(--waiting-border); }
+  .section-head.done    .section-count { background: var(--done-bg);    color: #7DDB95; border: 1px solid var(--done-border); }
+
+  /* ── Rows ── */
+  .rows { display: flex; flex-direction: column; gap: 0.48rem; }
+  .row {
+    border-radius: 12px; padding: 0.82rem 1rem 0.82rem 1.05rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    border: 1.5px solid var(--border); background: var(--card);
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.28s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .row::before {
+    content:''; position:absolute; left:0; top:0; bottom:0;
+    width:3px; border-radius:3px 0 0 3px;
+  }
+  .row.current { background: linear-gradient(to right, var(--current-bg), var(--card)); border-color: var(--current-border); box-shadow: 0 0 18px rgba(212,160,23,0.10); }
+  .row.current::before { background: var(--gold); }
+  .row.done    { background: linear-gradient(to right, var(--done-bg), var(--card)); border-color: var(--done-border); opacity: 0.68; }
+  .row.done::before    { background: #4CAF6A; }
+  .row.waiting::before { background: #7090D0; }
+
+  .row-pos { font-size: 0.67rem; font-weight: 700; color: var(--muted); min-width: 20px; text-align: center; flex-shrink: 0; }
+  .row.current .row-pos { color: var(--gold); }
+  .row-info { flex: 1; min-width: 0; }
+  .row-name { font-family: 'Playfair Display', serif; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row.current .row-name { color: var(--gold-light); font-size: 1.1rem; }
+  .row.done    .row-name { color: #A0C8A8; }
+  .row.waiting .row-name { color: var(--text); }
+  .row-song { font-size: 0.74rem; margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
+  .row-song::before { content: '♪  '; }
+  .row.current .row-song { color: var(--saffron-light); }
+  .row.done    .row-song { color: #6aab78; }
+  .row.waiting .row-song { color: #8090C0; }
+  .status-badge {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0.2rem 0.5rem;
+    border-radius: 20px; border: 1.5px solid; flex-shrink: 0;
+  }
+  .row.current .status-badge { background: var(--current-bg); border-color: var(--gold); color: var(--gold-light); }
+  .row.done    .status-badge { background: var(--done-bg);    border-color: var(--done-border); color: #7DDB95; }
+  .row.waiting .status-badge { background: var(--waiting-bg); border-color: var(--waiting-border); color: #9AB4EE; }
+
+
+  /* ── Up Next emphasis ── */
+  .row.upcoming-1 {
+    border-color: rgba(100,130,210,0.55);
+    background: linear-gradient(to right, rgba(80,100,170,0.18), var(--card));
+    box-shadow: 0 2px 16px rgba(80,100,180,0.12);
+  }
+  .row.upcoming-1 .row-name { font-size: 1.12rem; color: #C0D0FF; }
+  .row.upcoming-1 .row-song { color: #8898CC; }
+  .row.upcoming-1 .row-pos  { color: #8898CC; font-size: 0.85rem; }
+  .row.upcoming-1 .status-badge { background: rgba(80,100,180,0.2); border-color: rgba(120,150,220,0.6); color: #B0C0F0; }
+
+  .row.upcoming-2 { opacity: 0.82; }
+  .row.upcoming-2 .row-name { font-size: 0.98rem; color: #9AA8C8; }
+  .row.upcoming-2 .row-song { color: #6878A0; }
+  .row.upcoming-2 .status-badge { opacity: 0.7; }
+
+  .more-waiting {
+    text-align: center;
+    font-size: 0.72rem; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.06em;
+    padding: 0.5rem 0.8rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(100,130,200,0.25);
+    border-radius: 8px;
+    margin-top: 0.1rem;
+  }
+  .empty-section { text-align: center; padding: 1rem; color: var(--muted); font-size: 0.82rem; font-style: italic; }
+
+  /* ── Refresh bar ── */
+  .refresh-bar {
+    text-align: center; color: var(--muted); font-size: 0.68rem;
+    margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+  }
+  #countdown { color: var(--saffron-light); font-weight: 600; min-width: 14px; }
+
+  /* ── Cloud URL input ── */
+  .cloud-row {
+    max-width: 560px; margin: 0 auto 0.8rem; padding: 0 0.9rem;
+    display: flex; gap: 0.5rem; align-items: center;
+  }
+  .cloud-input {
+    flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem; padding: 0.52rem 0.8rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .cloud-input::placeholder { color: var(--muted); opacity: 0.5; }
+  .cloud-input:focus { border-color: var(--saffron); }
+  .cloud-set-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600; border-radius: 10px;
+    padding: 0.52rem 0.85rem; cursor: pointer; white-space: nowrap;
+    transition: all 0.18s;
+  }
+  .cloud-set-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .cloud-set-btn.active { border-color: #4AE080; color: #4AE080; background: rgba(74,224,128,0.08); }
+
+  /* ── No data ── */
+  .no-data {
+    text-align: center; padding: 3rem 1rem; color: var(--muted);
+  }
+  .no-data .nd-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+  .no-data h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 0.5rem; }
+  .no-data p  { font-size: 0.82rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-ornament">✦ &nbsp; DTS Media Live &nbsp; ✦</div>
+  <h1>Performance Board</h1>
+  <div class="subtitle">Live Queue · View Only</div>
+  <div class="divider"></div>
+  <div class="divider-dot"></div>
+  <div class="source-bar" id="sourceBar"></div>
+</header>
+
+<!-- Cloud URL input -->
+<div class="cloud-row">
+  <input class="cloud-input" type="url" id="cloudUrlInput"
+    placeholder="☁️ Paste Cloud URL here to sync across devices (from Song Queue Manager)"
+    oninput="onCloudUrlInput(this.value)">
+  <button class="cloud-set-btn" id="cloudSetBtn" onclick="toggleCloud()">Connect</button>
+</div>
+
+<!-- CSV Upload -->
+<div class="upload-zone">
+  <div class="upload-drop" id="dropZone">
+    <input type="file" id="csvInput" accept=".csv" onchange="handleFile(event)">
+    <div class="upload-icon">📂</div>
+    <div class="upload-title">Load CSV File</div>
+    <div class="upload-hint">Drop a <span>song-queue.csv</span> here · also syncs to OBS overlay</div>
+  </div>
+  <div class="upload-actions">
+    <button class="upload-action-btn" onclick="reloadCSV()" id="reloadBtn" disabled>↻ Reload Last CSV</button>
+    <button class="upload-action-btn" onclick="useLocalStorage()" id="lsBtn">⚡ Use Live Queue</button>
+    <button class="upload-action-btn danger" onclick="clearData()" id="clearBtn" disabled>✕ Clear</button>
+  </div>
+</div>
+
+<!-- Board -->
+<div class="main" id="main"></div>
+
+<script>
+  // ── State ──
+  let dataSource = 'local'; // 'local' | 'csv' | 'cloud'
+  let csvData    = null;    // raw CSV text for reload
+  let queueData  = [];
+  let cloudUrl   = localStorage.getItem('cloudUrl') || '';
+  let cloudData  = null;
+
+  // ── Cloud URL setup ──
+  function onCloudUrlInput(v) { cloudUrl = v.trim(); }
+
+  function toggleCloud() {
+    const input = document.getElementById('cloudUrlInput');
+    const btn   = document.getElementById('cloudSetBtn');
+    if (dataSource === 'cloud') {
+      // Disconnect
+      cloudUrl = '';
+      localStorage.removeItem('cloudUrl');
+      cloudData = null;
+      dataSource = 'local';
+      input.value = '';
+      btn.textContent = 'Connect';
+      btn.classList.remove('active');
+      updateButtons(); renderBoard();
+    } else {
+      const url = input.value.trim();
+      if (!url) { alert('Paste a Cloud URL first'); return; }
+      cloudUrl = url;
+      localStorage.setItem('cloudUrl', url);
+      dataSource = 'cloud';
+      btn.textContent = '✓ Connected';
+      btn.classList.add('active');
+      fetchCloud().then(() => { updateButtons(); renderBoard(); });
+    }
+  }
+
+  async function fetchCloud() {
+    if (!cloudUrl) return;
+    try {
+      const token = localStorage.getItem('sync_token') || '';
+      const sep = cloudUrl.includes('?') ? '&' : '?';
+      const headers = { 'Accept': 'application/vnd.github.v3+json' };
+      if (token) headers['Authorization'] = 'token ' + token;
+      const res = await fetch(cloudUrl + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        // GitHub Contents API returns base64-encoded content
+        cloudData = data.content
+          ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
+          : data; // fallback for plain JSON
+        if (dataSource === 'cloud') { queueData = cloudData; }
+      }
+    } catch(e) { /* keep last cloud data */ }
+  }
+
+  // Restore cloud URL on load and auto-connect
+  if (cloudUrl) {
+    document.getElementById('cloudUrlInput').value = cloudUrl;
+    dataSource = 'cloud';
+    const btn = document.getElementById('cloudSetBtn');
+    btn.textContent = '✓ Connected';
+    btn.classList.add('active');
+  }
+
+  // ── Load from localStorage ──
+  function loadLocal() {
+    try { return JSON.parse(localStorage.getItem('songQueue') || '[]'); }
+    catch { return []; }
+  }
+
+  // ── Parse CSV text → array of objects ──
+  function parseCSV(text) {
+    const lines = text.trim().split('\n').filter(l => l.trim());
+    if (lines.length < 2) return [];
+    // skip header
+    const result = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCSVLine(lines[i]);
+      if (cols.length < 3) continue;
+      const status = (cols[3] || 'waiting').trim().toLowerCase();
+      result.push({
+        id:     parseInt(cols[0]) || (Date.now() + i),
+        name:   cols[1].trim(),
+        song:   cols[2].trim(),
+        status: ['current','done','waiting'].includes(status) ? status : 'waiting'
+      });
+    }
+    // enforce only-one-current
+    let seenCur = false;
+    result.forEach(e => {
+      if (e.status === 'current') { if (seenCur) e.status = 'waiting'; seenCur = true; }
+    });
+    return result;
+  }
+
+  function parseCSVLine(line) {
+    const result = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+      else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+      else cur += c;
+    }
+    result.push(cur);
+    return result;
+  }
+
+  // ── Handle file drop/pick ──
+  function handleFile(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    readFile(file);
+    ev.target.value = '';
+  }
+
+  function readFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      csvData = e.target.result;
+      dataSource = 'csv';
+      queueData = parseCSV(csvData);
+      // Write to localStorage so OBS overlay picks it up automatically
+      localStorage.setItem('songQueue', JSON.stringify(queueData));
+      updateButtons();
+      renderBoard();
+    };
+    reader.readAsText(file);
+  }
+
+  // ── Reload last CSV ──
+  function reloadCSV() {
+    if (!csvData) return;
+    queueData = parseCSV(csvData);
+    localStorage.setItem('songQueue', JSON.stringify(queueData));
+    renderBoard();
+  }
+
+  // ── Switch to localStorage ──
+  function useLocalStorage() {
+    dataSource = 'local';
+    csvData = null;
+    updateButtons();
+    renderBoard();
+  }
+
+  // ── Clear ──
+  function clearData() {
+    dataSource = 'local';
+    csvData = null;
+    queueData = [];
+    localStorage.removeItem('songQueue');
+    updateButtons();
+    renderBoard();
+  }
+
+  function updateButtons() {
+    document.getElementById('reloadBtn').disabled = !csvData;
+    document.getElementById('clearBtn').disabled  = !csvData && dataSource === 'local';
+    document.getElementById('lsBtn').disabled     = dataSource === 'local' && !csvData;
+  }
+
+  // ── Drag-over drop zone ──
+  const dz = document.getElementById('dropZone');
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.csv')) readFile(file);
+  });
+
+  // ── Render board ──
+  function renderBoard() {
+    const queue = dataSource === 'csv' ? queueData
+                : dataSource === 'cloud' ? (cloudData || [])
+                : loadLocal();
+
+    // Source badge
+    const srcEl = document.getElementById('sourceBar');
+    if (dataSource === 'cloud') {
+      srcEl.innerHTML = `<div class="source-badge local"><div class="live-dot"></div> ☁️ Cloud Sync · ${queue.length} entries</div>`;
+    } else if (dataSource === 'csv') {
+      srcEl.innerHTML = `<div class="source-badge csv"><span>📄</span> CSV File loaded · ${queue.length} entries</div>`;
+    } else if (queue.length > 0) {
+      srcEl.innerHTML = `<div class="source-badge local"><div class="live-dot"></div> Live Queue · ${queue.length} entries</div>`;
+    } else {
+      srcEl.innerHTML = `<div class="source-badge none">No data loaded</div>`;
+    }
+
+    const current = queue.filter(e => e.status === 'current');
+    const done    = queue.filter(e => e.status === 'done');
+    const waiting = queue.filter(e => e.status === 'waiting');
+    const main    = document.getElementById('main');
+
+    if (queue.length === 0) {
+      main.innerHTML = `
+        <div class="no-data">
+          <div class="nd-icon">🎵</div>
+          <h3>No Queue Data</h3>
+          <p>Paste a <strong>Cloud URL</strong> above to sync across devices,<br>or load a <strong>song-queue.csv</strong> file,<br>or click <strong>Use Live Queue</strong> (same browser only).</p>
+        </div>`;
+      return;
+    }
+
+    let html = '';
+
+    // Spotlight
+    if (current.length > 0) {
+      const c = current[0];
+      html += `<div class="spotlight">
+        <div class="spotlight-label"><span>🎤</span> Now Performing</div>
+        <div class="spotlight-name">${esc(c.name)}</div>
+        <div class="spotlight-song">${esc(c.song)}</div>
+      </div>`;
+    } else {
+      html += `<div class="no-current"><div class="icon">🎵</div>No one performing right now</div>`;
+    }
+
+    // Waiting — max 2 shown
+    const upNext  = waiting.slice(0, 2);
+    const moreCount = waiting.length - upNext.length;
+    html += `<div class="section">
+      <div class="section-head waiting">
+        <span class="section-icon">⏳</span>
+        <span class="section-title">Up Next</span>
+        <div class="section-line"></div>
+        <span class="section-count">${waiting.length}</span>
+      </div>
+      <div class="rows">`;
+    if (waiting.length === 0) {
+      html += `<div class="empty-section">No one in the queue right now</div>`;
+    } else {
+      upNext.forEach((e, i) => {
+        html += `<div class="row waiting upcoming-${i+1}" style="animation-delay:${i*0.07}s">
+          <div class="row-pos">${i+1}</div>
+          <div class="row-info">
+            <div class="row-name">${esc(e.name)}</div>
+            <div class="row-song">${esc(e.song)}</div>
+          </div>
+          <div class="status-badge">Up Next</div>
+        </div>`;
+      });
+      if (moreCount > 0) {
+        html += `<div class="more-waiting">+${moreCount} more waiting in queue</div>`;
+      }
+    }
+    html += `</div></div>`;
+
+    // Done
+    html += `<div class="section">
+      <div class="section-head done">
+        <span class="section-icon">✅</span>
+        <span class="section-title">Performed</span>
+        <div class="section-line"></div>
+        <span class="section-count">${done.length}</span>
+      </div>
+      <div class="rows">`;
+    if (done.length === 0) {
+      html += `<div class="empty-section">No completed performances yet</div>`;
+    } else {
+      done.forEach((e, i) => {
+        html += `<div class="row done" style="animation-delay:${i*0.04}s">
+          <div class="row-pos">✓</div>
+          <div class="row-info">
+            <div class="row-name">${esc(e.name)}</div>
+            <div class="row-song">${esc(e.song)}</div>
+          </div>
+          <div class="status-badge">Done</div>
+        </div>`;
+      });
+    }
+    html += `</div></div>`;
+
+    // Refresh notice (only for live mode)
+    if (dataSource === 'local') {
+      html += `<div class="refresh-bar">
+        <span>Auto-refreshes every</span>
+        <span id="countdown">5</span>
+        <span>seconds</span>
+      </div>`;
+    }
+
+    main.innerHTML = html;
+  }
+
+  // ── Auto-refresh countdown (local + cloud mode) ──
+  let tick = 5;
+  function updateCountdown() {
+    if (dataSource !== 'local' && dataSource !== 'cloud') return;
+    const el = document.getElementById('countdown');
+    if (el) el.textContent = tick;
+    tick--;
+    if (tick < 0) {
+      tick = 5;
+      if (dataSource === 'cloud') {
+        fetchCloud().then(renderBoard);
+      } else {
+        renderBoard();
+      }
+    }
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Init
+  updateButtons();
+  if (cloudUrl) {
+    fetchCloud().then(() => { updateButtons(); renderBoard(); });
+  } else {
+    renderBoard();
+  }
+  setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>
