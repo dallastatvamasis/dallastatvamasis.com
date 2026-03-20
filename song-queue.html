@@ -1,8 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Song Queue Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --saffron: #E8671A;
+    --saffron-light: #F5A04A;
+    --saffron-glow: rgba(232,103,26,0.18);
+    --gold: #D4A017;
+    --gold-light: #F7D87C;
+    --deep: #1A0F00;
+    --surface: #2A1800;
+    --card: #311C00;
+    --border: rgba(232,103,26,0.22);
+    --text: #F5E8D0;
+    --muted: #B09070;
+    --current-bg: rgba(212,160,23,0.13);
+    --current-border: #D4A017;
+    --done-bg: rgba(60,160,80,0.12);
+    --done-border: #4CAF6A;
+    --waiting-bg: rgba(80,100,160,0.12);
+    --waiting-border: #7090D0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(232,103,26,0.20) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(212,160,23,0.08) 0%, transparent 60%);
+  }
+  header {
+    text-align: center;
+    padding: 1.6rem 1rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  header::after {
+    content: '';
+    display: block;
+    width: 70px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--saffron), transparent);
+    margin: 0.6rem auto 0;
+  }
+  header .logo { font-size: 1.5rem; margin-bottom: 0.15rem; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    background: linear-gradient(135deg, var(--saffron-light), var(--gold-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
+  .main { max-width: 680px; margin: 0 auto; padding: 1.2rem 0.9rem 4rem; }
+  .entry-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.2rem 1.1rem;
+    margin-bottom: 1.3rem;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.3);
+  }
+  .entry-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--saffron-light);
+    margin-bottom: 0.85rem;
+  }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+  @media (max-width: 460px) { .fields { grid-template-columns: 1fr; } }
+  .field label {
+    display: block; font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.3rem;
+  }
+  .field input {
+    width: 100%; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem; padding: 0.6rem 0.8rem; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field input::placeholder { color: var(--muted); opacity: 0.55; }
+  .field input:focus { border-color: var(--saffron); box-shadow: 0 0 0 3px var(--saffron-glow); }
+  .add-btn, .sync-save-btn, .next-btn {
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: #1A0F00; border: none; font-family: 'DM Sans', sans-serif; font-weight: 700;
+    cursor: pointer; transition: opacity 0.18s, transform 0.12s;
+  }
+  .add-btn {
+    width: 100%; margin-top: 0.85rem; font-size: 0.92rem;
+    border-radius: 11px; padding: 0.75rem 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  }
+  .add-btn:hover, .sync-save-btn:hover, .next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .add-btn:active, .sync-save-btn:active, .next-btn:active { transform: translateY(0); }
+  .stats { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .stat-pill {
+    flex: 1; min-width: 65px; border-radius: 30px;
+    padding: 0.38rem 0.6rem; text-align: center;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; border: 1.5px solid;
+  }
+  .stat-pill.all  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
+  .stat-pill.cur  { background: var(--current-bg); border-color: var(--current-border); color: var(--gold-light); }
+  .stat-pill.done { background: var(--done-bg); border-color: var(--done-border); color: #7DDB95; }
+  .stat-pill.wait { background: var(--waiting-bg); border-color: var(--waiting-border); color: #9AB4EE; }
+  .tabs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--surface); border-radius: 12px;
+    border: 1.5px solid var(--border); overflow: hidden;
+    margin-bottom: 1.1rem;
+  }
+  .tab-btn {
+    background: transparent; border: none; color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
+    padding: 0.6rem 0.2rem; cursor: pointer; transition: all 0.18s; letter-spacing: 0.02em;
+    border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn .tab-icon { font-size: 1rem; }
+  .tab-btn .tab-count {
+    font-size: 0.62rem; background: rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 0 5px; min-width: 16px; text-align: center;
+  }
+  .tab-btn.active-all { background: var(--saffron-glow); color: var(--saffron-light); }
+  .tab-btn.active-current { background: var(--current-bg); color: var(--gold-light); }
+  .tab-btn.active-done { background: var(--done-bg); color: #7DDB95; }
+  .tab-btn.active-waiting { background: var(--waiting-bg); color: #9AB4EE; }
+  .queue-list { display: flex; flex-direction: column; gap: 0.55rem; }
+  .empty-state {
+    text-align: center; padding: 2.5rem 1rem; color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .empty-state .big { font-size: 2.2rem; margin-bottom: 0.4rem; }
+  .section-label {
+    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); padding: 0.3rem 0; margin-top: 0.3rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .row-card {
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 13px;
+    padding: 0.75rem 0.85rem; display: flex; align-items: center; gap: 0.6rem;
+    transition: border-color 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+  }
+  .row-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 4px 0 0 4px;
+    background: var(--waiting-border); transition: background 0.3s;
+  }
+  .row-card.status-current::before { background: var(--gold); }
+  .row-card.status-done::before { background: var(--done-border); }
+  .row-card.status-current {
+    border-color: rgba(212,160,23,0.4);
+    background: linear-gradient(to right, var(--current-bg), var(--card));
+  }
+  .row-card.status-done { border-color: rgba(76,175,106,0.25); opacity: 0.78; }
+  .row-num { font-size: 0.68rem; color: var(--muted); font-weight: 700; min-width: 18px; text-align: center; }
+  .row-info { flex: 1; min-width: 0; }
+  .row-name {
+    font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .row-song {
+    font-size: 0.75rem; color: var(--saffron-light); margin-top: 0.1rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .row-song::before { content: '♪ '; }
+  .row-actions { display: flex; gap: 0.28rem; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .act-btn {
+    border: 1.5px solid; border-radius: 8px; background: transparent; font-size: 0.66rem; font-weight: 700;
+    letter-spacing: 0.02em; padding: 0.27rem 0.48rem; cursor: pointer; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+  }
+  .act-btn.to-current, .act-btn.set-current { border-color: var(--current-border); color: var(--gold-light); }
+  .act-btn.to-current:hover, .act-btn.set-current:hover { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
+  .act-btn.to-done { border-color: var(--done-border); color: #7DDB95; }
+  .act-btn.to-done:hover { background: var(--done-border); color: #1A0F00; }
+  .act-btn.to-waiting { border-color: var(--waiting-border); color: #9AB4EE; }
+  .act-btn.to-waiting:hover { background: var(--waiting-border); color: #1A0F00; }
+  .act-btn.set-current.is-current { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
+  .move-btns { display: flex; flex-direction: column; gap: 2px; }
+  .mv-btn {
+    background: var(--surface); border: 1.5px solid var(--border); color: var(--muted);
+    font-size: 0.62rem; border-radius: 5px; padding: 0.14rem 0.35rem; cursor: pointer; line-height: 1;
+  }
+  .mv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .mv-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
+  .del-btn {
+    background: none; border: none; color: #7a3a2a; font-size: 0.88rem; cursor: pointer; padding: 0.2rem;
+    border-radius: 6px; transition: color 0.15s;
+  }
+  .del-btn:hover { color: #E04030; }
+  .next-btn-bar {
+    background: var(--current-bg); border: 1.5px solid var(--current-border); border-radius: 12px;
+    padding: 0.7rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    margin-bottom: 0.7rem;
+  }
+  .next-btn-bar span { font-size: 0.78rem; color: var(--gold-light); }
+  .next-btn { border-radius: 9px; font-size: 0.78rem; padding: 0.48rem 0.9rem; white-space: nowrap; }
+  .next-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+  .csv-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .csv-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: var(--surface);
+    border: 1.5px solid var(--border); color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600; border-radius: 10px; padding: 0.52rem 0.7rem; cursor: pointer;
+  }
+  .csv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .sync-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem; background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 0.28rem 0.8rem; font-size: 0.7rem; font-weight: 600; cursor: pointer;
+    color: var(--muted); transition: all 0.2s; margin-top: 0.45rem; font-family: 'DM Sans', sans-serif;
+  }
+  .sync-pill:hover { border-color: var(--saffron); color: var(--saffron-light); }
+  .sync-pill.synced { border-color: #4AE080; color: #4AE080; }
+  .sync-pill.syncing { border-color: var(--gold); color: var(--gold-light); animation: syncPulse 1s infinite; }
+  .sync-pill.error { border-color: #E04030; color: #E04030; }
+  @keyframes syncPulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+  .sync-modal-bg {
+    display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px); align-items: center; justify-content: center;
+  }
+  .sync-modal-bg.open { display: flex; }
+  .sync-modal {
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 18px;
+    padding: 1.5rem; max-width: 460px; width: calc(100% - 2rem); box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  .sync-modal h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--saffron-light); margin-bottom: 0.3rem; }
+  .sync-help { font-size: 0.72rem; color: var(--muted); line-height: 1.55; margin-bottom: 0.9rem; }
+  .sync-modal label {
+    display: block; font-size: 0.67rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.28rem; margin-top: 0.8rem;
+  }
+  .sync-modal input[type="password"], .sync-modal input[type="text"] {
+    width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 9px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; padding: 0.52rem 0.8rem; outline: none;
+  }
+  .sync-modal input:focus { border-color: var(--saffron); }
+  .sync-url-row { display: flex; gap: 0.4rem; margin-top: 0.35rem; }
+  .sync-url-row input { font-size: 0.72rem; color: var(--saffron-light); flex: 1; }
+  .copy-url-btn, .sync-close-btn {
+    background: var(--surface); border: 1.5px solid var(--border); color: var(--muted); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+  }
+  .copy-url-btn { font-size: 0.72rem; padding: 0 0.75rem; white-space: nowrap; }
+  .sync-close-btn { font-size: 0.88rem; font-weight: 600; padding: 0.62rem 1rem; width: 100%; margin-top: 0.8rem; }
+  .copy-url-btn:hover, .sync-close-btn:hover { border-color: var(--saffron); color: var(--saffron-light); }
+  .sync-modal-btns { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
+  .sync-save-btn { flex: 1; border-radius: 10px; font-size: 0.88rem; padding: 0.62rem; }
+  .sync-result { font-size: 0.73rem; color: var(--muted); margin-top: 0.55rem; min-height: 1.1rem; }
+  .toast {
+    position: fixed; bottom: 1.4rem; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--saffron); color: #1A0F00; font-weight: 700; font-size: 0.82rem; padding: 0.58rem 1.2rem;
+    border-radius: 30px; box-shadow: 0 4px 20px rgba(232,103,26,0.4); opacity: 0;
+    transition: opacity 0.22s, transform 0.22s; pointer-events: none; z-index: 9999; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🎵</div>
+  <h1>Song Queue Manager</h1>
+  <p>Add singers &amp; songs · Load and sync with GitHub JSON + CSV</p>
+  <button class="sync-pill" id="syncPill" onclick="openSyncModal()">☁️ GitHub Sync</button>
+</header>
+
+<div class="sync-modal-bg" id="syncModalBg" onclick="if(event.target===this)closeSyncModal()">
+  <div class="sync-modal">
+    <h3>☁️ GitHub Sync</h3>
+    <p class="sync-help">
+      This version loads queue data from GitHub raw JSON on page open and saves both JSON and CSV back to GitHub.<br>
+      Repo: <strong>dallastatvamasis/dallastatvamasis.com</strong><br>
+      Branch: <strong>queue-data</strong>
+    </p>
+    <label>GitHub Token</label>
+    <input type="password" id="syncTokenInput" placeholder="Fine-grained token with Contents: Read and write" autocomplete="off">
+    <div id="syncUrlSection" style="display:none">
+      <label>Raw JSON URL</label>
+      <div class="sync-url-row">
+        <input type="text" id="syncUrlDisplay" readonly>
+        <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
+      </div>
+      <label>Raw CSV URL</label>
+      <div class="sync-url-row">
+        <input type="text" id="syncCsvUrlDisplay" readonly>
+        <button class="copy-url-btn" onclick="copyCsvUrl()">Copy</button>
+      </div>
+    </div>
+    <div class="sync-modal-btns">
+      <button class="sync-save-btn" onclick="saveSyncSettings()">Save Token &amp; Sync Now</button>
+    </div>
+    <div class="sync-result" id="syncResult"></div>
+    <button class="sync-close-btn" onclick="closeSyncModal()">Close</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="entry-card">
+    <h2>✦ Add to Queue</h2>
+    <div class="fields">
+      <div class="field">
+        <label>Singer Name</label>
+        <input type="text" id="nameInput" placeholder="e.g. Ramesh Kumar" maxlength="60" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Song / Bhajan</label>
+        <input type="text" id="songInput" placeholder="e.g. Venkateswara Suprabhatam" maxlength="80" autocomplete="off">
+      </div>
+    </div>
+    <button class="add-btn" onclick="addEntry()">＋ Add to Queue</button>
+  </div>
+
+  <div class="csv-bar">
+    <button class="csv-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <label class="csv-btn">
+      ⬆ Import CSV
+      <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" style="display:none">
+    </label>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs">
+    <button class="tab-btn" id="tab-all" onclick="setTab('all')"><span class="tab-icon">🎵</span><span>All</span><span class="tab-count" id="cnt-all">0</span></button>
+    <button class="tab-btn" id="tab-current" onclick="setTab('current')"><span class="tab-icon">🎤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span></button>
+    <button class="tab-btn" id="tab-done" onclick="setTab('done')"><span class="tab-icon">✅</span><span>Done</span><span class="tab-count" id="cnt-done">0</span></button>
+    <button class="tab-btn" id="tab-waiting" onclick="setTab('waiting')"><span class="tab-icon">⏳</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span></button>
+  </div>
+
+  <div class="queue-list" id="queueList"></div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
 <script>
   const _REPO = 'dallastatvamasis/dallastatvamasis.com';
   const _BRANCH = 'queue-data';
   const _JSON_FILE = 'song-queue.json';
   const _CSV_FILE = 'song-queue.csv';
+
+  let queue = [];
+  let activeTab = 'all';
 
   function getJsonRawUrl() {
     return `https://raw.githubusercontent.com/${_REPO}/${_BRANCH}/${_JSON_FILE}`;
@@ -12,42 +351,427 @@
     return `https://raw.githubusercontent.com/${_REPO}/${_BRANCH}/${_CSV_FILE}`;
   }
 
+  function toast(msg) {
+    const t = document.getElementById('toastEl');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function setPillStatus(s) {
+    const pill = document.getElementById('syncPill');
+    if (s === 'syncing') {
+      pill.className = 'sync-pill syncing';
+      pill.textContent = '⏳ Syncing…';
+    } else if (s === 'ok') {
+      pill.className = 'sync-pill synced';
+      pill.textContent = '✓ Synced';
+      setTimeout(() => refreshSyncUrlUI(), 2500);
+    } else if (s === 'error') {
+      pill.className = 'sync-pill error';
+      pill.textContent = '✗ Sync Error';
+    } else {
+      refreshSyncUrlUI();
+    }
+  }
+
+  function refreshSyncUrlUI() {
+    const token = localStorage.getItem('sync_token');
+    const sec = document.getElementById('syncUrlSection');
+    if (token) {
+      sec.style.display = '';
+      document.getElementById('syncUrlDisplay').value = getJsonRawUrl();
+      document.getElementById('syncCsvUrlDisplay').value = getCsvRawUrl();
+    } else {
+      sec.style.display = 'none';
+    }
+    const pill = document.getElementById('syncPill');
+    if (token) {
+      pill.textContent = '✓ GitHub Ready';
+      pill.className = 'sync-pill synced';
+    } else {
+      pill.textContent = '☁️ GitHub Sync';
+      pill.className = 'sync-pill';
+    }
+  }
+
+  function openSyncModal() {
+    document.getElementById('syncTokenInput').value = localStorage.getItem('sync_token') || '';
+    document.getElementById('syncResult').textContent = '';
+    refreshSyncUrlUI();
+    document.getElementById('syncModalBg').classList.add('open');
+  }
+
+  function closeSyncModal() {
+    document.getElementById('syncModalBg').classList.remove('open');
+  }
+
+  function copyCloudUrl() {
+    const v = document.getElementById('syncUrlDisplay').value;
+    if (!v) return;
+    navigator.clipboard.writeText(v).then(() => toast('Copied JSON URL'));
+  }
+
+  function copyCsvUrl() {
+    const v = document.getElementById('syncCsvUrlDisplay').value;
+    if (!v) return;
+    navigator.clipboard.writeText(v).then(() => toast('Copied CSV URL'));
+  }
+
   function queueToCsv(rows) {
-    const header = ['id','name','song','status'];
-    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const header = ['id', 'name', 'song', 'status'];
+    const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
     const lines = [header.join(',')];
     rows.forEach(e => {
       lines.push([
         e.id ?? '',
-        esc(e.name),
-        esc(e.song),
-        esc(e.status || 'waiting')
+        escapeCsv(e.name),
+        escapeCsv(e.song),
+        escapeCsv(e.status || 'waiting')
       ].join(','));
     });
     return lines.join('\n');
   }
 
+  function parseCSVLine(line) {
+    const result = [];
+    let cur = '';
+    let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQ && line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQ = !inQ;
+        }
+      } else if (c === ',' && !inQ) {
+        result.push(cur);
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    result.push(cur);
+    return result;
+  }
+
+  function save() {
+    localStorage.setItem('songQueue', JSON.stringify(queue));
+    if (localStorage.getItem('sync_token')) {
+      syncToRepo();
+    }
+  }
+
+  function addEntry() {
+    const name = document.getElementById('nameInput').value.trim();
+    const song = document.getElementById('songInput').value.trim();
+    if (!name) { toast('⚠️ Please enter a name'); document.getElementById('nameInput').focus(); return; }
+    if (!song) { toast('⚠️ Please enter a song'); document.getElementById('songInput').focus(); return; }
+    queue.push({ id: Date.now(), name, song, status: 'waiting' });
+    save();
+    render();
+    document.getElementById('nameInput').value = '';
+    document.getElementById('songInput').value = '';
+    document.getElementById('nameInput').focus();
+    toast('✓ Added to queue');
+  }
+
+  function setStatus(id, status) {
+    const entry = queue.find(e => e.id === id);
+    if (!entry) return;
+    if (status === 'current') {
+      queue.forEach(e => { if (e.id !== id && e.status === 'current') e.status = 'waiting'; });
+    }
+    entry.status = status;
+    save();
+    render();
+  }
+
+  function promoteNext() {
+    const next = queue.find(e => e.status === 'waiting');
+    if (!next) { toast('No one in waiting list'); return; }
+    queue.forEach(e => { if (e.status === 'current') e.status = 'waiting'; });
+    next.status = 'current';
+    save();
+    render();
+    toast('🎤 Now performing: ' + next.name);
+  }
+
+  function deleteEntry(id) {
+    queue = queue.filter(e => e.id !== id);
+    save();
+    render();
+    toast('Removed from queue');
+  }
+
+  function moveEntry(id, dir) {
+    const wIds = queue.filter(e => e.status === 'waiting').map(e => e.id);
+    const pos = wIds.indexOf(id);
+    if (pos < 0) return;
+    const np = pos + dir;
+    if (np < 0 || np >= wIds.length) return;
+    const iA = queue.findIndex(e => e.id === wIds[pos]);
+    const iB = queue.findIndex(e => e.id === wIds[np]);
+    [queue[iA], queue[iB]] = [queue[iB], queue[iA]];
+    save();
+    render();
+  }
+
+  function setTab(tab) {
+    activeTab = tab;
+    render();
+  }
+
+  function exportCSV() {
+    if (queue.length === 0) { toast('⚠️ Queue is empty'); return; }
+    const blob = new Blob([queueToCsv(queue)], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'song-queue.csv';
+    a.click();
+    toast('✓ CSV exported');
+  }
+
+  function importCSV(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const lines = e.target.result.trim().split(/\r?\n/);
+        const header = (lines[0] || '').toLowerCase();
+        if (!header.includes('name') || !header.includes('song')) {
+          toast('⚠️ Invalid CSV format');
+          return;
+        }
+        const parsed = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVLine(lines[i]);
+          if (cols.length < 3) continue;
+          const status = String(cols[3] || 'waiting').trim().toLowerCase();
+          parsed.push({
+            id: parseInt(cols[0], 10) || Date.now() + i,
+            name: String(cols[1] || '').trim(),
+            song: String(cols[2] || '').trim(),
+            status: ['current', 'done', 'waiting'].includes(status) ? status : 'waiting'
+          });
+        }
+        let seenCurrent = false;
+        parsed.forEach(e => {
+          if (e.status === 'current') {
+            if (seenCurrent) e.status = 'waiting';
+            seenCurrent = true;
+          }
+        });
+        queue = parsed;
+        save();
+        render();
+        toast('✓ Imported ' + parsed.length + ' entries');
+      } catch (err) {
+        toast('⚠️ Import failed');
+      }
+      ev.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function render() {
+    const nAll = queue.length;
+    const nCur = queue.filter(e => e.status === 'current').length;
+    const nDone = queue.filter(e => e.status === 'done').length;
+    const nWait = queue.filter(e => e.status === 'waiting').length;
+
+    document.getElementById('stats').innerHTML = `
+      <div class="stat-pill all">Total: ${nAll}</div>
+      <div class="stat-pill cur">🎤 ${nCur} Current</div>
+      <div class="stat-pill done">✅ ${nDone} Done</div>
+      <div class="stat-pill wait">⏳ ${nWait} Waiting</div>`;
+
+    document.getElementById('cnt-all').textContent = nAll;
+    document.getElementById('cnt-current').textContent = nCur;
+    document.getElementById('cnt-done').textContent = nDone;
+    document.getElementById('cnt-waiting').textContent = nWait;
+
+    ['all','current','done','waiting'].forEach(t => {
+      document.getElementById('tab-' + t).className = 'tab-btn' + (activeTab === t ? ' active-' + t : '');
+    });
+
+    const list = document.getElementById('queueList');
+    let html = '';
+
+    if (activeTab === 'all') {
+      if (nAll === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="big">🎵</div>No entries yet.<br>Add the first singer above.</div>`;
+        return;
+      }
+      const groups = [
+        { label: '🎤 Currently Performing', items: queue.filter(e => e.status === 'current') },
+        { label: '⏳ Waiting', items: queue.filter(e => e.status === 'waiting') },
+        { label: '✅ Done', items: queue.filter(e => e.status === 'done') }
+      ];
+      let idx = 0;
+      groups.forEach(g => {
+        if (!g.items.length) return;
+        html += `<div class="section-label">${g.label}</div>`;
+        g.items.forEach((e, i) => {
+          idx++;
+          const isCur = e.status === 'current';
+          const isWait = e.status === 'waiting';
+          const isFirst = i === 0;
+          const isLast = i === g.items.length - 1;
+          const moveBtns = isWait
+            ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst ? 'disabled' : ''}>▲</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast ? 'disabled' : ''}>▼</button></div>`
+            : '';
+          html += `
+            <div class="row-card status-${e.status}">
+              <div class="row-num">${idx}</div>
+              <div class="row-info">
+                <div class="row-name">${esc(e.name)}</div>
+                <div class="row-song">${esc(e.song)}</div>
+              </div>
+              ${moveBtns}
+              <div class="row-actions">
+                <button class="act-btn set-current${isCur ? ' is-current' : ''}" onclick="setStatus(${e.id},'current')">${isCur ? '🎤 On Stage' : '🎤 Set Current'}</button>
+              </div>
+              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
+            </div>`;
+        });
+      });
+    } else if (activeTab === 'current') {
+      const curItems = queue.filter(e => e.status === 'current');
+      const hasWait = queue.some(e => e.status === 'waiting');
+      html += `
+        <div class="next-btn-bar">
+          <span>⏭ Move first Waiting singer to Current</span>
+          <button class="next-btn" onclick="promoteNext()" ${!hasWait ? 'disabled' : ''}>Next →</button>
+        </div>`;
+      if (!curItems.length) {
+        html += `<div class="empty-state"><div class="big">🎤</div>No one is performing right now.</div>`;
+      } else {
+        curItems.forEach((e, i) => {
+          html += `
+            <div class="row-card status-current">
+              <div class="row-num">${i + 1}</div>
+              <div class="row-info">
+                <div class="row-name">${esc(e.name)}</div>
+                <div class="row-song">${esc(e.song)}</div>
+              </div>
+              <div class="row-actions">
+                <button class="act-btn to-done" onclick="setStatus(${e.id},'done')">✅ Done</button>
+                <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')">⏳ Waiting</button>
+              </div>
+              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
+            </div>`;
+        });
+      }
+    } else if (activeTab === 'done') {
+      const doneItems = queue.filter(e => e.status === 'done');
+      if (!doneItems.length) {
+        html = `<div class="empty-state"><div class="big">✅</div>No completed performances yet.</div>`;
+      } else {
+        doneItems.forEach((e, i) => {
+          html += `
+            <div class="row-card status-done">
+              <div class="row-num">${i + 1}</div>
+              <div class="row-info">
+                <div class="row-name">${esc(e.name)}</div>
+                <div class="row-song">${esc(e.song)}</div>
+              </div>
+              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
+            </div>`;
+        });
+      }
+    } else if (activeTab === 'waiting') {
+      const waitItems = queue.filter(e => e.status === 'waiting');
+      if (!waitItems.length) {
+        html = `<div class="empty-state"><div class="big">⏳</div>No one waiting.</div>`;
+      } else {
+        waitItems.forEach((e, i) => {
+          const isFirst = i === 0;
+          const isLast = i === waitItems.length - 1;
+          html += `
+            <div class="row-card status-waiting">
+              <div class="row-num">${i + 1}</div>
+              <div class="row-info">
+                <div class="row-name">${esc(e.name)}</div>
+                <div class="row-song">${esc(e.song)}</div>
+              </div>
+              <div class="move-btns">
+                <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst ? 'disabled' : ''}>▲</button>
+                <button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast ? 'disabled' : ''}>▼</button>
+              </div>
+              <div class="row-actions">
+                <button class="act-btn to-current" onclick="setStatus(${e.id},'current')">🎤 Current</button>
+                <button class="act-btn to-done" onclick="setStatus(${e.id},'done')">✅ Done</button>
+              </div>
+              <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
+            </div>`;
+        });
+      }
+    }
+
+    list.innerHTML = html;
+  }
+
+  async function loadFromGitHubJson() {
+    try {
+      const res = await fetch(getJsonRawUrl() + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('GitHub JSON not found');
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('JSON is not an array');
+
+      let seenCurrent = false;
+      queue = data.map((row, i) => {
+        const status = ['current','done','waiting'].includes(String(row.status || '').toLowerCase())
+          ? String(row.status).toLowerCase()
+          : 'waiting';
+        let fixedStatus = status;
+        if (fixedStatus === 'current') {
+          if (seenCurrent) fixedStatus = 'waiting';
+          seenCurrent = true;
+        }
+        return {
+          id: row.id || (Date.now() + i),
+          name: String(row.name || '').trim(),
+          song: String(row.song || '').trim(),
+          status: fixedStatus
+        };
+      });
+
+      localStorage.setItem('songQueue', JSON.stringify(queue));
+      render();
+      return true;
+    } catch (e) {
+      console.log('GitHub load skipped:', e.message);
+      return false;
+    }
+  }
+
   async function getFileSha(token, path) {
-    const res = await fetch(`https://api.github.com/repos/${_REPO}/contents/${path}?ref=${_BRANCH}&_t=${Date.now()}`, {
+    const url = `https://api.github.com/repos/${_REPO}/contents/${path}?ref=${_BRANCH}&_t=${Date.now()}`;
+    const res = await fetch(url, {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Accept': 'application/vnd.github+json'
       }
     });
-
     if (res.status === 404) return null;
-
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'SHA fetch failed');
+    if (!res.ok) throw new Error(data.message || 'Failed to read file SHA');
     return data.sha || null;
   }
 
-  async function putFile(token, path, text, message) {
+  async function putFileToGitHub(token, path, textContent, commitMessage) {
     const sha = await getFileSha(token, path);
-
     const body = {
-      message,
-      content: btoa(unescape(encodeURIComponent(text))),
+      message: commitMessage,
+      content: btoa(unescape(encodeURIComponent(textContent))),
       branch: _BRANCH
     };
     if (sha) body.sha = sha;
@@ -72,65 +796,16 @@
     if (!token) return { ok: false, msg: 'No token configured' };
 
     setPillStatus('syncing');
-
     try {
       const jsonText = JSON.stringify(queue, null, 2);
       const csvText = queueToCsv(queue);
-
-      await putFile(token, _JSON_FILE, jsonText, 'Update song queue JSON');
-      await putFile(token, _CSV_FILE, csvText, 'Update song queue CSV');
-
+      await putFileToGitHub(token, _JSON_FILE, jsonText, 'Update song queue JSON');
+      await putFileToGitHub(token, _CSV_FILE, csvText, 'Update song queue CSV');
       setPillStatus('ok');
       return { ok: true };
     } catch (e) {
       setPillStatus('error');
       return { ok: false, msg: e.message };
-    }
-  }
-
-  async function loadFromGitHubJson() {
-    try {
-      const res = await fetch(getJsonRawUrl() + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) throw new Error('JSON not found');
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        queue = data;
-        localStorage.setItem('songQueue', JSON.stringify(queue));
-        render();
-        return true;
-      }
-    } catch (e) {
-      console.log('GitHub JSON load skipped:', e.message);
-    }
-    return false;
-  }
-
-  async function initData() {
-    const loaded = await loadFromGitHubJson();
-    if (!loaded) {
-      queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
-      render();
-    }
-  }
-
-  function refreshSyncUrlUI() {
-    const token = localStorage.getItem('sync_token');
-    const sec = document.getElementById('syncUrlSection');
-
-    if (token) {
-      sec.style.display = '';
-      document.getElementById('syncUrlDisplay').value = getJsonRawUrl();
-    } else {
-      sec.style.display = 'none';
-    }
-
-    const pill = document.getElementById('syncPill');
-    if (token) {
-      pill.textContent = '✓ Cloud Synced';
-      pill.className = 'sync-pill synced';
-    } else {
-      pill.textContent = '☁️ Cloud Sync';
-      pill.className = 'sync-pill';
     }
   }
 
@@ -140,10 +815,8 @@
       document.getElementById('syncResult').textContent = '⚠️ Enter a GitHub token';
       return;
     }
-
     localStorage.setItem('sync_token', token);
-    document.getElementById('syncResult').textContent = 'Syncing JSON + CSV...';
-
+    document.getElementById('syncResult').textContent = 'Syncing JSON + CSV…';
     const r = await syncToRepo();
     if (r.ok) {
       document.getElementById('syncResult').textContent = '✓ Synced JSON + CSV to GitHub';
@@ -153,6 +826,22 @@
     }
   }
 
-  refreshSyncUrlUI();
+  async function initData() {
+    refreshSyncUrlUI();
+    const loaded = await loadFromGitHubJson();
+    if (!loaded) {
+      queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
+      render();
+    }
+  }
+
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' && (document.activeElement.id === 'nameInput' || document.activeElement.id === 'songInput')) {
+      addEntry();
+    }
+  });
+
   initData();
 </script>
+</body>
+</html>
