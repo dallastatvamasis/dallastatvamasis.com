@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Song Queue Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --saffron: #E8671A;
+    --saffron-light: #F5A04A;
+    --saffron-glow: rgba(232,103,26,0.18);
+    --gold: #D4A017;
+    --gold-light: #F7D87C;
+    --deep: #1A0F00;
+    --surface: #2A1800;
+    --card: #311C00;
+    --border: rgba(232,103,26,0.22);
+    --text: #F5E8D0;
+    --muted: #B09070;
+    --current-bg: rgba(212,160,23,0.13);
+    --current-border: #D4A017;
+    --done-bg: rgba(60,160,80,0.12);
+    --done-border: #4CAF6A;
+    --waiting-bg: rgba(80,100,160,0.12);
+    --waiting-border: #7090D0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(232,103,26,0.20) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(212,160,23,0.08) 0%, transparent 60%);
+  }
+
+  header {
+    text-align: center;
+    padding: 1.6rem 1rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  header::after {
+    content: '';
+    display: block;
+    width: 70px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--saffron), transparent);
+    margin: 0.6rem auto 0;
+  }
+  header .logo { font-size: 1.5rem; margin-bottom: 0.15rem; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    background: linear-gradient(135deg, var(--saffron-light), var(--gold-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
+
+  .main { max-width: 680px; margin: 0 auto; padding: 1.2rem 0.9rem 4rem; }
+
+  /* Entry Form */
+  .entry-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.2rem 1.1rem;
+    margin-bottom: 1.3rem;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.3);
+  }
+  .entry-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--saffron-light);
+    margin-bottom: 0.85rem;
+  }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+  @media (max-width: 460px) { .fields { grid-template-columns: 1fr; } }
+  .field label {
+    display: block; font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.3rem;
+  }
+  .field input {
+    width: 100%; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem; padding: 0.6rem 0.8rem; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field input::placeholder { color: var(--muted); opacity: 0.55; }
+  .field input:focus { border-color: var(--saffron); box-shadow: 0 0 0 3px var(--saffron-glow); }
+  .add-btn {
+    width: 100%; margin-top: 0.85rem;
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: #1A0F00; font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem; font-weight: 700; border: none;
+    border-radius: 11px; padding: 0.75rem 1rem;
+    cursor: pointer; letter-spacing: 0.03em;
+    transition: opacity 0.18s, transform 0.12s;
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  }
+  .add-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .add-btn:active { transform: translateY(0); }
+
+  /* Stats */
+  .stats { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .stat-pill {
+    flex: 1; min-width: 65px; border-radius: 30px;
+    padding: 0.38rem 0.6rem; text-align: center;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; border: 1.5px solid;
+  }
+  .stat-pill.all  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
+  .stat-pill.cur  { background: var(--current-bg);   border-color: var(--current-border); color: var(--gold-light); }
+  .stat-pill.done { background: var(--done-bg);       border-color: var(--done-border); color: #7DDB95; }
+  .stat-pill.wait { background: var(--waiting-bg);    border-color: var(--waiting-border); color: #9AB4EE; }
+
+  /* Tabs */
+  .tabs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--surface); border-radius: 12px;
+    border: 1.5px solid var(--border); overflow: hidden;
+    margin-bottom: 1.1rem;
+  }
+  .tab-btn {
+    background: transparent; border: none;
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem; font-weight: 600;
+    padding: 0.6rem 0.2rem; cursor: pointer;
+    transition: all 0.18s; letter-spacing: 0.02em;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn .tab-icon { font-size: 1rem; }
+  .tab-btn .tab-count {
+    font-size: 0.62rem; background: rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 0 5px; min-width: 16px; text-align: center;
+  }
+  .tab-btn.active-all     { background: var(--saffron-glow); color: var(--saffron-light); }
+  .tab-btn.active-current { background: var(--current-bg);   color: var(--gold-light); }
+  .tab-btn.active-done    { background: var(--done-bg);       color: #7DDB95; }
+  .tab-btn.active-waiting { background: var(--waiting-bg);    color: #9AB4EE; }
+
+  /* Queue list */
+  .queue-list { display: flex; flex-direction: column; gap: 0.55rem; }
+
+  .empty-state {
+    text-align: center; padding: 2.5rem 1rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .empty-state .big { font-size: 2.2rem; margin-bottom: 0.4rem; }
+
+  .section-label {
+    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 0.3rem 0; margin-top: 0.3rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Row card */
+  .row-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+    padding: 0.75rem 0.85rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.22s ease;
+    position: relative; overflow: hidden;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .row-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    border-radius: 4px 0 0 4px; background: var(--waiting-border); transition: background 0.3s;
+  }
+  .row-card.status-current::before { background: var(--gold); }
+  .row-card.status-done::before    { background: var(--done-border); }
+  .row-card.status-current {
+    border-color: rgba(212,160,23,0.4);
+    background: linear-gradient(to right, var(--current-bg), var(--card));
+  }
+  .row-card.status-done { border-color: rgba(76,175,106,0.25); opacity: 0.72; }
+  .row-card.dragging    { opacity: 0.38; border-color: var(--saffron) !important; }
+  .row-card.drag-over   { border-color: var(--gold) !important; box-shadow: 0 -3px 0 0 var(--gold); }
+
+  .row-num { font-size: 0.68rem; color: var(--muted); font-weight: 700; min-width: 18px; text-align: center; flex-shrink: 0; }
+
+  .row-info { flex: 1; min-width: 0; }
+  .row-name {
+    font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .row-song {
+    font-size: 0.75rem; color: var(--saffron-light); margin-top: 0.1rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .row-song::before { content: '♪ '; }
+
+  /* Action buttons */
+  .row-actions { display: flex; gap: 0.28rem; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .act-btn {
+    border: 1.5px solid; border-radius: 8px; background: transparent;
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 0.27rem 0.48rem; cursor: pointer; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+  }
+  .act-btn.to-current { border-color: var(--current-border); color: var(--gold-light); }
+  .act-btn.to-current:hover { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
+  .act-btn.to-done    { border-color: var(--done-border); color: #7DDB95; }
+  .act-btn.to-done:hover { background: var(--done-border); color: #1A0F00; }
+  .act-btn.to-waiting { border-color: var(--waiting-border); color: #9AB4EE; }
+  .act-btn.to-waiting:hover { background: var(--waiting-border); color: #1A0F00; }
+
+  /* All-tab set-current toggle */
+  .act-btn.set-current { border-color: var(--current-border); color: var(--gold-light); padding: 0.27rem 0.6rem; }
+  .act-btn.set-current.is-current { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
+  .act-btn.set-current:hover:not(.is-current) { background: var(--saffron-glow); }
+
+  /* Drag handle */
+  .drag-handle {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 0.22rem 0.15rem;
+    cursor: grab; flex-shrink: 0; opacity: 0.35; transition: opacity 0.15s; touch-action: none;
+  }
+  .drag-handle:hover { opacity: 0.85; }
+  .drag-handle span { display: block; width: 15px; height: 2px; background: var(--saffron-light); border-radius: 2px; }
+
+  /* Move up/down */
+  .move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .mv-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); font-size: 0.62rem; border-radius: 5px;
+    padding: 0.14rem 0.35rem; cursor: pointer; line-height: 1; transition: all 0.15s;
+  }
+  .mv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .mv-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
+
+  /* Del */
+  .del-btn {
+    background: none; border: none; color: #7a3a2a;
+    font-size: 0.88rem; cursor: pointer; padding: 0.2rem;
+    border-radius: 6px; transition: color 0.15s; flex-shrink: 0;
+  }
+  .del-btn:hover { color: #E04030; }
+
+  /* Current tab — Next banner */
+  .next-btn-bar {
+    background: var(--current-bg); border: 1.5px solid var(--current-border);
+    border-radius: 12px; padding: 0.7rem 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    margin-bottom: 0.7rem;
+  }
+  .next-btn-bar span { font-size: 0.78rem; color: var(--gold-light); }
+  .next-btn {
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    color: #1A0F00; border: none; border-radius: 9px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
+    padding: 0.48rem 0.9rem; cursor: pointer; white-space: nowrap;
+    transition: opacity 0.15s, transform 0.1s; flex-shrink: 0;
+  }
+  .next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .next-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+  @media (max-width: 380px) {
+    .act-btn { font-size: 0.6rem; padding: 0.22rem 0.35rem; }
+    .row-card { gap: 0.4rem; padding: 0.65rem 0.55rem; }
+  }
+
+
+  /* CSV toolbar */
+  .csv-bar {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem;
+  }
+  .csv-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600; border-radius: 10px;
+    padding: 0.52rem 0.7rem; cursor: pointer; letter-spacing: 0.03em;
+    transition: all 0.18s;
+  }
+  .csv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
+  .export-btn:hover { border-color: var(--done-border); color: #7DDB95; background: var(--done-bg); }
+  .import-btn:hover { border-color: var(--waiting-border); color: #9AB4EE; background: var(--waiting-bg); }
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 1.4rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--saffron); color: #1A0F00;
+    font-weight: 700; font-size: 0.82rem;
+    padding: 0.58rem 1.2rem; border-radius: 30px;
+    box-shadow: 0 4px 20px rgba(232,103,26,0.4);
+    opacity: 0; transition: opacity 0.22s, transform 0.22s;
+    pointer-events: none; z-index: 9999; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎵</div>
+  <h1>Song Queue Manager</h1>
+  <p>Add singers &amp; songs · Manage performance order</p>
+</header>
+
+<div class="main">
+
+  <!-- Entry Form -->
+  <div class="entry-card">
+    <h2>✦ Add to Queue</h2>
+    <div class="fields">
+      <div class="field">
+        <label>Singer Name</label>
+        <input type="text" id="nameInput" placeholder="e.g. Ramesh Kumar" maxlength="60" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Song / Bhajan</label>
+        <input type="text" id="songInput" placeholder="e.g. Venkateswara Suprabhatam" maxlength="80" autocomplete="off">
+      </div>
+    </div>
+    <button class="add-btn" onclick="addEntry()">＋ Add to Queue</button>
+  </div>
+
+
+  <!-- CSV toolbar -->
+  <div class="csv-bar">
+    <button class="csv-btn export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <label class="csv-btn import-btn">
+      ⬆ Import CSV
+      <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" style="display:none">
+    </label>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats"></div>
+
+  <!-- Tabs: All | Current | Done | Waiting -->
+  <div class="tabs">
+    <button class="tab-btn" id="tab-all"     onclick="setTab('all')">
+      <span class="tab-icon">🎵</span><span>All</span><span class="tab-count" id="cnt-all">0</span>
+    </button>
+    <button class="tab-btn" id="tab-current" onclick="setTab('current')">
+      <span class="tab-icon">🎤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span>
+    </button>
+    <button class="tab-btn" id="tab-done"    onclick="setTab('done')">
+      <span class="tab-icon">✅</span><span>Done</span><span class="tab-count" id="cnt-done">0</span>
+    </button>
+    <button class="tab-btn" id="tab-waiting" onclick="setTab('waiting')">
+      <span class="tab-icon">⏳</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span>
+    </button>
+  </div>
+
+  <!-- Queue -->
+  <div class="queue-list" id="queueList"></div>
+
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+  let queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
+  let activeTab = 'all';
+
+  function save() { localStorage.setItem('songQueue', JSON.stringify(queue)); }
+
+  function toast(msg) {
+    const t = document.getElementById('toastEl');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ── Add ── */
+  function addEntry() {
+    const name = document.getElementById('nameInput').value.trim();
+    const song = document.getElementById('songInput').value.trim();
+    if (!name) { toast('⚠️ Please enter a name'); document.getElementById('nameInput').focus(); return; }
+    if (!song) { toast('⚠️ Please enter a song'); document.getElementById('songInput').focus(); return; }
+    queue.push({ id: Date.now(), name, song, status: 'waiting' });
+    save(); render();
+    document.getElementById('nameInput').value = '';
+    document.getElementById('songInput').value = '';
+    document.getElementById('nameInput').focus();
+    toast('✓ Added to queue!');
+  }
+
+  /* ── Set status — only-one-current enforced ── */
+  function setStatus(id, status) {
+    const entry = queue.find(e => e.id === id);
+    if (!entry) return;
+    if (status === 'current') {
+      // Move any existing current back to waiting
+      queue.forEach(e => { if (e.id !== id && e.status === 'current') e.status = 'waiting'; });
+    }
+    entry.status = status;
+    save(); render();
+  }
+
+  /* ── Promote first waiting → current ── */
+  function promoteNext() {
+    const next = queue.find(e => e.status === 'waiting');
+    if (!next) { toast('No one in waiting list'); return; }
+    queue.forEach(e => { if (e.status === 'current') e.status = 'waiting'; });
+    next.status = 'current';
+    save(); render();
+    toast('🎤 Now performing: ' + next.name);
+  }
+
+  /* ── Delete ── */
+  function deleteEntry(id) {
+    queue = queue.filter(e => e.id !== id);
+    save(); render(); toast('Removed from queue');
+  }
+
+  /* ── Tab switch ── */
+  function setTab(tab) { activeTab = tab; render(); }
+
+  /* ── Move waiting entry up/down ── */
+  function moveEntry(id, dir) {
+    const wIds = queue.filter(e => e.status === 'waiting').map(e => e.id);
+    const pos = wIds.indexOf(id);
+    if (pos < 0) return;
+    const np = pos + dir;
+    if (np < 0 || np >= wIds.length) return;
+    const iA = queue.findIndex(e => e.id === wIds[pos]);
+    const iB = queue.findIndex(e => e.id === wIds[np]);
+    [queue[iA], queue[iB]] = [queue[iB], queue[iA]];
+    save(); render();
+  }
+
+
+  /* ── Export CSV ── */
+  function exportCSV() {
+    if (queue.length === 0) { toast('⚠️ Queue is empty'); return; }
+    const rows = ['id,name,song,status'];
+    queue.forEach(e => {
+      const name = '"' + String(e.name).replace(/"/g,'""') + '"';
+      const song = '"' + String(e.song).replace(/"/g,'""') + '"';
+      rows.push([e.id, name, song, e.status].join(','));
+    });
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'song-queue.csv';
+    a.click();
+    toast('✓ CSV exported!');
+  }
+
+  /* ── Import CSV ── */
+  function importCSV(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const lines = e.target.result.trim().split('\n');
+        const header = lines[0].toLowerCase();
+        if (!header.includes('name') || !header.includes('song')) {
+          toast('⚠️ Invalid CSV format'); return;
+        }
+        const parsed = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVLine(lines[i]);
+          if (cols.length < 3) continue;
+          const status = (cols[3] || 'waiting').trim().toLowerCase();
+          parsed.push({
+            id: parseInt(cols[0]) || Date.now() + i,
+            name: cols[1].trim(),
+            song: cols[2].trim(),
+            status: ['current','done','waiting'].includes(status) ? status : 'waiting'
+          });
+        }
+        if (parsed.length === 0) { toast('⚠️ No valid rows found'); return; }
+        // Enforce only-one-current
+        let seenCurrent = false;
+        parsed.forEach(e => {
+          if (e.status === 'current') {
+            if (seenCurrent) e.status = 'waiting';
+            seenCurrent = true;
+          }
+        });
+        queue = parsed;
+        save(); render();
+        toast('✓ Imported ' + parsed.length + ' entries!');
+      } catch(err) { toast('⚠️ Import failed'); }
+      ev.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function parseCSVLine(line) {
+    const result = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+      else cur += c;
+    }
+    result.push(cur);
+    return result;
+  }
+
+  /* ── Render ── */
+  function render() {
+    const nAll  = queue.length;
+    const nWait = queue.filter(e => e.status === 'waiting').length;
+    const nCur  = queue.filter(e => e.status === 'current').length;
+    const nDone = queue.filter(e => e.status === 'done').length;
+
+    // Stats bar
+    document.getElementById('stats').innerHTML = `
+      <div class="stat-pill all">Total: ${nAll}</div>
+      <div class="stat-pill cur">🎤 ${nCur} Current</div>
+      <div class="stat-pill done">✅ ${nDone} Done</div>
+      <div class="stat-pill wait">⏳ ${nWait} Waiting</div>`;
+
+    // Tab counts + active class
+    document.getElementById('cnt-all').textContent     = nAll;
+    document.getElementById('cnt-current').textContent = nCur;
+    document.getElementById('cnt-done').textContent    = nDone;
+    document.getElementById('cnt-waiting').textContent = nWait;
+    ['all','current','done','waiting'].forEach(t => {
+      document.getElementById('tab-'+t).className =
+        'tab-btn' + (activeTab === t ? ' active-'+t : '');
+    });
+
+    const list = document.getElementById('queueList');
+    let html = '';
+
+    /* ════ ALL TAB ════ */
+    if (activeTab === 'all') {
+      if (nAll === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="big">🎵</div>No entries yet.<br>Add the first singer above!</div>`;
+        return;
+      }
+      const groups = [
+        { key:'current', label:'🎤 Currently Performing', items: queue.filter(e=>e.status==='current') },
+        { key:'waiting', label:'⏳ Waiting',               items: queue.filter(e=>e.status==='waiting') },
+        { key:'done',    label:'✅ Done',                   items: queue.filter(e=>e.status==='done') },
+      ];
+      let idx = 0;
+      groups.forEach(g => {
+        if (!g.items.length) return;
+        html += `<div class="section-label">${g.label}</div>`;
+        g.items.forEach((e, i) => {
+          idx++;
+          const isCur  = e.status === 'current';
+          const isWait = e.status === 'waiting';
+          const isFirst = i === 0, isLast = i === g.items.length - 1;
+          const dragAttrs = isWait ? `draggable="true" ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()" ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)" ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})"` : '';
+          const dragHandle = isWait ? `<div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>` : `<div style="width:22px;flex-shrink:0"></div>`;
+          const moveBtns = isWait ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>▲</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast?'disabled':''}>▼</button></div>` : '';
+          html += `
+          <div class="row-card status-${e.status}" id="card-${e.id}" data-id="${e.id}" ${dragAttrs}>
+            ${dragHandle}
+            <div class="row-num">${idx}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            ${moveBtns}
+            <div class="row-actions">
+              <button class="act-btn set-current${isCur?' is-current':''}" onclick="setStatus(${e.id},'current')" title="${isCur?'Currently performing':'Set as current performer'}">${isCur?'🎤 On Stage':'🎤 Set Current'}</button>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
+        });
+      });
+    }
+
+    /* ════ CURRENT TAB ════ */
+    else if (activeTab === 'current') {
+      const curItems = queue.filter(e => e.status === 'current');
+      const hasWait  = queue.some(e => e.status === 'waiting');
+      html += `
+      <div class="next-btn-bar">
+        <span>⏭ Move first Waiting singer to Current</span>
+        <button class="next-btn" onclick="promoteNext()" ${!hasWait?'disabled':''}>Next →</button>
+      </div>`;
+      if (curItems.length === 0) {
+        html += `<div class="empty-state"><div class="big">🎤</div>No one is performing right now.<br>Use "Set Current" in All tab or click Next →</div>`;
+      } else {
+        curItems.forEach((e, i) => {
+          html += `
+          <div class="row-card status-current" id="card-${e.id}" data-id="${e.id}">
+            <div class="row-num">${i+1}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            <div class="row-actions">
+              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">✅ Done</button>
+              <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')" title="Back to Waiting">⏳ Waiting</button>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
+        });
+      }
+    }
+
+    /* ════ DONE TAB ════ */
+    else if (activeTab === 'done') {
+      const doneItems = queue.filter(e => e.status === 'done');
+      if (doneItems.length === 0) {
+        html = `<div class="empty-state"><div class="big">✅</div>No completed performances yet.</div>`;
+      } else {
+        doneItems.forEach((e, i) => {
+          html += `
+          <div class="row-card status-done" id="card-${e.id}" data-id="${e.id}">
+            <div class="row-num">${i+1}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
+        });
+      }
+    }
+
+    /* ════ WAITING TAB ════ */
+    else if (activeTab === 'waiting') {
+      const waitItems = queue.filter(e => e.status === 'waiting');
+      if (waitItems.length === 0) {
+        html = `<div class="empty-state"><div class="big">⏳</div>No one waiting.<br>Add singers above!</div>`;
+      } else {
+        waitItems.forEach((e, i) => {
+          const isFirst = i === 0, isLast = i === waitItems.length - 1;
+          html += `
+          <div class="row-card status-waiting" id="card-${e.id}" data-id="${e.id}"
+            draggable="true"
+            ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()"
+            ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)"
+            ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})">
+            <div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>
+            <div class="row-num">${i+1}</div>
+            <div class="row-info">
+              <div class="row-name">${esc(e.name)}</div>
+              <div class="row-song">${esc(e.song)}</div>
+            </div>
+            <div class="move-btns">
+              <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>▲</button>
+              <button class="mv-btn" onclick="moveEntry(${e.id},1)"  ${isLast?'disabled':''}>▼</button>
+            </div>
+            <div class="row-actions">
+              <button class="act-btn to-current" onclick="setStatus(${e.id},'current')" title="Set as Current">🎤 Current</button>
+              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">✅ Done</button>
+            </div>
+            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">✕</button>
+          </div>`;
+        });
+      }
+    }
+
+    list.innerHTML = html;
+  }
+
+  /* ── Drag & Drop (desktop) ── */
+  let dragId = null;
+  function onDragStart(ev, id) {
+    dragId = id; ev.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => { const el = document.getElementById('card-'+id); if(el) el.classList.add('dragging'); }, 0);
+  }
+  function onDragEnd() {
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('dragging','drag-over'));
+    dragId = null;
+  }
+  function onDragOver(ev, overId) {
+    ev.preventDefault();
+    if (dragId === overId) return;
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over'));
+    const el = document.getElementById('card-'+overId);
+    if (el) el.classList.add('drag-over');
+  }
+  function onDragLeave(ev) { ev.currentTarget.classList.remove('drag-over'); }
+  function onDrop(ev, overId) {
+    ev.preventDefault();
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over','dragging'));
+    if (!dragId || dragId === overId) return;
+    reorderWaiting(dragId, overId); dragId = null;
+  }
+
+  function reorderWaiting(fromId, toId) {
+    const fi = queue.findIndex(e => e.id === fromId);
+    const ti = queue.findIndex(e => e.id === toId);
+    if (fi < 0 || ti < 0) return;
+    const item = queue.splice(fi, 1)[0];
+    const newTi = queue.findIndex(e => e.id === toId);
+    queue.splice(newTi, 0, item);
+    save(); render();
+  }
+
+  /* ── Touch drag (mobile) ── */
+  let touchId = null, touchClone = null, touchOverId = null;
+  function onTouchStart(ev, id) {
+    if (ev.touches.length !== 1) return;
+    touchId = id;
+    const card = document.getElementById('card-'+id);
+    card.classList.add('dragging');
+    const rect = card.getBoundingClientRect();
+    touchClone = card.cloneNode(true);
+    touchClone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.82;z-index:9999;pointer-events:none;border-radius:13px;`;
+    document.body.appendChild(touchClone);
+  }
+  function onTouchMove(ev) {
+    if (!touchId || !touchClone) return;
+    ev.preventDefault();
+    const t = ev.touches[0];
+    const w = parseFloat(touchClone.style.width);
+    touchClone.style.left = (t.clientX - w/2) + 'px';
+    touchClone.style.top  = (t.clientY - 28) + 'px';
+    touchClone.style.display = 'none';
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    touchClone.style.display = '';
+    const card = el ? el.closest('.row-card[data-id]') : null;
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over'));
+    if (card && card.dataset.id && parseInt(card.dataset.id) !== touchId) {
+      card.classList.add('drag-over');
+      touchOverId = parseInt(card.dataset.id);
+    } else { touchOverId = null; }
+  }
+  function onTouchEnd(ev, id) {
+    if (touchClone) { touchClone.remove(); touchClone = null; }
+    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('dragging','drag-over'));
+    if (touchId && touchOverId && touchId !== touchOverId) reorderWaiting(touchId, touchOverId);
+    touchId = null; touchOverId = null;
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && (document.activeElement.id === 'nameInput' || document.activeElement.id === 'songInput'))
+      addEntry();
+  });
+
+  render();
+</script>
+</body>
+</html>
