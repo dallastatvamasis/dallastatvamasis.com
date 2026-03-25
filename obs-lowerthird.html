@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Lower Third – Ayyappan Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: transparent; font-family: 'DM Sans', sans-serif; }
+
+  /* Card sits bottom-left */
+  .lower-third {
+    position: absolute;
+    bottom: 80px; left: 80px;
+    display: flex; align-items: stretch;
+    animation: slideIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* Accent bar */
+  .accent-bar {
+    width: 6px; border-radius: 3px 0 0 3px;
+    background: linear-gradient(180deg, #FF6B1A, #FFD166);
+    flex-shrink: 0;
+  }
+
+  /* Main card body */
+  .card-body {
+    background: rgba(0,0,0,0.88);
+    border-top: 1px solid rgba(255,107,26,0.4);
+    border-bottom: 1px solid rgba(255,107,26,0.2);
+    border-right: 1px solid rgba(255,107,26,0.2);
+    padding: 20px 40px 20px 30px;
+    min-width: 480px; max-width: 700px;
+    position: relative; overflow: hidden;
+  }
+
+  /* shimmer line at top */
+  .card-body::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #FF6B1A, #FFD166, #FF6B1A);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { 0%{background-position:0% 0%} 100%{background-position:200% 0%} }
+
+  .card-tag {
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.28em; text-transform: uppercase; color: #FF8C42;
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-tag::after { content: ''; flex: 1; height: 1px; background: rgba(255,107,26,0.3); }
+
+  .card-name {
+    font-family: 'Cinzel', serif; font-size: 52px; font-weight: 700;
+    color: #FFFFFF; line-height: 1.1; letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .card-role {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 26px; font-weight: 500; color: #FFB366;
+    margin-top: 4px; letter-spacing: 0.04em;
+  }
+  .card-role::before { content: '♪  '; font-style: normal; font-size: 18px; color: #FF8C42; }
+
+  /* Auto-hide after display duration */
+  .lower-third.hide { animation: slideOut 0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
+  @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
+</style>
+</head>
+<body>
+
+<!-- Lower Third Card -->
+<div class="lower-third" id="lowerThird">
+  <div class="accent-bar"></div>
+  <div class="card-body">
+    <div class="card-tag">🎤 &nbsp; Now Singing</div>
+    <div class="card-name" id="cardName">Devotee Name</div>
+    <div class="card-role" id="cardRole">Song / Bhajan Title</div>
+  </div>
+</div>
+
+<script>
+  // ── Configuration ──────────────────────────────────────────────────────
+  // To control via URL params: ?name=Rajan&role=Harivarasanam&duration=8
+  // Default auto-hide after 8 seconds
+  const params   = new URLSearchParams(window.location.search);
+  const name     = params.get('name')     || 'Devotee Name';
+  const role     = params.get('role')     || 'Song / Bhajan Title';
+  const duration = parseInt(params.get('duration') || '8', 10) * 1000;
+
+  document.getElementById('cardName').textContent = name;
+  document.getElementById('cardRole').textContent = role;
+
+  // Auto-hide
+  setTimeout(() => {
+    document.getElementById('lowerThird').classList.add('hide');
+  }, duration);
+</script>
+</body>
+</html>
