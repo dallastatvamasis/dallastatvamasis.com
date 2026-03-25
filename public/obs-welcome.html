@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Welcome – Ayyappan Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── AMBIENT GLOW LAYERS ── */
+  .glow-top {
+    position: absolute; top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 1200px; height: 600px;
+    background: radial-gradient(ellipse at center,
+      rgba(255,107,26,0.12) 0%,
+      rgba(255,180,60,0.06) 40%,
+      transparent 70%);
+    pointer-events: none;
+  }
+  .glow-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1600px; height: 800px;
+    background: radial-gradient(ellipse at center,
+      rgba(255,209,102,0.05) 0%,
+      transparent 65%);
+    pointer-events: none;
+  }
+
+  /* ── DECORATIVE HORIZONTAL RULES ── */
+  .rule-top, .rule-bottom {
+    position: absolute; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,107,26,0.3) 8%,
+      #FF6B1A 22%,
+      #FFD166 50%,
+      #FF6B1A 78%,
+      rgba(255,107,26,0.3) 92%,
+      transparent 100%);
+  }
+  .rule-top { top: 60px; }
+  .rule-bottom { bottom: 60px; }
+  .rule-top::before, .rule-bottom::before {
+    content: '◆'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 10px; color: #FFD166;
+    text-shadow: 0 0 8px rgba(255,200,80,0.9);
+  }
+
+  /* ── CORNER ACCENTS ── */
+  .corner {
+    position: absolute; width: 60px; height: 60px;
+    pointer-events: none;
+  }
+  .corner.tl { top: 40px; left: 60px;
+    border-top: 2px solid rgba(255,107,26,0.5);
+    border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.tr { top: 40px; right: 60px;
+    border-top: 2px solid rgba(255,107,26,0.5);
+    border-right: 2px solid rgba(255,107,26,0.5); }
+  .corner.bl { bottom: 40px; left: 60px;
+    border-bottom: 2px solid rgba(255,107,26,0.5);
+    border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.br { bottom: 40px; right: 60px;
+    border-bottom: 2px solid rgba(255,107,26,0.5);
+    border-right: 2px solid rgba(255,107,26,0.5); }
+
+  /* ── WATERMARK ── */
+  .watermark {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none; user-select: none;
+  }
+  .wm-main {
+    font-family: 'Cinzel', serif; font-size: 96px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.03); white-space: nowrap;
+  }
+  .wm-sub {
+    font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600;
+    letter-spacing: 0.38em; text-transform: uppercase;
+    color: rgba(255,255,255,0.02); margin-top: 8px; white-space: nowrap;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .stage {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
+  }
+
+  /* DTS org name */
+  .org-name {
+    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 600;
+    letter-spacing: 0.38em; text-transform: uppercase;
+    color: rgba(255,179,102,0.7);
+    animation: fadeDown 1s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* OM / flame symbol */
+  .flame {
+    font-size: 56px; line-height: 1;
+    margin: 18px 0 10px;
+    animation: fadeDown 1s 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    filter: drop-shadow(0 0 18px rgba(255,140,40,0.7));
+  }
+
+  /* WELCOME TO */
+  .welcome-to {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 42px; font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.12em;
+    animation: fadeDown 1s 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* AYYAPPAN POOJAI */
+  .event-title {
+    font-family: 'Cinzel', serif; font-size: 112px; font-weight: 900;
+    letter-spacing: 0.06em; color: #FFD166;
+    line-height: 1; white-space: nowrap;
+    text-shadow:
+      0 0 60px rgba(255,180,40,0.35),
+      0 4px 24px rgba(0,0,0,0.9);
+    animation: fadeDown 1s 0.65s cubic-bezier(0.22,1,0.36,1) both;
+    margin-top: 6px;
+  }
+
+  /* divider gem line */
+  .gem-line {
+    display: flex; align-items: center; gap: 18px;
+    margin: 28px 0 24px;
+    animation: fadeDown 1s 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .gem-line::before, .gem-line::after {
+    content: '';
+    display: block; width: 280px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,107,26,0.6), #FFD166);
+  }
+  .gem-line::after {
+    background: linear-gradient(90deg, #FFD166, rgba(255,107,26,0.6), transparent);
+  }
+  .gem { font-size: 16px; color: #FFD166; text-shadow: 0 0 10px rgba(255,200,80,0.8); }
+
+  /* LIVE STARTS SOON */
+  .live-badge {
+    display: flex; align-items: center; gap: 16px;
+    animation: fadeDown 1s 0.95s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .live-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #FF3B30;
+    box-shadow: 0 0 0 0 rgba(255,59,48,0.6);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,59,48,0.7); }
+    60%  { box-shadow: 0 0 0 14px rgba(255,59,48,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
+  }
+  .live-text {
+    font-family: 'Cinzel', serif; font-size: 36px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: #FFFFFF;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .live-text span { color: #FF8C42; }
+
+  /* ── BIG DATE & TIME ── */
+  .dt-stage {
+    margin-top: 44px;
+    display: flex; flex-direction: column; align-items: center;
+    animation: fadeDown 1s 1.1s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .big-time-row {
+    display: flex; align-items: baseline; gap: 14px; line-height: 1;
+  }
+  .big-time {
+    font-family: 'Cinzel', serif; font-size: 160px; font-weight: 900;
+    color: #FFFFFF; letter-spacing: 0.03em;
+    text-shadow:
+      0 0 80px rgba(255,180,60,0.2),
+      0 4px 28px rgba(0,0,0,0.9);
+  }
+  .big-sec {
+    font-family: 'Cinzel', serif; font-size: 80px; font-weight: 700;
+    color: rgba(255,180,80,0.55); letter-spacing: 0.03em;
+    padding-bottom: 14px;
+    text-shadow: 0 0 20px rgba(255,140,40,0.3);
+  }
+  .big-ampm {
+    font-family: 'Cinzel', serif; font-size: 42px; font-weight: 700;
+    color: #FF8C42; letter-spacing: 0.14em;
+    padding-bottom: 18px;
+    text-shadow: 0 0 20px rgba(255,140,40,0.5);
+  }
+  .big-date {
+    font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 500;
+    color: #FFB366; letter-spacing: 0.14em;
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.92);
+    border-top: 3px solid #FF6B1A;
+    height: 52px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .bar-center {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.32em; text-transform: uppercase;
+    color: rgba(255,150,60,0.5); white-space: nowrap;
+  }
+
+  /* ── SHARED ENTRANCE ANIMATION ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient glows -->
+<div class="glow-top"></div>
+<div class="glow-center"></div>
+
+<!-- Corner accents -->
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<!-- Horizontal rules -->
+<div class="rule-top"></div>
+<div class="rule-bottom"></div>
+
+<!-- Ghost watermark -->
+<div class="watermark">
+  <div class="wm-main">DTS Media Live</div>
+  <div class="wm-sub">Dallas Tatvamasi Sangam</div>
+</div>
+
+<!-- Main stage content -->
+<div class="stage">
+  <div class="org-name">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
+  <div class="flame">🪔</div>
+  <div class="welcome-to">Welcome to</div>
+  <div class="event-title">Ayyappan Poojai</div>
+
+  <div class="gem-line"><span class="gem">◆</span></div>
+
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    <div class="live-text">Live Starts <span>Soon</span></div>
+  </div>
+
+  <!-- Big date & time -->
+  <div class="dt-stage">
+    <div class="big-time-row">
+      <div class="big-time" id="bigTime">--:--</div>
+      <div class="big-sec" id="bigSec">--</div>
+      <div class="big-ampm" id="bigAmPm">--</div>
+    </div>
+    <div class="big-date" id="bigDate">--- --, ----</div>
+  </div>
+</div>
+
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <div class="bar-center">DTS Media Live &nbsp;·&nbsp; Swamy Saranam</div>
+</div>
+
+<script>
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const WDAYS  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  function updateClock() {
+    const n  = new Date();
+    let h    = n.getHours(), m = n.getMinutes(), s = n.getSeconds();
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+
+    document.getElementById('bigTime').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    document.getElementById('bigSec').textContent  = ':' + String(s).padStart(2,'0');
+    document.getElementById('bigAmPm').textContent = ap;
+    document.getElementById('bigDate').textContent =
+      WDAYS[n.getDay()] + ',  ' + MONTHS[n.getMonth()] + ' ' + n.getDate() + ',  ' + n.getFullYear();
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
