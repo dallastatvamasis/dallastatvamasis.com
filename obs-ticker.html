@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Ticker – Ayyappan Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: transparent; font-family: 'DM Sans', sans-serif; }
+
+  /* Ticker sits at top of screen */
+  .ticker-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.92);
+    border-bottom: 3px solid #FF6B1A;
+    height: 64px;
+    display: flex; align-items: center; overflow: hidden;
+  }
+
+  /* Left label badge */
+  .ticker-label {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FF6B1A, #FF8C42);
+    height: 100%; padding: 0 28px;
+    display: flex; align-items: center; gap: 10px;
+    border-right: 2px solid rgba(255,209,102,0.4);
+  }
+  .ticker-label-icon { font-size: 20px; }
+  .ticker-label-text {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase; color: #FFFFFF;
+    white-space: nowrap;
+  }
+
+  /* Scroll track */
+  .ticker-track { flex: 1; overflow: hidden; position: relative; height: 100%; }
+  .ticker-inner {
+    display: flex; align-items: center; height: 100%;
+    white-space: nowrap;
+    animation: tickerScroll 40s linear infinite;
+  }
+  .ticker-inner:hover { animation-play-state: paused; }
+
+  @keyframes tickerScroll {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 0 50px;
+  }
+  .ticker-sep {
+    font-size: 18px; color: #FF6B1A;
+    text-shadow: 0 0 8px rgba(255,107,26,0.6);
+  }
+  .ticker-text {
+    font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 500;
+    color: #FFD166; letter-spacing: 0.04em;
+  }
+  .ticker-text.highlight {
+    font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;
+    color: #FFFFFF; letter-spacing: 0.08em;
+  }
+  .ticker-text.dim { color: rgba(255,179,102,0.7); }
+
+  /* Right clock pill */
+  .ticker-clock {
+    flex-shrink: 0;
+    border-left: 2px solid rgba(255,107,26,0.4);
+    height: 100%; padding: 0 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tc-time { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: #FFFFFF; letter-spacing: 0.04em; }
+  .tc-ampm { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; color: #FF8C42; letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+
+<div class="ticker-bar">
+  <!-- Label -->
+  <div class="ticker-label">
+    <span class="ticker-label-icon">📢</span>
+    <span class="ticker-label-text">Announcements</span>
+  </div>
+
+  <!-- Scrolling content -->
+  <div class="ticker-track">
+    <div class="ticker-inner" id="tickerInner">
+      <!-- Filled dynamically from ticker.txt -->
+    </div>
+  </div>
+
+  <!-- Clock -->
+  <div class="ticker-clock">
+    <div class="tc-time" id="tcTime">--:--</div>
+    <div class="tc-ampm" id="tcAmPm">--</div>
+  </div>
+</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────────────
+  const TICKER_URL    = 'https://dallastatvamasis.com/ticker.txt';
+  const REFRESH_MS    = 30000; // reload ticker.txt every 30 seconds
+  const SCROLL_SPEED  = 40;    // seconds for one full scroll (increase = slower)
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+
+  // ── Clock ─────────────────────────────────────────────────────────────
+  function tickClock() {
+    const n = new Date(); let h = n.getHours(), m = n.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+    document.getElementById('tcTime').textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    document.getElementById('tcAmPm').textContent = ap;
+  }
+  tickClock(); setInterval(tickClock, 1000);
+
+  // ── Render ticker items ───────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderTicker(lines) {
+    const el = document.getElementById('tickerInner');
+    if (!lines.length) return;
+
+    // Build HTML — alternate highlight/normal styling
+    let html = lines.map((line, i) => {
+      const cls = (i % 2 === 0) ? 'ticker-text highlight' : 'ticker-text';
+      return `
+        <div class="ticker-item">
+          <span class="ticker-sep">✦</span>
+          <span class="${cls}">${esc(line)}</span>
+        </div>`;
+    }).join('');
+
+    // Replace content and restart animation smoothly
+    el.style.animation = 'none';
+    el.innerHTML = html;
+    void el.offsetWidth; // reflow to restart animation
+    el.style.animation = `tickerScroll ${SCROLL_SPEED}s linear infinite`;
+  }
+
+  // ── Fetch ticker.txt ──────────────────────────────────────────────────
+  async function loadTicker() {
+    try {
+      const res  = await fetch(TICKER_URL + '?t=' + Date.now()); // bust cache
+      const text = await res.text();
+      const lines = text
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l.length > 0 && !l.startsWith('#')); // skip blank & comment lines
+      if (lines.length) renderTicker(lines);
+    } catch (err) {
+      // Keep showing last known ticker on network error
+      console.warn('ticker.txt fetch failed:', err);
+    }
+  }
+
+  // Init
+  loadTicker();
+  setInterval(loadTicker, REFRESH_MS);
+</script>
+</body>
+</html>

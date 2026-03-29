@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F0EAE2">
+<title>DTS Photo Manager</title>
+<style>
+:root {
+  --saffron:#FF6B00; --gold:#D4A017; --gold-lt:#F0C843;
+  --brown:#1A0800; --bg:#F0EAE2; --bg2:#E4D8CC;
+  --card:#FFFFFF; --text:#1A0800; --sub:#8B6B50;
+  --border:rgba(0,0,0,0.09); --red:#E53935;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,'SF Pro Text',system-ui,sans-serif;
+  font-size:15px;height:100%;display:flex;flex-direction:column;
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+}
+
+/* TOP BAR */
+.topbar{
+  background:rgba(240,234,226,0.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:calc(var(--safe-t) + 10px) 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;position:sticky;top:0;z-index:100;
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-om{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle,var(--gold-lt),var(--saffron));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--brown);box-shadow:0 2px 10px rgba(255,107,0,0.3);
+}
+.tb-title{font-size:17px;font-weight:700;color:var(--text)}
+.tb-sub{font-size:11px;color:var(--sub);margin-top:1px}
+.tb-add{
+  background:var(--saffron);color:#fff;border:none;
+  border-radius:20px;padding:8px 18px;font-size:13px;font-weight:600;
+  cursor:pointer;-webkit-user-select:none;user-select:none;
+}
+.tb-add:active{opacity:0.8;transform:scale(0.97)}
+#file-input{display:none}
+
+/* TABS */
+.tabs{
+  background:rgba(240,234,226,0.97);
+  display:flex;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.tab{
+  flex:1;text-align:center;padding:11px 4px 9px;
+  font-size:13px;font-weight:600;color:var(--sub);
+  cursor:pointer;border-bottom:2.5px solid transparent;
+  transition:all 0.15s;-webkit-user-select:none;user-select:none;
+}
+.tab.active{color:var(--saffron);border-bottom-color:var(--saffron)}
+
+/* PAGES */
+.page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;
+  padding-bottom:calc(24px + var(--safe-b))}
+.page.active{display:block}
+
+/* STATUS */
+.status-pill{
+  margin:12px 16px 0;background:var(--card);border-radius:12px;
+  padding:10px 14px;display:flex;align-items:center;gap:9px;
+  font-size:13px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.s-dot{width:7px;height:7px;border-radius:50%;background:var(--saffron);
+  flex-shrink:0;animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* UPLOAD ZONE */
+.upload-zone{
+  margin:10px 16px;background:var(--card);
+  border:2px dashed rgba(255,107,0,0.3);border-radius:16px;
+  padding:24px 16px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:all 0.18s;
+}
+.upload-zone:active{background:#FFF5EE;border-color:var(--saffron)}
+.uz-icon{font-size:34px}
+.uz-title{font-size:14px;font-weight:600;color:var(--text)}
+.uz-sub{font-size:12px;color:var(--sub);line-height:1.5}
+
+/* PROGRESS */
+#prog-wrap{margin:0 16px 8px;display:none;flex-direction:column;gap:5px}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:var(--sub)}
+.prog-bg{height:5px;background:rgba(0,0,0,0.08);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;width:0%;background:linear-gradient(to right,var(--saffron),var(--gold));border-radius:3px;transition:width 0.3s}
+
+/* STAGE */
+#stage-wrap{margin:0 16px;display:none;flex-direction:column;gap:10px}
+.stage-hd{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--sub);padding:4px 0;
+}
+.stage-hd span{color:var(--saffron)}
+.stage-card{
+  background:var(--card);border-radius:14px;overflow:hidden;
+  display:flex;align-items:stretch;box-shadow:0 1px 6px rgba(0,0,0,0.07);
+}
+.stage-thumb{width:80px;flex-shrink:0;overflow:hidden}
+.stage-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.stage-body{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.stage-name{font-size:10px;font-weight:700;color:var(--saffron);
+  font-family:ui-monospace,monospace;letter-spacing:0.06em}
+.stage-ta{
+  width:100%;background:var(--bg);border:1.5px solid var(--bg2);
+  border-radius:8px;padding:8px 10px;font-size:14px;
+  color:var(--text);outline:none;resize:none;height:50px;font-family:inherit;
+}
+.stage-ta:focus{border-color:var(--saffron)}
+.stage-ta::placeholder{color:rgba(0,0,0,0.25)}
+.stage-rm{background:none;border:none;color:var(--red);
+  font-size:13px;padding:0;cursor:pointer;align-self:flex-start;font-weight:600}
+.stage-btns{display:flex;gap:8px;margin:0 16px 4px}
+.stage-btns button{flex:1;padding:13px;border-radius:12px;
+  font-size:13px;font-weight:600;cursor:pointer;border:none}
+.s-cancel{background:var(--bg2);color:var(--sub)}
+.s-upload{background:linear-gradient(135deg,var(--saffron),var(--gold));color:#fff;flex:2}
+.s-cancel:active,.s-upload:active{opacity:0.82;transform:scale(0.98)}
+
+/* REORDER BAR */
+.reorder-bar{
+  display:none;align-items:center;gap:10px;
+  margin:10px 16px;background:#FFF5EE;
+  border:1.5px solid rgba(255,107,0,0.3);border-radius:12px;padding:10px 14px;
+}
+.reorder-bar.on{display:flex}
+.reorder-bar p{flex:1;font-size:12px;color:var(--saffron)}
+.save-ord{
+  background:var(--saffron);color:#fff;border:none;
+  border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
+}
+.save-ord:active{opacity:0.82}
+
+/* SECTION HEAD */
+.sec-hd{
+  padding:16px 16px 6px;font-size:11px;font-weight:700;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.sec-hd span{color:var(--saffron)}
+
+/* PHOTO LIST */
+.photo-list{margin:0}
+.p-row{
+  background:var(--card);display:flex;align-items:center;
+  padding:10px 14px 10px 6px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background 0.12s;gap:2px;
+  -webkit-user-select:none;user-select:none;
+}
+.p-row:first-child{border-top:1px solid var(--border)}
+.p-row:active{background:#FFF5EE}
+.p-row.dragging{opacity:0.35}
+.p-row.drag-over{border-top:2.5px solid var(--saffron)}
+.p-handle{
+  padding:10px 8px;color:#C8B49A;font-size:22px;flex-shrink:0;
+  cursor:grab;touch-action:none;line-height:1;
+}
+.p-handle:active{color:var(--gold)}
+.p-thumb{
+  width:60px;height:60px;border-radius:12px;flex-shrink:0;overflow:hidden;
+  background:linear-gradient(135deg,#8B4000,#3D1800);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.p-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.p-info{flex:1;padding:0 10px;min-width:0}
+.p-num{font-size:10px;font-weight:700;color:var(--saffron);
+  font-family:ui-monospace,monospace;letter-spacing:0.06em;margin-bottom:3px}
+.p-cap{font-size:13px;color:var(--text);line-height:1.35;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-nocap{font-size:12px;color:#B8A898;font-style:italic}
+.p-arrow{color:#C8B49A;font-size:20px;flex-shrink:0}
+
+/* EMPTY */
+.empty{text-align:center;padding:52px 24px;
+  display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty-icon{font-size:52px}
+.empty-ttl{font-size:16px;font-weight:600;color:var(--text)}
+.empty-sub{font-size:13px;color:var(--sub);line-height:1.6}
+
+/* CLEAR BTN */
+.clear-btn{
+  display:block;width:calc(100% - 32px);margin:10px 16px;
+  background:var(--card);border:1.5px solid rgba(229,57,53,0.2);
+  color:var(--red);border-radius:12px;padding:14px;
+  font-size:14px;font-weight:600;cursor:pointer;text-align:center;
+}
+.clear-btn:active{background:#FFF0EF}
+
+/* EVENT PAGE */
+.ev-page{padding:16px;display:flex;flex-direction:column;gap:12px}
+.f-card{background:var(--card);border-radius:16px;padding:14px 16px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:5px}
+.f-lbl{font-size:11px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--sub)}
+.f-in{
+  width:100%;border:none;background:transparent;
+  font-size:15px;color:var(--text);outline:none;
+  font-family:inherit;padding:4px 0;
+  border-bottom:1.5px solid var(--bg2);
+}
+.f-in:focus{border-bottom-color:var(--saffron)}
+.f-ta{
+  width:100%;border:none;background:transparent;
+  font-size:13px;color:var(--text);outline:none;
+  font-family:inherit;padding:4px 0;resize:none;height:64px;
+  border-bottom:1.5px solid var(--bg2);line-height:1.5;
+}
+.f-ta:focus{border-bottom-color:var(--saffron)}
+.f-hint{font-size:11px;color:#B8A898}
+.f-in[type="datetime-local"]{color-scheme:light}
+.upd-btn{
+  background:linear-gradient(135deg,var(--saffron),var(--gold));
+  color:#fff;border:none;border-radius:16px;padding:16px;
+  font-size:15px;font-weight:700;cursor:pointer;width:100%;
+  box-shadow:0 4px 16px rgba(255,107,0,0.28);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.upd-btn:active{opacity:0.88;transform:scale(0.99)}
+.upd-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.upd-stat{font-size:12px;text-align:center;color:var(--sub);min-height:16px}
+
+/* BOTTOM SHEET */
+.backdrop{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0.45);
+  opacity:0;pointer-events:none;transition:opacity 0.28s;
+}
+.backdrop.on{opacity:1;pointer-events:all}
+.sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:201;
+  background:var(--card);border-radius:22px 22px 0 0;
+  padding-bottom:calc(24px + var(--safe-b));
+  transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);
+  max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.sheet.on{transform:translateY(0)}
+.sh-handle{width:36px;height:4px;background:#DDD;border-radius:2px;
+  margin:10px auto 16px}
+.sh-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px 14px;border-bottom:1px solid var(--border);
+}
+.sh-title{font-size:16px;font-weight:700;color:var(--text)}
+.sh-done{color:var(--saffron);font-size:16px;font-weight:600;
+  cursor:pointer;padding:4px 0 4px 16px}
+.sh-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+.sh-photo{
+  width:100%;height:200px;border-radius:16px;overflow:hidden;
+  background:linear-gradient(135deg,#8B4000,#3D1800);
+  display:flex;align-items:center;justify-content:center;
+  font-size:64px;position:relative;
+}
+.sh-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sh-photo-num{
+  position:absolute;top:10px;right:12px;z-index:1;
+  background:rgba(0,0,0,0.55);color:#fff;
+  border-radius:20px;padding:3px 10px;font-size:11px;
+  font-family:ui-monospace,monospace;font-weight:700;
+}
+.sh-lbl{font-size:11px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.sh-input{
+  width:100%;background:var(--bg);border:1.5px solid var(--bg2);
+  border-radius:12px;padding:12px 14px;font-size:15px;
+  color:var(--text);outline:none;resize:none;height:80px;
+  font-family:inherit;line-height:1.5;
+}
+.sh-input:focus{border-color:var(--saffron);background:#fff}
+.sh-input::placeholder{color:#B8A898}
+.sh-btns{display:flex;gap:10px}
+.sh-del{
+  background:#FFF0EF;color:var(--red);
+  border:1.5px solid rgba(229,57,53,0.18);
+  border-radius:12px;padding:14px;flex:1;
+  font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.sh-save{
+  background:linear-gradient(135deg,var(--saffron),var(--gold));
+  color:#fff;border:none;border-radius:12px;
+  padding:14px;flex:2;font-size:14px;font-weight:700;cursor:pointer;
+}
+.sh-del:active,.sh-save:active{opacity:0.82;transform:scale(0.98)}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:calc(20px + var(--safe-b));left:50%;
+  transform:translateX(-50%) translateY(30px);
+  color:#fff;border-radius:24px;padding:10px 20px;
+  font-size:13px;font-weight:600;white-space:nowrap;
+  z-index:300;opacity:0;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:none;
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-om">ॐ</div>
+    <div>
+      <div class="tb-title">DTS Photos</div>
+      <div class="tb-sub" id="tb-sub">Loading…</div>
+    </div>
+  </div>
+  <button class="tb-add" onclick="triggerAdd()">＋ Add</button>
+</div>
+<input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('photos')">📸  Photos</div>
+  <div class="tab"        onclick="showTab('event')">🪔  Event &amp; Update</div>
+</div>
+
+<!-- ════════════ PHOTOS PAGE ════════════ -->
+<div class="page active" id="page-photos">
+
+  <div class="status-pill">
+    <div class="s-dot"></div>
+    <span id="status-msg">Loading…</span>
+  </div>
+
+  <div class="upload-zone" onclick="triggerAdd()">
+    <div class="uz-icon">📸</div>
+    <div class="uz-title">Tap to Select Photos</div>
+    <div class="uz-sub">Pick multiple · add captions · upload<br>Saved to <strong>/obs-photos/</strong></div>
+  </div>
+
+  <div id="prog-wrap">
+    <div class="prog-row"><span id="prog-lbl">Uploading…</span><span id="prog-pct">0%</span></div>
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill"></div></div>
+  </div>
+
+  <div id="stage-wrap">
+    <div class="stage-hd">📝 Add captions before upload <span id="stage-count"></span></div>
+    <div id="stage-list"></div>
+    <div class="stage-btns">
+      <button class="s-cancel" onclick="clearStage()">✕ Cancel</button>
+      <button class="s-upload" id="up-btn" onclick="uploadStage()">📤 Upload All</button>
+    </div>
+  </div>
+
+  <div class="reorder-bar" id="reorder-bar">
+    <p>⟳ Order changed — save to apply</p>
+    <button class="save-ord" onclick="saveOrder()">💾 Save Order</button>
+  </div>
+
+  <div class="sec-hd">Photos — hold ⠿ to reorder <span id="photo-count">0</span></div>
+  <div class="photo-list" id="photo-list"></div>
+  <button class="clear-btn" id="clear-btn" onclick="clearAll()" style="display:none">🗑  Clear All Photos</button>
+
+</div>
+
+<!-- ════════════ EVENT PAGE ════════════ -->
+<div class="page" id="page-event">
+  <div class="ev-page">
+
+    <div class="f-card">
+      <div class="f-lbl">Poojai / Event Name</div>
+      <input class="f-in" id="ev-event" type="text" value="Ayyappan Poojai" placeholder="e.g. Ayyappan Poojai">
+    </div>
+
+    <div class="f-card">
+      <div class="f-lbl">Subtitle</div>
+      <input class="f-in" id="ev-sub" type="text" value="Dallas Tatvamasi Sangam · Swamy Saranam">
+    </div>
+
+    <div class="f-card">
+      <div class="f-lbl">Ticker Messages</div>
+      <textarea class="f-ta" id="ev-ticker">DTS Media Live · Swamy Saranam|Ayyappan Poojai – Live Streaming|Dallas Tatvamasi Sangam|Subscribe &amp; Share ✦ YouTube Live</textarea>
+      <div class="f-hint">Separate items with  |</div>
+    </div>
+
+    <div class="f-card">
+      <div class="f-lbl">Live Start Date &amp; Time</div>
+      <input class="f-in" id="ev-dt" type="datetime-local">
+    </div>
+
+    <button class="upd-btn" id="upd-btn" onclick="updateWelcome()">🔄  Update Welcome Page</button>
+    <div class="upd-stat" id="upd-stat"></div>
+
+  </div>
+</div>
+
+<!-- BOTTOM SHEET -->
+<div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sh-handle"></div>
+  <div class="sh-hdr">
+    <div class="sh-title" id="sh-title">Edit Photo</div>
+    <div class="sh-done" onclick="saveSheet()">Save</div>
+  </div>
+  <div class="sh-body">
+    <div class="sh-photo" id="sh-photo">
+      <span id="sh-emoji">📸</span>
+      <div class="sh-photo-num" id="sh-num">#1</div>
+    </div>
+    <div>
+      <div class="sh-lbl">Caption</div>
+      <textarea class="sh-input" id="sh-cap" placeholder="Describe this photo…"></textarea>
+    </div>
+    <div class="sh-btns">
+      <button class="sh-del"  onclick="deleteSheet()">🗑 Delete</button>
+      <button class="sh-save" onclick="saveSheet()">Save Caption</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API   = '/obs-photos-upload.php';
+const BASE  = '/obs-photos/';
+
+let current  = [];   /* [{name,caption}] */
+let staged   = [];   /* [{file,name,caption,previewUrl}] */
+let editIdx  = -1;
+let reordered = false;
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('file-input').addEventListener('change', onPick);
+  const d = new Date(Date.now()+3600000); d.setSeconds(0,0);
+  const p = n=>String(n).padStart(2,'0');
+  document.getElementById('ev-dt').value=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  load();
+});
+
+/* ── TABS ── */
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['photos','event'][i]===id));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+}
+
+/* ── ADD PHOTOS ── */
+function triggerAdd(){document.getElementById('file-input').value='';document.getElementById('file-input').click();}
+
+function onPick(e){
+  const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));
+  e.target.value='';
+  if(!files.length)return;
+  const base=current.length+staged.length+1;
+  staged=[...staged,...files.map((f,i)=>({
+    file:f, name:`photo_${String(base+i).padStart(2,'0')}.jpg`,
+    caption:'', previewUrl:URL.createObjectURL(f)
+  }))];
+  renderStage();
+  setMsg(`${staged.length} photo${staged.length>1?'s':''} ready — add captions then upload`);
+}
+
+function renderStage(){
+  const w=document.getElementById('stage-wrap');
+  const l=document.getElementById('stage-list');
+  if(!staged.length){w.style.display='none';return;}
+  w.style.display='flex';
+  document.getElementById('stage-count').textContent=staged.length;
+  l.innerHTML=staged.map((it,i)=>`
+    <div class="stage-card">
+      <div class="stage-thumb"><img src="${it.previewUrl}" alt=""></div>
+      <div class="stage-body">
+        <div class="stage-name">${it.name}</div>
+        <textarea class="stage-ta" placeholder="Caption… (optional)"
+          oninput="staged[${i}].caption=this.value">${it.caption}</textarea>
+        <button class="stage-rm" onclick="rmStaged(${i})">✕ Remove</button>
+      </div>
+    </div>`).join('');
+}
+function rmStaged(i){
+  URL.revokeObjectURL(staged[i].previewUrl); staged.splice(i,1);
+  const base=current.length+1;
+  staged.forEach((s,j)=>s.name=`photo_${String(base+j).padStart(2,'0')}.jpg`);
+  renderStage(); if(!staged.length)setMsg('Ready');
+}
+function clearStage(){
+  staged.forEach(s=>URL.revokeObjectURL(s.previewUrl)); staged=[];
+  renderStage(); setMsg('Cancelled');
+}
+
+/* ── UPLOAD ── */
+async function uploadStage(){
+  if(!staged.length)return;
+  const btn=document.getElementById('up-btn');
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  showProg(true); let done=0,ok=0;
+  for(const it of staged){
+    progUpdate(done,staged.length,`Uploading ${it.name}…`);
+    try{await uploadOne(it.file,it.name,it.caption);ok++;}catch{}
+    done++;
+  }
+  progUpdate(done,staged.length,'✅ Done'); showProg(false);
+  staged.forEach(s=>URL.revokeObjectURL(s.previewUrl)); staged=[];
+  renderStage(); btn.disabled=false; btn.textContent='📤 Upload All';
+  toast(`✅ ${ok} photo${ok!==1?'s':''} uploaded`,'ok');
+  setTimeout(load,500);
+}
+function uploadOne(file,name,caption){
+  return new Promise((res,rej)=>{
+    const fd=new FormData();
+    fd.append('action','upload');fd.append('photo',file,name);
+    fd.append('filename',name);fd.append('caption',caption||'');
+    const x=new XMLHttpRequest();
+    x.open('POST',API);
+    x.onload=()=>x.status===200?res():rej();
+    x.onerror=rej; x.send(fd);
+  });
+}
+
+/* ── LOAD ── */
+async function load(){
+  setMsg('Loading photos…'); reordered=false;
+  document.getElementById('reorder-bar').classList.remove('on');
+  try{
+    const r=await fetch(API+'?action=list&t='+Date.now(),
+      {cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    const d=await r.json();
+    current=d.photos||[];
+    renderList();
+    const n=current.length;
+    setMsg(`${n} photo${n!==1?'s':''} in /obs-photos/`);
+    document.getElementById('tb-sub').textContent=`${n} photo${n!==1?'s':''}`;
+    document.getElementById('clear-btn').style.display=n?'block':'none';
+  }catch{setMsg('⚠ Could not load — check server');}
+}
+
+/* ── RENDER LIST ── */
+function renderList(){
+  const list=document.getElementById('photo-list');
+  document.getElementById('photo-count').textContent=current.length;
+  if(!current.length){
+    list.innerHTML=`<div class="empty">
+      <div class="empty-icon">🖼️</div>
+      <div class="empty-ttl">No photos yet</div>
+      <div class="empty-sub">Tap <strong>＋ Add</strong> to upload photos.</div>
+    </div>`; return;
+  }
+  list.innerHTML=current.map((it,i)=>`
+    <div class="p-row" data-idx="${i}" onclick="openSheet(${i})">
+      <div class="p-handle" data-handle="1" onclick="event.stopPropagation()">⠿</div>
+      <div class="p-thumb">
+        <img src="${BASE}${it.name}?t=${Date.now()}" loading="lazy"
+             onerror="this.style.display='none'" alt="">
+      </div>
+      <div class="p-info">
+        <div class="p-num">#${i+1} · ${it.name}</div>
+        ${it.caption
+          ?`<div class="p-cap">${esc(it.caption)}</div>`
+          :`<div class="p-nocap">No caption — tap to add</div>`}
+      </div>
+      <div class="p-arrow">›</div>
+    </div>`).join('');
+  initDrag();
+}
+
+/* ── SHEET ── */
+function openSheet(i){
+  editIdx=i;
+  const it=current[i];
+  document.getElementById('sh-title').textContent=`Photo ${i+1} of ${current.length}`;
+  document.getElementById('sh-num').textContent=`#${i+1}`;
+  document.getElementById('sh-cap').value=it.caption||'';
+  /* photo */
+  const ph=document.getElementById('sh-photo');
+  document.getElementById('sh-emoji').style.display='';
+  ph.querySelectorAll('img').forEach(e=>e.remove());
+  const img=document.createElement('img');
+  img.src=BASE+it.name+'?t='+Date.now();
+  img.onload=()=>document.getElementById('sh-emoji').style.display='none';
+  ph.appendChild(img);
+  document.getElementById('backdrop').classList.add('on');
+  document.getElementById('sheet').classList.add('on');
+  setTimeout(()=>document.getElementById('sh-cap').focus(),420);
+}
+function closeSheet(){
+  document.getElementById('backdrop').classList.remove('on');
+  document.getElementById('sheet').classList.remove('on');
+  editIdx=-1;
+}
+async function saveSheet(){
+  if(editIdx<0)return;
+  const it=current[editIdx];
+  it.caption=document.getElementById('sh-cap').value.trim();
+  closeSheet(); renderList();
+  try{
+    const fd=new FormData();
+    fd.append('action','caption');fd.append('filename',it.name);fd.append('caption',it.caption);
+    await fetch(API,{method:'POST',body:fd});
+    toast('✅ Caption saved','ok');
+  }catch{toast('⚠ Save failed','err');}
+}
+async function deleteSheet(){
+  if(editIdx<0)return;
+  const it=current[editIdx];
+  if(!confirm(`Delete ${it.name}?`))return;
+  closeSheet();
+  try{
+    const fd=new FormData();fd.append('action','delete');fd.append('filename',it.name);
+    const r=await fetch(API,{method:'POST',body:fd});
+    if(r.ok){
+      current.splice(editIdx,1); renderList();
+      document.getElementById('clear-btn').style.display=current.length?'block':'none';
+      document.getElementById('tb-sub').textContent=`${current.length} photos`;
+      setMsg(`${current.length} photos in /obs-photos/`);
+      toast(`🗑 ${it.name} deleted`,'ok');
+    }
+  }catch{toast('⚠ Delete failed','err');}
+}
+
+/* ── DRAG ── */
+function initDrag(){
+  const list=document.getElementById('photo-list');
+  let drag=null,ph=null,startY=0;
+  function rows(){return[...list.querySelectorAll('.p-row')]}
+  function start(row,cy){
+    drag=row; startY=cy;
+    drag.classList.add('dragging');
+    const rect=drag.getBoundingClientRect();
+    drag.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;z-index:150;margin:0;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,0.12);`;
+    ph=document.createElement('div');
+    ph.style.cssText=`height:${rect.height}px;background:rgba(255,107,0,0.05);border-top:2px dashed rgba(255,107,0,0.3);`;
+    list.insertBefore(ph,drag);
+  }
+  function move(cy){
+    if(!drag)return;
+    drag.style.top=(parseFloat(drag.style.top)+cy-startY)+'px';
+    startY=cy;
+    const rs=rows().filter(r=>r!==drag);
+    let target=null;
+    for(const r of rs){const rect=r.getBoundingClientRect();if(cy<rect.top+rect.height/2){target=r;break;}}
+    rs.forEach(r=>r.classList.remove('drag-over'));
+    if(target)target.classList.add('drag-over');
+    list.insertBefore(ph,target);
+  }
+  function end(){
+    if(!drag)return;
+    drag.style.cssText=''; drag.classList.remove('dragging');
+    list.insertBefore(drag,ph); ph.remove(); ph=null;
+    list.querySelectorAll('.drag-over').forEach(r=>r.classList.remove('drag-over'));
+    current=rows().map(r=>current[parseInt(r.dataset.idx)]);
+    renderList();
+    reordered=true; document.getElementById('reorder-bar').classList.add('on');
+    drag=null;
+  }
+  list.addEventListener('mousedown',e=>{if(!e.target.closest('[data-handle]'))return;e.preventDefault();start(e.target.closest('.p-row'),e.clientY);});
+  document.addEventListener('mousemove',e=>{if(drag)move(e.clientY);});
+  document.addEventListener('mouseup',()=>{if(drag)end();});
+  list.addEventListener('touchstart',e=>{if(!e.target.closest('[data-handle]'))return;e.preventDefault();start(e.target.closest('.p-row'),e.touches[0].clientY);},{passive:false});
+  list.addEventListener('touchmove',e=>{if(!drag)return;e.preventDefault();move(e.touches[0].clientY);},{passive:false});
+  list.addEventListener('touchend',()=>{if(drag)end();});
+}
+
+async function saveOrder(){
+  const order=current.map(p=>p.name);
+  try{
+    const fd=new FormData();fd.append('action','reorder');fd.append('order',JSON.stringify(order));
+    const r=await fetch(API,{method:'POST',body:fd});
+    const d=await r.json();
+    if(d.ok){reordered=false;document.getElementById('reorder-bar').classList.remove('on');toast('✅ Order saved!','ok');}
+  }catch{toast('⚠ Save failed','err');}
+}
+
+/* ── CLEAR ALL ── */
+async function clearAll(){
+  if(!current.length)return;
+  if(!confirm(`Delete all ${current.length} photos?`))return;
+  setMsg('Deleting all…'); let done=0;
+  for(const it of[...current]){
+    try{const fd=new FormData();fd.append('action','delete');fd.append('filename',it.name);await fetch(API,{method:'POST',body:fd});done++;}catch{}
+  }
+  current=[]; renderList();
+  document.getElementById('clear-btn').style.display='none';
+  document.getElementById('tb-sub').textContent='0 photos';
+  toast(`🗑 ${done} photos cleared`,'ok'); setMsg('All photos cleared');
+}
+
+/* ── UPDATE WELCOME ── */
+async function updateWelcome(){
+  const btn=document.getElementById('upd-btn');
+  const stat=document.getElementById('upd-stat');
+  const event=document.getElementById('ev-event').value.trim();
+  const sub=document.getElementById('ev-sub').value.trim();
+  const ticker=document.getElementById('ev-ticker').value.trim()
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+  const dt=document.getElementById('ev-dt').value;
+  if(!event){toast('⚠ Enter event name','err');return;}
+  btn.disabled=true; btn.textContent='⏳ Updating…';
+  stat.textContent='Saving…'; stat.style.color='var(--sub)';
+  try{
+    const fd=new FormData();
+    fd.append('action','settings');fd.append('event',event);
+    fd.append('sub',sub);fd.append('ticker',ticker);
+    fd.append('dt',dt);fd.append('dur','8');
+    const r=await fetch(API,{method:'POST',body:fd});
+    const d=await r.json();
+    if(d.ok){
+      btn.textContent='✅ Welcome Page Updated!';
+      stat.style.color='#2E7D32'; stat.textContent=`"${event}" is now live on welcome page`;
+      toast('✅ Welcome page updated!','ok');
+      setTimeout(()=>{btn.disabled=false;btn.textContent='🔄  Update Welcome Page';stat.textContent='';},3000);
+    }else throw new Error(d.error||'Error');
+  }catch(err){
+    btn.disabled=false; btn.textContent='🔄  Update Welcome Page';
+    stat.style.color='var(--red)'; stat.textContent='⚠ '+err.message;
+    toast('⚠ Update failed','err');
+  }
+}
+
+/* ── PROGRESS / STATUS / UTILS ── */
+function showProg(v){document.getElementById('prog-wrap').style.display=v?'flex':'none';}
+function progUpdate(done,total,label){
+  const pct=Math.round((done/total)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-lbl').textContent=label;
+}
+function setMsg(m){document.getElementById('status-msg').textContent=m;}
+
+let _t;
+function toast(msg,type){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='on';
+  el.style.background=type==='ok'?'rgba(30,100,10,0.93)':type==='err'?'rgba(180,20,10,0.93)':'rgba(26,8,0,0.93)';
+  clearTimeout(_t); _t=setTimeout(()=>el.classList.remove('on'),3000);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

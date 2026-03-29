@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OBS Welcome – DTS Ayyappa Mandala Mahotsavam 2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --saffron:   #FF6B00;
+  --saffron-lt:#FFA040;
+  --gold:      #D4A017;
+  --gold-lt:   #F0C843;
+  --brown:     #180800;
+  --panel:     #1C0900;
+  --cream:     #FFF8EE;
+  --muted:     rgba(255,248,238,0.55);
+  --border:    rgba(212,160,23,0.28);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  width:1920px; height:1080px;
+  overflow:hidden;
+  background:#000;
+  font-family:'EB Garamond',Georgia,serif;
+}
+
+/* ── SLIDESHOW ── */
+#slideshow {
+  position:fixed; top:0; left:0;
+  width:1920px;
+  height:790px;   /* stops at top of panel */
+  z-index:0;
+}
+.slide {
+  position:absolute; inset:0;
+  background-size:contain;
+  background-position:center center;
+  background-repeat:no-repeat;
+  background-color:#000;
+  opacity:0;
+  transition:opacity 1400ms ease-in-out;
+}
+.slide.active {
+  opacity:1;
+  animation:kb 14s ease-in-out forwards;
+}
+@keyframes kb {
+  0%  { transform:scale(1.00) translate(  0%,   0%); }
+  50% { transform:scale(1.06) translate(-0.8%, 0.5%); }
+  100%{ transform:scale(1.04) translate( 0.6%,-0.4%); }
+}
+
+/* ── CAPTION OVERLAY — fixed above the solid panel ── */
+#caption-overlay {
+  position:fixed;
+  bottom:290px;          /* sits flush on top of panel border */
+  left:0; right:0;
+  z-index:15;
+  padding:0 60px 18px;
+  display:flex; align-items:flex-end;
+  pointer-events:none;
+  height:110px;
+  background:linear-gradient(to top, rgba(10,3,0,0.82) 0%, transparent 100%);
+}
+#caption-text {
+  font-family:'EB Garamond', Georgia, serif;
+  font-style:italic;
+  font-size:28px;
+  color:var(--cream);
+  letter-spacing:0.06em;
+  line-height:1.3;
+  text-shadow:0 2px 10px rgba(0,0,0,0.9);
+  opacity:0;
+  transform:translateY(12px);
+  transition:opacity 0.6s ease, transform 0.6s ease;
+  max-width:1400px;
+}
+#caption-text.show {
+  opacity:1;
+  transform:translateY(0);
+}
+#caption-text::before {
+  content:'❝  ';
+  color:var(--gold);
+  font-style:normal;
+  font-size:22px;
+}
+
+/* top shadow */
+#top-shade {
+  position:fixed; top:0; left:0; right:0; height:180px;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.45) 0%,transparent 100%);
+  z-index:1; pointer-events:none;
+}
+/* extra gradient at bottom of photo area so it blends into panel */
+#bottom-fade {
+  position:fixed;
+  bottom:290px; left:0; right:0; height:80px;
+  background:linear-gradient(to bottom, transparent 0%, rgba(10,3,0,0.6) 100%);
+  z-index:1; pointer-events:none;
+}
+
+/* ── CORNER ORNAMENTS ── */
+#corners { position:fixed; inset:0; z-index:2; pointer-events:none; }
+#corners svg { width:100%; height:100%; }
+
+
+
+/* ── PHOTO COUNTER top-right ── */
+#photo-ctr {
+  position:fixed; top:32px; right:44px; z-index:10;
+  font-family:'Cinzel',serif; font-size:12px; letter-spacing:0.2em;
+  color:rgba(255,248,238,0.35);
+  background:rgba(24,8,0,0.75);
+  border:1px solid rgba(212,160,23,0.18);
+  border-radius:4px; padding:5px 14px;
+}
+
+/* ── SOLID BOTTOM PANEL ── */
+#panel {
+  position:fixed; bottom:0; left:0; right:0;
+  height:290px;
+  background:#1C0900;          /* fully opaque — no transparency */
+  border-top:2px solid var(--gold);
+  z-index:20;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+#panel::before {
+  content:'';
+  position:absolute; top:-4px; left:0; right:0; height:1px;
+  background:linear-gradient(to right,
+    transparent 0%, var(--saffron) 25%,
+    var(--gold-lt) 50%, var(--saffron) 75%, transparent 100%);
+}
+
+/* main row */
+#panel-main {
+  flex:1;
+  display:flex; align-items:stretch;
+  padding:0 60px; gap:0;
+  border-bottom:1px solid var(--border);
+}
+
+/* left — event */
+#left-col {
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; gap:6px; padding:20px 0;
+}
+.welcome-lbl {
+  font-family:'Cinzel',serif; font-size:14px; letter-spacing:0.55em;
+  color:var(--saffron-lt); text-transform:uppercase;
+}
+#event-name {
+  font-family:'Cinzel Decorative','Cinzel',serif;
+  font-size:58px; font-weight:700; color:var(--cream);
+  letter-spacing:0.02em; line-height:1.05;
+}
+#event-sub {
+  font-family:'EB Garamond',serif; font-style:italic;
+  font-size:24px; color:var(--muted); letter-spacing:0.1em;
+}
+
+/* centre — lamp divider */
+#centre-col {
+  width:130px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+#centre-col::before {
+  content:''; position:absolute; top:16px; bottom:16px; left:50%; width:1px;
+  background:linear-gradient(to bottom,transparent,var(--border),var(--border),transparent);
+}
+.lamp {
+  font-size:52px; position:relative; z-index:1;
+  background:#1C0900; padding:8px 0;
+  filter:drop-shadow(0 0 18px rgba(255,160,40,0.75));
+  animation:lampGlow 3s ease-in-out infinite;
+}
+@keyframes lampGlow {
+  0%,100%{ filter:drop-shadow(0 0 18px rgba(255,160,40,0.7)); }
+  50%    { filter:drop-shadow(0 0 36px rgba(255,160,40,1.0)); }
+}
+
+/* right — countdown */
+#right-col {
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:flex-end; gap:10px; padding:20px 0;
+}
+#cd-row { display:flex; gap:14px; align-items:flex-end; }
+.cd-box {
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(212,160,23,0.07);
+  border:1px solid rgba(212,160,23,0.22);
+  border-radius:6px; padding:10px 20px 7px; min-width:92px;
+}
+.cd-n {
+  font-family:'Cinzel Decorative',serif; font-size:46px;
+  color:var(--gold-lt); line-height:1;
+  text-shadow:0 0 20px rgba(212,160,23,0.4);
+}
+.cd-l {
+  font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.25em;
+  color:rgba(255,248,238,0.45); text-transform:uppercase; margin-top:4px;
+}
+#live-pill {
+  display:inline-flex; align-items:center; gap:10px;
+  background:rgba(212,160,23,0.07);
+  border:1px solid rgba(212,160,23,0.22);
+  border-radius:30px; padding:7px 24px;
+}
+.live-dot {
+  width:9px; height:9px; border-radius:50%;
+  background:var(--saffron);
+  animation:blink 1.5s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100%{ opacity:1; box-shadow:0 0 7px var(--saffron); }
+  50%    { opacity:0.25; box-shadow:none; }
+}
+#live-txt {
+  font-family:'Cinzel',serif; font-size:13px; letter-spacing:0.3em;
+  color:var(--gold); text-transform:uppercase;
+}
+
+/* foot row */
+#panel-foot {
+  height:62px; display:flex; align-items:center;
+  padding:0 44px; gap:0;
+  background:rgba(0,0,0,0.2);
+}
+#foot-org {
+  font-family:'Cinzel',serif; font-size:15px; letter-spacing:0.28em;
+  color:rgba(255,248,238,0.5); text-transform:uppercase;
+  white-space:nowrap; flex-shrink:0;
+  padding-right:28px;
+}
+#ticker-wrap { flex:1; overflow:hidden; height:100%; margin-left:24px; display:flex; align-items:center; }
+#ticker-track {
+  display:inline-flex; align-items:center; white-space:nowrap;
+  animation:tickerScroll 32s linear infinite; gap:60px;
+}
+@keyframes tickerScroll { 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
+.t-item { font-family:'Cinzel',serif; font-size:15px; letter-spacing:0.14em; color:var(--muted); }
+.t-sep  { color:var(--saffron); margin:0 10px; }
+
+</style>
+</head>
+<body>
+
+<div id="slideshow"></div>
+<div id="top-shade"></div>
+
+
+
+<!-- CAPTION OVERLAY — floats above the panel -->
+<div id="caption-overlay">
+  <div id="caption-text"></div>
+</div>
+
+<div id="bottom-fade"></div>
+
+<div id="corners">
+  <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#D4A017" stop-opacity="0.85"/>
+        <stop offset="100%" stop-color="#FF6B00" stop-opacity="0.3"/>
+      </linearGradient>
+    </defs>
+    <g fill="none" stroke="url(#cg)" stroke-width="2.5">
+      <polyline points="22,100 22,22 100,22"/><polyline points="38,100 38,38 100,38"/>
+      <polyline points="1898,100 1898,22 1820,22"/><polyline points="1882,100 1882,38 1820,38"/>
+    </g>
+    <line x1="110" y1="19" x2="1810" y2="19" stroke="#D4A017" stroke-width="0.7" stroke-opacity="0.28"/>
+  </svg>
+</div>
+
+<!-- ALBUM TAG -->
+
+
+<div id="photo-ctr">— / —</div>
+
+<!-- SOLID BOTTOM PANEL -->
+<div id="panel">
+  <div id="panel-main">
+
+    <div id="left-col">
+      <div class="welcome-lbl">✦ &nbsp; Welcome to</div>
+      <div id="event-name">Ayyappan Poojai</div>
+      <div id="event-sub">Dallas Tatvamasi Sangam · Swamy Saranam</div>
+    </div>
+
+    <div id="centre-col"><div class="lamp">🪔</div></div>
+
+    <div id="right-col">
+      <div id="live-pill">
+        <div class="live-dot"></div>
+        <span id="live-txt">Live Starts Soon</span>
+      </div>
+      <div id="cd-row">
+        <div class="cd-box"><span class="cd-n" id="cd-h">00</span><span class="cd-l">Hours</span></div>
+        <div class="cd-box"><span class="cd-n" id="cd-m">00</span><span class="cd-l">Mins</span></div>
+        <div class="cd-box"><span class="cd-n" id="cd-s">00</span><span class="cd-l">Secs</span></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-main -->
+
+  <div id="panel-foot">
+    <span id="foot-org">DTS Media Live</span>
+    <div id="ticker-wrap"><div id="ticker-track"></div></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   DTS Media Live — OBS Welcome Page
+   Auto-refreshes settings + photos every 10 seconds.
+   Settings written by obs-photo-manager.html → config.json
+   Photos served from /obs-photos/ via obs-photos-upload.php
+═══════════════════════════════════════════════════════ */
+
+const REFRESH_MS   = 10000;   /* check for updates every 10s */
+const LIST_URL     = '/obs-photos-upload.php?action=list';
+const CONFIG_URL   = '/obs-photos/config.json';
+const NOCACHE      = { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } };
+
+/* ── URL params (fallback if config.json not yet written) ── */
+const P   = new URLSearchParams(location.search);
+const par = (k, fb) => {
+  const v = P.get(k);
+  if (v === null || v.trim() === '') return fb;
+  try { return decodeURIComponent(v).replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>'); }
+  catch { return fb; }
+};
+
+let CFG = {
+  event:  par('event',  'Ayyappan Poojai'),
+  sub:    par('sub',    'Dallas Tatvamasi Sangam · Swamy Saranam'),
+  ticker: par('ticker', 'DTS Media Live · Swamy Saranam|Ayyappan Poojai – Live Streaming|Dallas Tatvamasi Sangam|Subscribe & Share ✦ YouTube Live'),
+  dt:     par('dt',     ''),
+  dur:    parseInt(par('dur', '8')) * 1000 || 8000,
+  order:  par('order',  'seq'),
+};
+
+/* ── Apply settings to DOM ── */
+let cdTarget = CFG.dt ? new Date(CFG.dt) : null;
+
+function applySettings(cfg) {
+  if (cfg.event)  { CFG.event = cfg.event;   document.getElementById('event-name').textContent = cfg.event; }
+  if (cfg.sub)    { CFG.sub   = cfg.sub;     document.getElementById('event-sub').textContent  = cfg.sub; }
+  if (cfg.ticker) {
+    CFG.ticker = cfg.ticker;
+    const its = cfg.ticker.split('|').map(s => s.trim()).filter(Boolean);
+    const all = [...its, ...its];
+    document.getElementById('ticker-track').innerHTML =
+      all.map(t => `<span class="t-item">${t}<span class="t-sep">✦</span></span>`).join('');
+  }
+  if (cfg.dt) { CFG.dt = cfg.dt; cdTarget = new Date(cfg.dt); }
+}
+
+/* Apply URL-param defaults immediately */
+applySettings(CFG);
+
+/* ── Load config.json from server ── */
+async function loadConfig() {
+  try {
+    const r = await fetch(CONFIG_URL + '?t=' + Date.now(), NOCACHE);
+    if (!r.ok) return;
+    const cfg = await r.json();
+    applySettings(cfg);
+  } catch { /* config.json not yet on server — URL params stay active */ }
+}
+
+/* ── Countdown clock ── */
+const cdH      = document.getElementById('cd-h');
+const cdM      = document.getElementById('cd-m');
+const cdS      = document.getElementById('cd-s');
+const liveTxt  = document.getElementById('live-txt');
+const liveDot  = document.querySelector('.live-dot');
+
+function tick() {
+  const now = new Date();
+
+  if (cdTarget) {
+    const diff = cdTarget - now;
+
+    if (diff <= 0) {
+      /* ── LIVE NOW ── */
+      cdH.textContent      = '00';
+      cdM.textContent      = '00';
+      cdS.textContent      = '00';
+      liveTxt.textContent  = '🔴  LIVE START';
+      liveTxt.style.color  = '#FF6B00';
+      liveDot.style.background = '#FF6B00';
+    } else {
+      /* ── Counting down ── */
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      cdH.textContent     = String(h).padStart(2,'0');
+      cdM.textContent     = String(m).padStart(2,'0');
+      cdS.textContent     = String(s).padStart(2,'0');
+      liveTxt.textContent = 'Live Starts Soon';
+      liveTxt.style.color = '';
+      liveDot.style.background = 'var(--saffron)';
+    }
+  } else {
+    /* ── No target set — show current time & "Live Starts Soon" ── */
+    const raw_h = now.getHours();
+    const h12   = raw_h % 12 || 12;
+    cdH.textContent     = String(h12).padStart(2,'0');
+    cdM.textContent     = String(now.getMinutes()).padStart(2,'0');
+    cdS.textContent     = String(now.getSeconds()).padStart(2,'0');
+    liveTxt.textContent = 'Live Starts Soon';
+    liveTxt.style.color = '';
+  }
+}
+tick();
+setInterval(tick, 1000);
+
+/* ═══════════════════════════════════════════════════════
+   SLIDESHOW
+═══════════════════════════════════════════════════════ */
+(function () {
+  const stage   = document.getElementById('slideshow');
+  const ctrEl   = document.getElementById('photo-ctr');
+  const capText = document.getElementById('caption-text');
+
+  let items      = [];   /* [{url, caption}] */
+  let idx        = 0;
+  let cycleTimer = null;
+  let lastSig    = '';   /* fingerprint of current photo list */
+
+  /* ── Caption slide-up ── */
+  function showCaption(caption) {
+    /* fade out */
+    capText.classList.remove('show');
+    if (!caption) return;
+
+    /* wait for fade-out, then update text and fade in */
+    setTimeout(() => {
+      capText.textContent = caption;
+      void capText.offsetWidth;  /* reflow to restart transition */
+      capText.classList.add('show');
+    }, 500);
+  }
+
+  /* ── Show one slide ── */
+  function show(i) {
+    if (!items.length) return;
+    stage.querySelectorAll('.slide.active').forEach(el => {
+      el.classList.remove('active');
+      setTimeout(() => el.remove(), 1600);
+    });
+    const item = items[i];
+    const div  = document.createElement('div');
+    div.className = 'slide';
+    div.style.backgroundImage = `url("${item.url}?t=${Date.now()}")`;
+    stage.appendChild(div);
+    requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('active')));
+    ctrEl.textContent = `${i + 1} / ${items.length}`;
+    showCaption(item.caption);
+  }
+
+  /* ── Start / restart the slide cycle ── */
+  function startCycle() {
+    if (cycleTimer) clearInterval(cycleTimer);
+    idx = 0;
+    show(0);
+    cycleTimer = setInterval(() => {
+      idx = (idx + 1) % items.length;
+      show(idx);
+    }, CFG.dur);
+  }
+
+  /* ── Signature: detect any change in photo list ── */
+  function signature(arr) {
+    return arr.map(p => p.url + '|' + p.caption).join('||');
+  }
+
+  /* ── Load photos from server ── */
+  async function loadPhotos() {
+    try {
+      const r = await fetch(LIST_URL + '&t=' + Date.now(), NOCACHE);
+      const d = await r.json();
+      if (!d.ok || !d.photos || !d.photos.length) return false;
+
+      const newItems = d.photos.map(p => ({
+        url:     '/obs-photos/' + p.name,
+        caption: p.caption || ''
+      }));
+
+      const newSig = signature(newItems);
+      if (newSig === lastSig) return true;   /* no change — do nothing */
+
+      /* List changed — update and restart */
+      items   = newItems;
+      lastSig = newSig;
+      startCycle();
+      return true;
+    } catch { return false; }
+  }
+
+  /* ── Fallback: probe photo_01…30 directly ── */
+  async function fallbackProbe() {
+    const probes = [];
+    for (let i = 1; i <= 30; i++) {
+      const url = `/obs-photos/photo_${String(i).padStart(2,'0')}.jpg`;
+      probes.push(new Promise(res => {
+        const img = new Image();
+        img.onload  = () => res({ url, caption: '' });
+        img.onerror = () => res(null);
+        img.src = url + '?t=' + Date.now();
+        setTimeout(() => res(null), 3000);
+      }));
+    }
+    return (await Promise.all(probes)).filter(Boolean);
+  }
+
+  /* ── Initial load ── */
+  async function init() {
+    await loadConfig();             /* load settings first */
+    const ok = await loadPhotos();  /* try PHP list */
+    if (!ok) {
+      /* PHP not available — probe files directly */
+      const found = await fallbackProbe();
+      if (found.length) {
+        items   = found;
+        lastSig = signature(items);
+        startCycle();
+      }
+    }
+  }
+
+  init();
+
+  /* ── Auto-refresh every 10s ── */
+  setInterval(async () => {
+    await loadConfig();   /* settings: event name, ticker, countdown */
+    await loadPhotos();   /* photos: new uploads, reorders, deletes */
+  }, REFRESH_MS);
+
+})();
+</script>
+</body>
+</html>

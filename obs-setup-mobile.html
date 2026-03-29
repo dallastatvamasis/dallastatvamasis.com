@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1E0A00">
+<title>DTS Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --saffron:   #FF6B00;
+  --gold:      #D4A017;
+  --gold-lt:   #F0C843;
+  --brown:     #1A0800;
+  --card:      #2A1100;
+  --card-hi:   #381600;
+  --cream:     #FFF8EE;
+  --muted:     rgba(255,248,238,0.45);
+  --border:    rgba(212,160,23,0.22);
+  --border-hi: rgba(212,160,23,0.6);
+  --r:         14px;
+  --safe-b:    env(safe-area-inset-bottom, 16px);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html { height: 100%; }
+body {
+  background: var(--brown);
+  color: var(--cream);
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100%;
+  padding-bottom: calc(90px + var(--safe-b));
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.top-bar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(26,8,0,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.top-om {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-lt), var(--saffron));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--brown); flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(212,160,23,0.45);
+}
+.top-text { flex: 1; min-width: 0; }
+.top-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.06em; color: var(--cream);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.top-sub {
+  font-size: 11px; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.top-live-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--saffron); flex-shrink: 0;
+  box-shadow: 0 0 6px var(--saffron);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100%{opacity:1; transform:scale(1);}
+  50%{opacity:0.4; transform:scale(0.85);}
+}
+
+/* ── SCROLL BODY ── */
+.scroll-body {
+  padding: 16px 16px 0;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+/* card header / accordion */
+.card-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+  -webkit-user-select: none;
+}
+.card-head:active { background: var(--card-hi); }
+.card-icon { font-size: 20px; flex-shrink: 0; }
+.card-label {
+  font-family: 'Cinzel', serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  flex: 1;
+}
+.card-chevron {
+  font-size: 11px; color: var(--muted);
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+.card.open .card-chevron { transform: rotate(180deg); }
+
+.card-body {
+  padding: 0 16px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+  border-top: 1px solid var(--border);
+}
+.card:not(.open) .card-body { display: none; }
+
+/* ── FIELD ── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+select,
+textarea {
+  background: rgba(0,0,0,0.3);
+  border: 1.5px solid var(--border);
+  color: var(--cream);
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  border-radius: 10px;
+  outline: none;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 3px rgba(255,107,0,0.18);
+}
+textarea {
+  height: 90px; resize: none;
+  font-size: 13px; line-height: 1.6;
+}
+input[type="datetime-local"] { color-scheme: dark; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4A017' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+select option { background: #2A1100; }
+
+input[type="number"] { max-width: 110px; }
+
+.hint {
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+
+/* row of two fields */
+.row2 { display: flex; gap: 10px; }
+.row2 .field { flex: 1; }
+
+/* ── PHOTO THUMBNAILS ── */
+.thumb-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+.thumb {
+  aspect-ratio: 1;
+  border-radius: 7px;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(0,0,0,0.4);
+  border: 1.5px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.thumb .n {
+  position: absolute; bottom: 2px; right: 3px;
+  font-size: 8px; color: rgba(255,255,255,0.5);
+  font-feature-settings: 'tnum';
+}
+.thumb-more {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.4);
+  font-size: 10px; color: var(--muted);
+  border-radius: 7px;
+  aspect-ratio: 1;
+  border: 1.5px dashed var(--border);
+  text-align: center; line-height: 1.3;
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(212,160,23,0.12);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px; color: var(--gold);
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.08em;
+}
+.pill-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold);
+}
+
+/* ── BUTTONS ── */
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  -webkit-user-select: none; user-select: none;
+}
+.btn:active { transform: scale(0.97); opacity: 0.85; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--saffron) 0%, var(--gold) 100%);
+  color: #1A0800;
+  box-shadow: 0 4px 20px rgba(255,107,0,0.35);
+}
+.btn-ghost {
+  background: rgba(255,248,238,0.07);
+  color: var(--cream);
+  border: 1.5px solid var(--border);
+}
+.btn-gold {
+  background: rgba(212,160,23,0.15);
+  color: var(--gold-lt);
+  border: 1.5px solid var(--border-hi);
+}
+.btn-sm {
+  padding: 10px; font-size: 12px;
+  border-radius: 10px;
+}
+
+/* ── GENERATED URL BOX ── */
+.url-card {
+  background: rgba(0,0,0,0.35);
+  border: 1.5px solid var(--border-hi);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.url-card-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px; letter-spacing: 0.2em;
+  color: var(--gold); text-transform: uppercase;
+}
+.url-value {
+  font-size: 11px; color: var(--muted);
+  word-break: break-all; line-height: 1.6;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  max-height: 52px; overflow: hidden;
+}
+.url-actions { display: flex; gap: 8px; }
+.url-actions .btn { flex: 1; }
+
+/* ── STICKY BOTTOM BAR ── */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 12px 16px calc(12px + var(--safe-b));
+  background: rgba(26,8,0,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-hi);
+  z-index: 50;
+  display: flex; gap: 10px;
+}
+.bottom-bar .btn { flex: 1; }
+.bottom-bar .btn-primary { flex: 2; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: calc(86px + var(--safe-b)); left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--card-hi);
+  border: 1px solid var(--border-hi);
+  border-radius: 24px;
+  padding: 10px 20px;
+  font-size: 13px; font-weight: 600;
+  font-family: 'Cinzel', serif;
+  color: var(--cream);
+  white-space: nowrap;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+#toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+/* ── STEP NUMBER BADGES ── */
+.step-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--saffron), var(--gold));
+  color: var(--brown); font-size: 11px; font-weight: 700;
+  font-family: 'Cinzel', serif; flex-shrink: 0;
+}
+
+/* OBS steps list */
+.steps { display: flex; flex-direction: column; gap: 10px; }
+.step-row { display: flex; align-items: flex-start; gap: 10px; }
+.step-text { font-size: 13px; color: var(--muted); line-height: 1.5; padding-top: 2px; }
+.step-text strong { color: var(--cream); }
+
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-om">ॐ</div>
+  <div class="top-text">
+    <div class="top-title">DTS Media Live</div>
+    <div class="top-sub">Welcome Page Setup</div>
+  </div>
+  <div class="top-live-dot"></div>
+</div>
+
+<div class="scroll-body">
+
+  <!-- ① EVENT -->
+  <div class="card open" id="card-event">
+    <div class="card-head" onclick="toggle('card-event')">
+      <span class="card-icon">🪔</span>
+      <span class="card-label">Event</span>
+      <span class="card-chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label class="field-label">Event Name</label>
+        <input type="text" id="f-event" value="Ayyappan Poojai" oninput="update()">
+      </div>
+      <div class="field">
+        <label class="field-label">Subtitle</label>
+        <input type="text" id="f-sub" value="DTS Media Live" oninput="update()">
+      </div>
+      <div class="field">
+        <label class="field-label">Live Start Date &amp; Time</label>
+        <input type="datetime-local" id="f-dt" onchange="update()">
+      </div>
+    </div>
+  </div>
+
+  <!-- ② TICKER -->
+  <div class="card open" id="card-ticker">
+    <div class="card-head" onclick="toggle('card-ticker')">
+      <span class="card-icon">📜</span>
+      <span class="card-label">Ticker Messages</span>
+      <span class="card-chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <textarea id="f-ticker" oninput="update()">DTS Media Live  ·  Swamy Saranam|Ayyappan Poojai – Live Streaming|Dallas Tatvamasi Sangam|Subscribe &amp; Share ✦</textarea>
+        <span class="hint">Separate items with  |</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ PHOTOS -->
+  <div class="card open" id="card-photos">
+    <div class="card-head" onclick="toggle('card-photos')">
+      <span class="card-icon">📸</span>
+      <span class="card-label">Photos</span>
+      <span class="card-chevron">▼</span>
+    </div>
+    <div class="card-body">
+
+      <div class="field">
+        <label class="field-label">Google Photos Album URL</label>
+        <input type="text" id="f-album" placeholder="https://photos.app.goo.gl/…" oninput="update()">
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="fetchAlbum()">⬇ Fetch Photos from Album</button>
+
+      <!-- photo count pill -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="pill"><div class="pill-dot"></div><span id="photo-count">27 photos loaded</span></div>
+        <button class="btn btn-ghost btn-sm" style="width:auto;padding:6px 14px;font-size:11px;" onclick="clearPhotos()">✕ Clear</button>
+      </div>
+
+      <!-- thumb grid -->
+      <div class="thumb-grid" id="thumb-grid"></div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">Sec / Photo</label>
+          <input type="number" id="f-dur" value="8" min="3" max="60" oninput="update()">
+        </div>
+        <div class="field">
+          <label class="field-label">Order</label>
+          <select id="f-order" onchange="update()">
+            <option value="random">Random</option>
+            <option value="seq">Sequential</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- paste URLs fallback -->
+      <div class="field">
+        <label class="field-label">Or paste image URLs (one per line)</label>
+        <textarea id="f-urls" style="height:70px;" oninput="onUrlsChange()" placeholder="https://lh3.googleusercontent.com/pw/…"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ④ GENERATED URL -->
+  <div class="url-card">
+    <div class="url-card-label">🔗 OBS Browser Source URL</div>
+    <div class="url-value" id="url-display">Tap "Copy OBS URL" below to generate</div>
+    <div class="url-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openUrl()">↗ Preview</button>
+      <button class="btn btn-primary btn-sm" onclick="copyUrl()">📋 Copy URL</button>
+    </div>
+  </div>
+
+  <!-- ⑤ OBS INSTRUCTIONS -->
+  <div class="card" id="card-obs">
+    <div class="card-head" onclick="toggle('card-obs')">
+      <span class="card-icon">📺</span>
+      <span class="card-label">OBS Setup Guide</span>
+      <span class="card-chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step-row"><span class="step-badge">1</span><div class="step-text">Fill in Event name, time, and photos above</div></div>
+        <div class="step-row"><span class="step-badge">2</span><div class="step-text">Tap <strong>Copy OBS URL</strong> below</div></div>
+        <div class="step-row"><span class="step-badge">3</span><div class="step-text">In OBS → <strong>Add Source → Browser</strong></div></div>
+        <div class="step-row"><span class="step-badge">4</span><div class="step-text">Paste URL → Width <strong>1920</strong> · Height <strong>1080</strong></div></div>
+        <div class="step-row"><span class="step-badge">5</span><div class="step-text">✅ <em>Refresh when scene becomes active</em></div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /scroll-body -->
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <button class="btn btn-ghost" onclick="resetAll()">↺ Reset</button>
+  <button class="btn btn-primary" onclick="copyUrl()">📋 Copy OBS URL</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   DEFAULT PHOTOS — Ayyappan Poojai Mar'26
+══════════════════════════════════════════ */
+const DEFAULTS = [
+  'https://lh3.googleusercontent.com/pw/AP1GczONwRTGH1qmj0CEBuQbzECYHSBBtLfPTzsN1XiUouNwGGKui2dQtfbEAI5NPcj8ILCiKXmwldC55tssOjN6Xd6nUtYg1RbboAO92jwUVm4iMTcCYvU=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPgO8yKuy6OAmSyKV8E231Rp_b7t729dPXRMPJbO4NLfS2_rf0SRkZgsFuih5cfm2tOYA3VX71EiZwn0IBNWvrYLLJluaNT38bEceoZd2XeaFNLcXs=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczM4JPx65uoFpnCgSgV_WPMlhLrg8mzD7aulIoqhC5e23Oc2gIf7xi7Gf-Rbk93Vhi7J5WrCtVPAA7gh1pvgIcOfl3L6RfwKzZY0b6FhVNys6ctvbM8=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczO5B6bqyIsZ1w8-IIjEx-7hqJsBzV7G484gvNguj6OnU9Tp2pu5MebFh14_DeXgVMjqD7NRM3gv4iP4W5jENNUTQV5FAE3s1sfFV1NrTpagq2vO6to=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMgxl3rmUoQp03Q9qvuact2HzJ_pnLFFdV04CdziDn8QN29Dc0C4OERhOe1AUsNQKHkotGy3pst01RiaDb5ElkTEpp1cztQrd8S1Vtxm9TI70m8OK4=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMawkVQJDsTzU17AfcS-E2TIQvXsgwMoxFo0nv4ZT_8owj73K6vhP1i_a5lz2HhTMcRwm__RwJJ--9K0JEOB6JlaVMz4tJQrbifgdnR_ngE4D8qx3o=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczN3PUv_dlftxpwiuBreRXbyRA7_Z6OxL96zEKhR79HuyPaHawdzGyyzS_5QoUOvelEiiehzFRlhIhTQLkmjVtbeVcy5Zq-N6GaAxs8ItLCDVLQsh3c=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczN-Ht_gc1LluGKrLIMFEJ0C_CLexAZ3tsSPaYI3DlcaLI2pTSnuU5Uzv7n8kLkWUhTXRJDyRlcFE2XO6NaXtIcrONPHF8xXU5-eHNz5ny0hFmpT1ZU=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPpZ9_6ZamG5faYIpMCk_IJVgce8FuAM06LcEUbQtP_e3n3OKdjP0A1-10yqHKG37dOmfV6vLYEGrAVPlRXWEiQG04mh74zbjlev0tY3sbtR6hc7AY=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOpOKXIG8lDqg2Nxbjr5IYSnHg2kdLaEvBUFaD1vd36JESWNNzYxPM695zx9WTHFiEXF8-HBynqmfTovO1YA4cJYMSe-G56Cypxlqt9q-4T1xN-luk=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczN2Ma5aAh5T4_Y0AiMdVFnbMUcqUo7K3MzO-myoscUSOHJv2t7s0kXIROhL8os0-tXLaO2HX8fm-IPf-qrNV2YBsOCLpK4PBphV1-O0uIUe5pXKfYA=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMtIERwF6aGgpd0LTWUhVAL0Err4GDvmyLNc8KTntQqxmnoEiBSyGsOwGPY4ooebs3SHYIvMB2M4FIIYMuSYT2k_ps8Whg8kxDaL1k7IuOHb-ICMjI=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNya9crKz923BEpiAbPoRyvo_fPCld8oef900kIwnYacyxao3YTHRRoGyFv0SJyeCXR2adPbcypVKmJ_XTJ0jOppWC6WnZ14V2KDJ7ilimR-GJOb6c=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczO3_B05SiacZtPRDgkB_m4S_aLmTIaBPS0HGEVZkMDzmS-NRRbiySJ8L_1_vTRol6xLmo5InTnDqbx-xeS32nAAARb92Yr5tU0MR2meaUHiEApA5Ws=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMfKxBG6Wq3ifwkQq1o3ODT4wLv6g3vE9n1KVyzsPsaUhBbzo937lT9Ic3SM2m8MnqZF2t9GFtixQxTc1pWXFB-u10I1zTyig4u9tsMrkKPfWq5omQ=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNeDv76udjx9QABbjLYbxvnC_9D1iNcHEeAiCxLzM83cGPPlKvtfrHA483eOSOkxYeO7JxN8taWN5H3dxybPZb8jJCSXYWnWYUem1uXKtBWdII9I2Y=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOkcW2ouvbEMP0g2NJx2bWL7IQvQViFDuCbjUAulFSPVrsxmE5I66Ddefho6lTrWBO5zliCgp2WjI-xq-NPs197Iy7RLGDrNfPw91SX5LBKx4WYxyc=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNhxuVehVwDHOqSpvJL1oT0bx8UmVjnDqKqMg_mJZOrdUutZQdHj10ZMoCtmkMiNSQ8MFPj0ES__1zrGFCCPC1uKSXpnrLi8AeyPQLwP1gQePrsEwo=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNSw3tXmthLfwv4Z7M9nvNeh3ORHsEc1-xFQLS3eyvwuvDINDUNYZrVz_oTVUmxMz5TphRrUKr2g7YHnRugxmK57i6Rnvw-wE3Lw76Z2yYmMPzz4VY=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOmfo8-xONjAdnySZ4TgygR3ZMtDFHIQLouY98E5o-1vhItlgrglNFvvuDO2xXqVTFppz7s39U4h10Jrl0VqrBzToPbmGJvjMB41FhcSovVJp1RCGU=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPQX787oKeSkzpNQnEPBRd0_I_rxaL9dwHbXm7wLBQdF6aFrbPv_eUdyyEc_Hp9VGPMr_KiglZUERBv_QHu3CXxzrDQlqWMT-aJwUDBQPfiPKKIjvE=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPW7SrfXXiDx3fdazrFTV4gbl-W54nBBJ0HDtY4wp-M06wZOKh388Izh876539pV1Z_0PQqljgtKjqBNwoeuekOG6hjhJVhCxHBRidQiXX18zbnYWc=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNqK6e3U4N-vzRQWijVL_fxNTL6upqJAFkJ-D5_S4HXsFbtubueBw2AHtnc3fjKagIhYgyIDVFK0ika6ec85Wq3UrBA82BhUHrA1vJ8VHD4hYKxCoc=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMdLPWxX_UbTgJPOUl-n84pOqJrjK_28YxSvP06TGZjl6-KsHruZEkJpie6Wbyr_4MopndekLRntQI2QkR-RZNfRe4hHYT8I5rPmngYa8iI0Or53EY=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczM__UVNOxBdInV6iNI6MtXTAfZ23H9kw79Gyn2xHR3qXUV4dsZyIlzSTiTpBjjtNmBOiHQy2Cfwf2Dqw04L4ZgNKyukFKCUAR5Dp4vx3DbVKR1VEsA=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOTO0TweufEcWj4FXJtNlAtawnV7oLez0baPkObccUAgeYeNopPAs59hHa-U_y5jQhDcXZZV4igX5yBfmZ_N5JARnsLYrIg134cNDfmXZ4oiGlbTew=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNNnTc1eArwaGmB9xz15la7QNJ_sHj_JH6Mng0J3rsrHQhC9Is_VDtBbgNdeZ7QETxtHXY7uo6Ir6EG8hcaYm9HpMBzWPcGBDtSWRuLhrWg_6bNG7s=w1920-h1080-rj'
+];
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  // default datetime = 1h from now
+  const soon = new Date(Date.now() + 3600000);
+  soon.setSeconds(0,0);
+  document.getElementById('f-dt').value = toLocal(soon);
+
+  // load default photos
+  setUrls(DEFAULTS);
+  update();
+});
+
+/* ══════════════════════════════════════════
+   ACCORDION
+══════════════════════════════════════════ */
+function toggle(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+/* ══════════════════════════════════════════
+   PHOTO UTILS
+══════════════════════════════════════════ */
+function setUrls(arr) {
+  document.getElementById('f-urls').value = arr.join('\n');
+  refreshPhotoUI(arr);
+}
+
+function parseUrls() {
+  return document.getElementById('f-urls').value
+    .split('\n').map(u => u.trim()).filter(Boolean);
+}
+
+function onUrlsChange() {
+  refreshPhotoUI(parseUrls());
+  update();
+}
+
+function refreshPhotoUI(urls) {
+  document.getElementById('photo-count').textContent = urls.length + ' photos loaded';
+  const grid = document.getElementById('thumb-grid');
+  const MAX = 9;
+  let html = urls.slice(0, MAX).map((u, i) => {
+    const t = u.replace(/=w\d+-h\d+/, '=w400-h300-rj');
+    return `<div class="thumb" style="background-image:url('${t}')"><span class="n">${i+1}</span></div>`;
+  }).join('');
+  if (urls.length > MAX) {
+    html += `<div class="thumb-more">+${urls.length - MAX}<br>more</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function clearPhotos() {
+  document.getElementById('f-urls').value = '';
+  document.getElementById('f-album').value = '';
+  refreshPhotoUI([]);
+  update();
+  toast('Photos cleared');
+}
+
+/* ══════════════════════════════════════════
+   FETCH ALBUM
+══════════════════════════════════════════ */
+async function fetchAlbum() {
+  const albumUrl = document.getElementById('f-album').value.trim();
+  if (!albumUrl) { toast('⚠ Paste album URL first', 'err'); return; }
+
+  toast('⏳ Fetching…');
+  try {
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(albumUrl)}`;
+    const r = await fetch(proxy, { signal: AbortSignal.timeout(12000) });
+    const d = await r.json();
+    const re = /https:\/\/lh3\.googleusercontent\.com\/pw\/[^"'\s=]+/g;
+    let matches = [...new Set((d.contents || '').match(re) || [])];
+    // Normalise: strip any existing size param, append -rj (forces JPEG even from video thumbnails)
+    matches = matches.map(u => u.replace(/=(w\d+(-h\d+)?(-[a-z]+)*)$/, '') + '=w1920-h1080-rj');
+    // Keep only /pw/ paths (photos); /af/ are video stream URLs that return mp4 not jpeg
+    matches = matches.filter(u => u.includes('/pw/') && !u.includes('/a/'));
+    if (!matches.length) throw new Error('none');
+    setUrls(matches);
+    update();
+    toast(`✅ ${matches.length} photos fetched!`, 'ok');
+  } catch {
+    toast('⚠ Fetch failed — paste URLs manually', 'err');
+  }
+}
+
+/* ══════════════════════════════════════════
+   BUILD URL
+══════════════════════════════════════════ */
+function buildUrl() {
+  const base = location.href.replace(/\/[^/]*$/, '/') + 'obs-welcome.html';
+  const q = new URLSearchParams({
+    obs:    '1',
+    event:  v('f-event'),
+    sub:    v('f-sub'),
+    ticker: v('f-ticker'),
+    dur:    v('f-dur'),
+    order:  v('f-order'),
+    dt:     v('f-dt'),
+    urls:   v('f-urls'),
+    album:  v('f-album'),
+  });
+  return `${base}?${q}`;
+}
+
+function update() {
+  const url = buildUrl();
+  const el  = document.getElementById('url-display');
+  el.textContent = url.length > 200 ? url.slice(0, 190) + '…' : url;
+}
+
+/* ══════════════════════════════════════════
+   COPY / OPEN
+══════════════════════════════════════════ */
+function copyUrl() {
+  const url = buildUrl();
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(url)
+      .then(() => toast('✅ Copied to clipboard!', 'ok'))
+      .catch(() => fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
+}
+
+function fallbackCopy(url) {
+  const ta = document.createElement('textarea');
+  ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); toast('✅ Copied!', 'ok'); }
+  catch { prompt('Copy this URL:', url); }
+  document.body.removeChild(ta);
+}
+
+function openUrl() { window.open(buildUrl(), '_blank'); }
+
+/* ══════════════════════════════════════════
+   RESET
+══════════════════════════════════════════ */
+function resetAll() {
+  if (!confirm('Reset everything to defaults?')) return;
+  document.getElementById('f-event').value  = 'Ayyappan Poojai';
+  document.getElementById('f-sub').value    = 'DTS Media Live';
+  document.getElementById('f-ticker').value = 'DTS Media Live  ·  Swamy Saranam|Ayyappan Poojai – Live Streaming|Dallas Tatvamasi Sangam|Subscribe & Share ✦';
+  document.getElementById('f-dur').value    = '8';
+  document.getElementById('f-order').value  = 'random';
+  document.getElementById('f-album').value  = '';
+  const soon = new Date(Date.now() + 3600000);
+  soon.setSeconds(0,0);
+  document.getElementById('f-dt').value = toLocal(soon);
+  setUrls(DEFAULTS);
+  update();
+  toast('↺ Reset to defaults', 'ok');
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let _tt;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show';
+  if (type === 'ok')  el.style.borderColor = 'rgba(76,175,80,0.6)';
+  else if (type === 'err') el.style.borderColor = 'rgba(255,82,82,0.6)';
+  else el.style.borderColor = 'rgba(212,160,23,0.6)';
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function v(id) { return document.getElementById(id)?.value ?? ''; }
+function toLocal(d) {
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+</script>
+</body>
+</html>

@@ -2,1087 +2,763 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ðµ Song Queue Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F5EFE8">
+<title>Song Queue — DTS</title>
 <style>
-  :root {
-    --saffron: #E8671A;
-    --saffron-light: #F5A04A;
-    --saffron-glow: rgba(232,103,26,0.18);
-    --gold: #D4A017;
-    --gold-light: #F7D87C;
-    --deep: #1A0F00;
-    --surface: #2A1800;
-    --card: #311C00;
-    --border: rgba(232,103,26,0.22);
-    --text: #F5E8D0;
-    --muted: #B09070;
-    --current-bg: rgba(212,160,23,0.13);
-    --current-border: #D4A017;
-    --done-bg: rgba(60,160,80,0.12);
-    --done-border: #4CAF6A;
-    --waiting-bg: rgba(80,100,160,0.12);
-    --waiting-border: #7090D0;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--deep);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(232,103,26,0.20) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(212,160,23,0.08) 0%, transparent 60%);
-  }
-
-  header {
-    text-align: center;
-    padding: 1.6rem 1rem 1rem;
-    border-bottom: 1px solid var(--border);
-  }
-  header::after {
-    content: '';
-    display: block;
-    width: 70px; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--saffron), transparent);
-    margin: 0.6rem auto 0;
-  }
-  header .logo { font-size: 1.5rem; margin-bottom: 0.15rem; }
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.4rem, 5vw, 2rem);
-    background: linear-gradient(135deg, var(--saffron-light), var(--gold-light));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  header p { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
-
-  .main { max-width: 680px; margin: 0 auto; padding: 1.2rem 0.9rem 4rem; }
-
-  /* Entry Form */
-  .entry-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.2rem 1.1rem;
-    margin-bottom: 1.3rem;
-    box-shadow: 0 4px 28px rgba(0,0,0,0.3);
-  }
-  .entry-card h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem; color: var(--saffron-light);
-    margin-bottom: 0.85rem;
-  }
-  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
-  @media (max-width: 460px) { .fields { grid-template-columns: 1fr; } }
-  .field label {
-    display: block; font-size: 0.68rem; font-weight: 600;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 0.3rem;
-  }
-  .field input {
-    width: 100%; background: var(--surface);
-    border: 1.5px solid var(--border); border-radius: 10px;
-    color: var(--text); font-family: 'DM Sans', sans-serif;
-    font-size: 0.93rem; padding: 0.6rem 0.8rem; outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .field input::placeholder { color: var(--muted); opacity: 0.55; }
-  .field input:focus { border-color: var(--saffron); box-shadow: 0 0 0 3px var(--saffron-glow); }
-  .add-btn {
-    width: 100%; margin-top: 0.85rem;
-    background: linear-gradient(135deg, var(--saffron), var(--gold));
-    color: #1A0F00; font-family: 'DM Sans', sans-serif;
-    font-size: 0.92rem; font-weight: 700; border: none;
-    border-radius: 11px; padding: 0.75rem 1rem;
-    cursor: pointer; letter-spacing: 0.03em;
-    transition: opacity 0.18s, transform 0.12s;
-    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-  }
-  .add-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-  .add-btn:active { transform: translateY(0); }
-
-  /* Stats */
-  .stats { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-  .stat-pill {
-    flex: 1; min-width: 65px; border-radius: 30px;
-    padding: 0.38rem 0.6rem; text-align: center;
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; border: 1.5px solid;
-  }
-  .stat-pill.all  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
-  .stat-pill.cur  { background: var(--current-bg);   border-color: var(--current-border); color: var(--gold-light); }
-  .stat-pill.done { background: var(--done-bg);       border-color: var(--done-border); color: #7DDB95; }
-  .stat-pill.wait { background: var(--waiting-bg);    border-color: var(--waiting-border); color: #9AB4EE; }
-
-  /* Tabs */
-  .tabs {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    background: var(--surface); border-radius: 12px;
-    border: 1.5px solid var(--border); overflow: hidden;
-    margin-bottom: 1.1rem;
-  }
-  .tab-btn {
-    background: transparent; border: none;
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 0.72rem; font-weight: 600;
-    padding: 0.6rem 0.2rem; cursor: pointer;
-    transition: all 0.18s; letter-spacing: 0.02em;
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-  }
-  .tab-btn:last-child { border-right: none; }
-  .tab-btn .tab-icon { font-size: 1rem; }
-  .tab-btn .tab-count {
-    font-size: 0.62rem; background: rgba(255,255,255,0.08);
-    border-radius: 10px; padding: 0 5px; min-width: 16px; text-align: center;
-  }
-  .tab-btn.active-all     { background: var(--saffron-glow); color: var(--saffron-light); }
-  .tab-btn.active-current { background: var(--current-bg);   color: var(--gold-light); }
-  .tab-btn.active-done    { background: var(--done-bg);       color: #7DDB95; }
-  .tab-btn.active-waiting { background: var(--waiting-bg);    color: #9AB4EE; }
-
-  /* Queue list */
-  .queue-list { display: flex; flex-direction: column; gap: 0.55rem; }
-
-  .empty-state {
-    text-align: center; padding: 2.5rem 1rem;
-    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
-  }
-  .empty-state .big { font-size: 2.2rem; margin-bottom: 0.4rem; }
-
-  .section-label {
-    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--muted);
-    padding: 0.3rem 0; margin-top: 0.3rem;
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  /* Row card */
-  .row-card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 13px;
-    padding: 0.75rem 0.85rem;
-    display: flex; align-items: center; gap: 0.6rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    animation: slideIn 0.22s ease;
-    position: relative; overflow: hidden;
-  }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .row-card::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-    border-radius: 4px 0 0 4px; background: var(--waiting-border); transition: background 0.3s;
-  }
-  .row-card.status-current::before { background: var(--gold); }
-  .row-card.status-done::before    { background: var(--done-border); }
-  .row-card.status-current {
-    border-color: rgba(212,160,23,0.4);
-    background: linear-gradient(to right, var(--current-bg), var(--card));
-  }
-  .row-card.status-done { border-color: rgba(76,175,106,0.25); opacity: 0.72; }
-  .row-card.dragging    { opacity: 0.38; border-color: var(--saffron) !important; }
-  .row-card.drag-over   { border-color: var(--gold) !important; box-shadow: 0 -3px 0 0 var(--gold); }
-
-  .row-num { font-size: 0.68rem; color: var(--muted); font-weight: 700; min-width: 18px; text-align: center; flex-shrink: 0; }
-
-  .row-info { flex: 1; min-width: 0; }
-  .row-name {
-    font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .row-song {
-    font-size: 0.75rem; color: var(--saffron-light); margin-top: 0.1rem;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .row-song::before { content: 'âª '; }
-
-  /* Action buttons */
-  .row-actions { display: flex; gap: 0.28rem; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-  .act-btn {
-    border: 1.5px solid; border-radius: 8px; background: transparent;
-    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em;
-    padding: 0.27rem 0.48rem; cursor: pointer; transition: all 0.15s;
-    font-family: 'DM Sans', sans-serif; white-space: nowrap;
-  }
-  .act-btn.to-current { border-color: var(--current-border); color: var(--gold-light); }
-  .act-btn.to-current:hover { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
-  .act-btn.to-done    { border-color: var(--done-border); color: #7DDB95; }
-  .act-btn.to-done:hover { background: var(--done-border); color: #1A0F00; }
-  .act-btn.to-waiting { border-color: var(--waiting-border); color: #9AB4EE; }
-  .act-btn.to-waiting:hover { background: var(--waiting-border); color: #1A0F00; }
-
-  /* All-tab set-current toggle */
-  .act-btn.set-current { border-color: var(--current-border); color: var(--gold-light); padding: 0.27rem 0.6rem; }
-  .act-btn.set-current.is-current { background: var(--gold); color: #1A0F00; border-color: var(--gold); }
-  .act-btn.set-current:hover:not(.is-current) { background: var(--saffron-glow); }
-
-  /* Drag handle */
-  .drag-handle {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 3px; padding: 0.22rem 0.15rem;
-    cursor: grab; flex-shrink: 0; opacity: 0.35; transition: opacity 0.15s; touch-action: none;
-  }
-  .drag-handle:hover { opacity: 0.85; }
-  .drag-handle span { display: block; width: 15px; height: 2px; background: var(--saffron-light); border-radius: 2px; }
-
-  /* Move up/down */
-  .move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
-  .mv-btn {
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--muted); font-size: 0.62rem; border-radius: 5px;
-    padding: 0.14rem 0.35rem; cursor: pointer; line-height: 1; transition: all 0.15s;
-  }
-  .mv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
-  .mv-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
-
-  /* Del */
-  .del-btn {
-    background: none; border: none; color: #7a3a2a;
-    font-size: 0.88rem; cursor: pointer; padding: 0.2rem;
-    border-radius: 6px; transition: color 0.15s; flex-shrink: 0;
-  }
-  .del-btn:hover { color: #E04030; }
-
-  /* Current tab â Next banner */
-  .next-btn-bar {
-    background: var(--current-bg); border: 1.5px solid var(--current-border);
-    border-radius: 12px; padding: 0.7rem 1rem;
-    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
-    margin-bottom: 0.7rem;
-  }
-  .next-btn-bar span { font-size: 0.78rem; color: var(--gold-light); }
-  .next-btn {
-    background: linear-gradient(135deg, var(--saffron), var(--gold));
-    color: #1A0F00; border: none; border-radius: 9px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
-    padding: 0.48rem 0.9rem; cursor: pointer; white-space: nowrap;
-    transition: opacity 0.15s, transform 0.1s; flex-shrink: 0;
-  }
-  .next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-  .next-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
-
-  @media (max-width: 380px) {
-    .act-btn { font-size: 0.6rem; padding: 0.22rem 0.35rem; }
-    .row-card { gap: 0.4rem; padding: 0.65rem 0.55rem; }
-  }
-
-
-  /* CSV toolbar */
-  .csv-bar {
-    display: flex; gap: 0.5rem; margin-bottom: 1rem;
-  }
-  .csv-btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem; font-weight: 600; border-radius: 10px;
-    padding: 0.52rem 0.7rem; cursor: pointer; letter-spacing: 0.03em;
-    transition: all 0.18s;
-  }
-  .csv-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
-  .export-btn:hover { border-color: var(--done-border); color: #7DDB95; background: var(--done-bg); }
-  .import-btn:hover { border-color: var(--waiting-border); color: #9AB4EE; background: var(--waiting-bg); }
-  /* ââ Cloud Sync ââ */
-  .sync-pill {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 20px; padding: 0.28rem 0.8rem;
-    font-size: 0.7rem; font-weight: 600; cursor: pointer;
-    color: var(--muted); transition: all 0.2s; margin-top: 0.45rem;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .sync-pill:hover { border-color: var(--saffron); color: var(--saffron-light); }
-  .sync-pill.synced { border-color: #4AE080; color: #4AE080; }
-  .sync-pill.syncing { border-color: var(--gold); color: var(--gold-light); animation: syncPulse 1s infinite; }
-  .sync-pill.error { border-color: #E04030; color: #E04030; }
-  @keyframes syncPulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
-
-  .sync-modal-bg {
-    display: none; position: fixed; inset: 0; z-index: 1000;
-    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
-    align-items: center; justify-content: center;
-  }
-  .sync-modal-bg.open { display: flex; }
-  .sync-modal {
-    background: var(--card); border: 1.5px solid var(--border);
-    border-radius: 18px; padding: 1.5rem; max-width: 420px; width: calc(100% - 2rem);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-  }
-  .sync-modal h3 {
-    font-family: 'Playfair Display', serif; font-size: 1.05rem;
-    color: var(--saffron-light); margin-bottom: 0.3rem;
-  }
-  .sync-modal .sync-help {
-    font-size: 0.72rem; color: var(--muted); line-height: 1.55; margin-bottom: 0.9rem;
-  }
-  .sync-modal .sync-help a { color: var(--saffron-light); }
-  .sync-modal label {
-    display: block; font-size: 0.67rem; font-weight: 600;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 0.28rem; margin-top: 0.8rem;
-  }
-  .sync-modal input[type="password"],
-  .sync-modal input[type="text"] {
-    width: 100%; background: var(--surface);
-    border: 1.5px solid var(--border); border-radius: 9px;
-    color: var(--text); font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem; padding: 0.52rem 0.8rem; outline: none;
-    transition: border-color 0.2s;
-  }
-  .sync-modal input:focus { border-color: var(--saffron); }
-  .sync-url-row { display: flex; gap: 0.4rem; margin-top: 0.35rem; }
-  .sync-url-row input { font-size: 0.72rem; color: var(--saffron-light); flex: 1; }
-  .copy-url-btn {
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--muted); border-radius: 8px; font-family: 'DM Sans', sans-serif;
-    font-size: 0.72rem; padding: 0 0.75rem; cursor: pointer; white-space: nowrap;
-    transition: all 0.15s;
-  }
-  .copy-url-btn:hover { border-color: var(--saffron); color: var(--saffron-light); }
-  .sync-modal-btns { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
-  .sync-save-btn {
-    flex: 1; background: linear-gradient(135deg, var(--saffron), var(--gold));
-    color: #1A0F00; border: none; border-radius: 10px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700;
-    padding: 0.62rem; cursor: pointer; transition: opacity 0.15s;
-  }
-  .sync-save-btn:hover { opacity: 0.88; }
-  .sync-close-btn {
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--muted); border-radius: 10px; font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem; font-weight: 600; padding: 0.62rem 1rem; cursor: pointer;
-    transition: all 0.15s;
-  }
-  .sync-close-btn:hover { border-color: var(--saffron); color: var(--saffron-light); }
-  .sync-result { font-size: 0.73rem; color: var(--muted); margin-top: 0.55rem; min-height: 1.1rem; }
-
-  /* Toast */
-  .toast {
-    position: fixed; bottom: 1.4rem; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--saffron); color: #1A0F00;
-    font-weight: 700; font-size: 0.82rem;
-    padding: 0.58rem 1.2rem; border-radius: 30px;
-    box-shadow: 0 4px 20px rgba(232,103,26,0.4);
-    opacity: 0; transition: opacity 0.22s, transform 0.22s;
-    pointer-events: none; z-index: 9999; white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+:root{--saffron:#FF6B00;--gold:#D4A017;--bg:#F5EFE8;--bg2:#EDE4D8;--card:#FFFFFF;--text:#1A0800;--sub:#8B6B50;--border:rgba(0,0,0,0.09);--red:#E53935;--green:#2E7D32;--blue:#5C7CDB;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'SF Pro Text',system-ui,sans-serif;font-size:17px;height:100%;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
+.topbar{background:rgba(245,239,232,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:calc(var(--safe-t) + 10px) 16px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-logo{width:40px;height:40px;border-radius:50%;overflow:hidden;box-shadow:0 2px 10px rgba(255,107,0,0.3);flex-shrink:0}
+.tb-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.tb-title{font-size:17px;font-weight:700;color:var(--text)}
+.tb-sub{font-size:11px;color:var(--sub);margin-top:1px}
+.tb-db{display:none;align-items:center;gap:5px;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:600;border:1.5px solid}
+.tb-db.ok{background:rgba(46,125,50,0.08);border-color:#A5D6A7;color:#2E7D32}
+.tb-db.error{background:rgba(229,57,53,0.08);border-color:#EF9A9A;color:#C62828}
+.tb-db-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.tabs{background:rgba(245,239,232,0.97);display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;text-align:center;padding:8px 2px 7px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;transition:all 0.15s;-webkit-user-select:none;user-select:none;display:flex;flex-direction:column;align-items:center;gap:1px}
+.tab .tab-lbl{font-size:12px}
+.tab .tab-cnt{font-size:11px;background:rgba(0,0,0,0.06);border-radius:10px;padding:0 6px;min-width:18px;text-align:center;height:16px;line-height:16px}
+.tab.active{color:var(--saffron);border-bottom-color:var(--saffron)}
+.tab.active.t-add{color:white;background:var(--saffron);border-bottom-color:var(--saffron)}
+.tab.active.t-wait{color:var(--blue);border-bottom-color:var(--blue)}
+.tab.active.t-done{color:var(--green);border-bottom-color:var(--green)}
+.tab.active .tab-cnt{background:currentColor;color:white}
+.page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;padding-bottom:calc(20px + var(--safe-b))}
+.page.active{display:block}
+.hero{margin:12px 14px 0;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(255,107,0,0.28)}
+.hero-icon{font-size:38px;flex-shrink:0}
+.hero-info{flex:1;min-width:0}
+.hero-lbl{font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:2px}
+.hero-name{font-size:22px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.hero-song{font-size:15px;color:rgba(255,255,255,0.82);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-done-btn{background:rgba(255,255,255,0.25);border:1.5px solid rgba(255,255,255,0.45);border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;color:white;cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-user-select:none;user-select:none}
+.hero-done-btn:active{background:rgba(255,255,255,0.38)}
+.next-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px}
+.next-lbl{font-size:14px;color:var(--sub);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px}
+.next-btn{background:var(--saffron);color:white;border:none;border-radius:20px;padding:10px 20px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-user-select:none;user-select:none}
+.next-btn:active{opacity:0.82}
+.next-btn:disabled{opacity:0.35;cursor:default}
+.add-page{padding:16px;display:flex;flex-direction:column;gap:14px}
+.add-page-hero{background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(255,107,0,0.25)}
+.add-page-icon{font-size:44px;flex-shrink:0}
+.add-page-title{font-size:20px;font-weight:700;color:white}
+.add-page-sub{font-size:14px;color:rgba(255,255,255,0.8);margin-top:3px}
+.add-card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,0.07);display:flex;flex-direction:column;gap:12px}
+.add-card-title{font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub)}
+.add-field{display:flex;flex-direction:column;gap:4px}
+.add-lbl{font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub)}
+.add-in{width:100%;background:var(--bg);border:1.5px solid var(--bg2);border-radius:10px;padding:13px 15px;font-size:17px;color:var(--text);outline:none;font-family:inherit}
+.add-in:focus{border-color:var(--saffron);background:white}
+.add-in::placeholder{color:#C0A898}
+.add-btn{background:linear-gradient(135deg,var(--saffron),var(--gold));color:white;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-user-select:none;user-select:none}
+.add-btn:active{opacity:0.85;transform:scale(0.99)}
+.add-btn:disabled{opacity:0.45;cursor:default;transform:none}
+.sec-hd{padding:14px 16px 6px;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
+.sec-hd span{color:var(--saffron);font-size:13px}
+.grp-hd{display:flex;align-items:center;gap:10px;padding:18px 16px 8px}
+.grp-icon{font-size:22px;flex-shrink:0}
+.grp-label{font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;flex:1}
+.grp-badge{border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;border:1.5px solid}
+.grp-cur .grp-label{color:var(--saffron)}.grp-cur .grp-badge{background:#FFF3E0;color:var(--saffron);border-color:#FFCC80}
+.grp-wait .grp-label{color:var(--blue)}.grp-wait .grp-badge{background:#EEF2FF;color:var(--blue);border-color:#C5D3F5}
+.grp-done .grp-label{color:var(--green)}.grp-done .grp-badge{background:#E8F5E9;color:var(--green);border-color:#A5D6A7}
+.grp-divider{height:1px;background:var(--border);margin:0 16px}
+.grp-block{margin-bottom:8px}
+.q-list{display:flex;flex-direction:column}
+.q-row{background:var(--card);display:flex;align-items:center;gap:8px;padding:14px 14px 14px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;-webkit-user-select:none;user-select:none;position:relative;overflow:hidden}
+.q-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3.5px;background:rgba(92,124,219,0.5)}
+.q-row.cur::before{background:var(--saffron)}
+.q-row.done::before{background:#81C784}
+.q-row:first-child{border-top:1px solid var(--border)}
+.q-row:active{background:#FFF5EE}
+.q-num{width:22px;font-size:13px;font-weight:700;color:var(--saffron);font-family:ui-monospace,monospace;text-align:center;flex-shrink:0}
+.q-info{flex:1;min-width:0}
+.q-name{font-size:17px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-song{font-size:14px;color:var(--saffron);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-song::before{content:'♪ '}
+.q-chip{border-radius:20px;padding:4px 11px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;border:1.5px solid}
+.q-chip.wait{background:#EEF2FF;color:var(--blue);border-color:#C5D3F5}
+.q-chip.cur{background:#FFF3E0;color:var(--saffron);border-color:#FFCC80}
+.q-chip.done{background:#E8F5E9;color:var(--green);border-color:#A5D6A7}
+.q-arrow{color:#C8B49A;font-size:18px;flex-shrink:0}
+.mv-wrap{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.mv-btn{width:36px;height:36px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--border);color:var(--sub);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-user-select:none;user-select:none;transition:all 0.12s}
+.mv-btn:active{background:var(--saffron);border-color:var(--saffron);color:white;transform:scale(0.92)}
+.mv-btn:disabled{opacity:0.2;pointer-events:none}
+.empty{text-align:center;padding:52px 24px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty-icon{font-size:50px}
+.empty-title{font-size:16px;font-weight:600;color:var(--text)}
+.empty-sub{font-size:13px;color:var(--sub);line-height:1.6}
+.toolbar{display:flex;gap:8px;padding:0}
+.tool-btn{flex:1;background:var(--card);border:1.5px solid var(--border);color:var(--sub);border-radius:10px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;-webkit-user-select:none;user-select:none}
+.tool-btn:active{background:var(--bg2)}
+.tool-btn.danger{border-color:rgba(229,57,53,0.25);color:var(--red)}
+.tool-btn.danger:active{background:#FFF0EF}
+.backdrop{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.42);opacity:0;pointer-events:none;transition:opacity 0.28s}
+.backdrop.on{opacity:1;pointer-events:all}
+.sheet{position:fixed;bottom:0;left:0;right:0;z-index:201;background:var(--card);border-radius:22px 22px 0 0;padding-bottom:calc(28px + var(--safe-b));transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet.on{transform:translateY(0)}
+.sh-handle{width:36px;height:4px;background:#DDD;border-radius:2px;margin:10px auto 16px}
+.sh-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 16px 14px;border-bottom:1px solid var(--border)}
+.sh-title{font-size:19px;font-weight:700;color:var(--text)}
+.sh-close{color:var(--sub);font-size:18px;cursor:pointer;padding:4px 0 4px 16px}
+.sh-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.sh-singer-card{background:var(--bg);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}
+.sh-singer-icon{font-size:36px;flex-shrink:0}
+.sh-singer-name{font-size:20px;font-weight:700;color:var(--text)}
+.sh-singer-song{font-size:15px;color:var(--saffron);margin-top:3px}
+.sh-singer-song::before{content:'♪  '}
+.sh-actions-title{font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub)}
+.sh-actions{display:flex;flex-direction:column;gap:8px}
+.sh-action-btn{width:100%;padding:14px 16px;border-radius:14px;border:1.5px solid;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--card);color:var(--text);-webkit-user-select:none;user-select:none;transition:all 0.15s;text-align:left}
+.sh-action-btn:active{transform:scale(0.98)}
+.sh-act-icon{font-size:26px;flex-shrink:0}
+.sh-act-info{flex:1}
+.sh-act-lbl{font-size:17px;font-weight:600}
+.sh-act-sub{font-size:13px;color:var(--sub);margin-top:1px}
+.sh-btn-cur{border-color:#FFCC80;background:#FFF3E0}
+.sh-btn-cur .sh-act-lbl{color:var(--saffron)}
+.sh-btn-done{border-color:#A5D6A7;background:#E8F5E9}
+.sh-btn-done .sh-act-lbl{color:var(--green)}
+.sh-btn-wait{border-color:#C5D3F5;background:#EEF2FF}
+.sh-btn-wait .sh-act-lbl{color:var(--blue)}
+.sh-btn-del{border-color:rgba(229,57,53,0.25);background:#FFF0EF}
+.sh-btn-del .sh-act-lbl{color:var(--red)}
+.sh-move-row{display:flex;gap:8px}
+.sh-move-btn{flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);color:var(--sub);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-user-select:none;user-select:none}
+.sh-move-btn:active{background:var(--bg2)}
+.sh-move-btn:disabled{opacity:0.3;cursor:default}
+#err-panel{display:none;margin:10px 14px;background:#FFF0EF;border:1.5px solid rgba(229,57,53,0.3);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--red);line-height:1.6}
+#err-panel.on{display:block}
+#toast{position:fixed;bottom:calc(20px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(30px);color:white;border-radius:24px;padding:10px 20px;font-size:13px;font-weight:600;white-space:nowrap;z-index:400;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">ðµ</div>
-  <h1>Song Queue Manager</h1>
-  <p>Add singers &amp; songs Â· Manage performance order</p>
-  <button class="sync-pill" id="syncPill" onclick="openSyncModal()">âï¸ Cloud Sync</button>
-</header>
-
-<!-- Cloud Sync Modal -->
-<div class="sync-modal-bg" id="syncModalBg" onclick="if(event.target===this)closeSyncModal()">
-  <div class="sync-modal">
-    <h3>âï¸ Cloud Sync</h3>
-
-    <!-- Tab switcher -->
-    <div style="display:flex;gap:0.4rem;margin-bottom:1rem">
-      <button id="tabGSheets" onclick="switchSyncTab('gsheets')"
-        style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--saffron);background:var(--saffron);color:#1a0a00;font-weight:700;cursor:pointer;font-size:0.82rem">
-        ð Google Sheets
-      </button>
-      <button id="tabGitHub" onclick="switchSyncTab('github')"
-        style="flex:1;padding:0.45rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
-        ð GitHub (advanced)
-      </button>
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo"><img id="logo-img" src="" alt="DTS"></div>
+    <div>
+      <div class="tb-title">Song Queue</div>
+      <div class="tb-sub" id="tb-sub">DTS Media Live</div>
     </div>
-
-    <!-- Google Sheets panel -->
-    <div id="panelGSheets">
-      <p class="sync-help">
-        1. Create a <strong>Google Sheet</strong> with columns: <code>name, song, status</code><br>
-        2. <strong>File â Share â Publish to web</strong> â Sheet1 â CSV â Publish<br>
-        3. Paste the published CSV link below. Then share the Display URL with any device â no tokens needed!
-      </p>
-      <label>Google Sheets Published CSV URL</label>
-      <input type="text" id="gsheetsUrlInput" placeholder="https://docs.google.com/spreadsheets/d/â¦/pub?output=csv"
-        style="width:100%;box-sizing:border-box">
-      <div id="gsheetsShareSection" style="display:none;margin-top:0.8rem">
-        <label>ðº Shareable Display URL â open on any device, no setup needed</label>
-        <div class="sync-url-row">
-          <input type="text" id="gsheetsShareUrl" readonly>
-          <button class="copy-url-btn" onclick="copyGsheetsUrl()">Copy</button>
-        </div>
-      </div>
-      <div style="margin-top:0.6rem">
-        <button class="sync-save-btn" onclick="saveGsheetsSettings()">Save &amp; Generate Link</button>
-        <button onclick="exportCsv()" style="margin-left:0.5rem;padding:0.45rem 0.9rem;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.82rem">
-          â¬ Download CSV
-        </button>
-      </div>
-      <div class="sync-result" id="gsheetsResult"></div>
-    </div>
-
-    <!-- GitHub panel -->
-    <div id="panelGitHub" style="display:none">
-      <p class="sync-help">
-        Syncs the queue to GitHub so OBS and other devices can read it in real-time.<br>
-        Create a token at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
-        â enable the <strong>repo</strong> scope.
-      </p>
-      <label>GitHub Token (repo scope)</label>
-      <input type="password" id="syncTokenInput" placeholder="ghp_â¦" autocomplete="off">
-      <div id="syncUrlSection" style="display:none">
-        <label>ðº Display URL â open on any device, no token needed</label>
-        <div class="sync-url-row">
-          <input type="text" id="syncUrlDisplay" readonly>
-          <button class="copy-url-btn" onclick="copyCloudUrl()">Copy</button>
-        </div>
-      </div>
-      <div class="sync-modal-btns">
-        <button class="sync-save-btn" onclick="saveSyncSettings()">Save &amp; Sync Now</button>
-      </div>
-      <div class="sync-result" id="syncResult"></div>
-    </div>
-
-    <button class="sync-close-btn" onclick="closeSyncModal()" style="margin-top:0.8rem;width:100%">Close</button>
+  </div>
+  <div class="tb-db" id="db-pill">
+    <div class="tb-db-dot" id="db-dot"></div>
+    <span id="db-txt"></span>
   </div>
 </div>
 
-<div class="main">
-
-  <!-- Entry Form -->
-  <div class="entry-card">
-    <h2>â¦ Add to Queue</h2>
-    <div class="fields">
-      <div class="field">
-        <label>Singer Name</label>
-        <input type="text" id="nameInput" placeholder="e.g. Ramesh Kumar" maxlength="60" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>Song / Bhajan</label>
-        <input type="text" id="songInput" placeholder="e.g. Venkateswara Suprabhatam" maxlength="80" autocomplete="off">
-      </div>
-    </div>
-    <button class="add-btn" onclick="addEntry()">ï¼ Add to Queue</button>
+<div class="tabs">
+  <div class="tab t-add active" id="tab-add" onclick="setTab('add')">
+    <span style="font-size:18px">+</span>
+    <span class="tab-lbl">Add</span>
   </div>
-
-
-  <!-- CSV toolbar -->
-  <div class="csv-bar">
-    <button class="csv-btn export-btn" onclick="exportCSV()">â¬ Export CSV</button>
-    <label class="csv-btn import-btn">
-      â¬ Import CSV
-      <input type="file" id="csvFileInput" accept=".csv" onchange="importCSV(event)" style="display:none">
-    </label>
+  <div class="tab t-all" id="tab-all" onclick="setTab('all')">
+    <span class="tab-lbl">All</span>
+    <span class="tab-cnt" id="cnt-all">0</span>
   </div>
-
-  <!-- Stats -->
-  <div class="stats" id="stats"></div>
-
-  <!-- Tabs: All | Current | Done | Waiting -->
-  <div class="tabs">
-    <button class="tab-btn" id="tab-all"     onclick="setTab('all')">
-      <span class="tab-icon">ðµ</span><span>All</span><span class="tab-count" id="cnt-all">0</span>
-    </button>
-    <button class="tab-btn" id="tab-current" onclick="setTab('current')">
-      <span class="tab-icon">ð¤</span><span>Current</span><span class="tab-count" id="cnt-current">0</span>
-    </button>
-    <button class="tab-btn" id="tab-done"    onclick="setTab('done')">
-      <span class="tab-icon">â</span><span>Done</span><span class="tab-count" id="cnt-done">0</span>
-    </button>
-    <button class="tab-btn" id="tab-waiting" onclick="setTab('waiting')">
-      <span class="tab-icon">â³</span><span>Waiting</span><span class="tab-count" id="cnt-waiting">0</span>
-    </button>
+  <div class="tab t-cur" id="tab-current" onclick="setTab('current')">
+    <span class="tab-lbl">Stage</span>
+    <span class="tab-cnt" id="cnt-cur">0</span>
   </div>
-
-  <!-- Queue -->
-  <div class="queue-list" id="queueList"></div>
-
+  <div class="tab t-wait" id="tab-waiting" onclick="setTab('waiting')">
+    <span class="tab-lbl">Waiting</span>
+    <span class="tab-cnt" id="cnt-wait">0</span>
+  </div>
+  <div class="tab t-done" id="tab-done" onclick="setTab('done')">
+    <span class="tab-lbl">Done</span>
+    <span class="tab-cnt" id="cnt-done">0</span>
+  </div>
 </div>
 
-<div class="toast" id="toastEl"></div>
+<div class="page active" id="page-add">
+  <div class="add-page">
+    <div class="add-page-hero">
+      <div class="add-page-icon">&#127908;</div>
+      <div>
+        <div class="add-page-title">Add Singer</div>
+        <div class="add-page-sub">Add a singer to the queue</div>
+      </div>
+    </div>
+    <div class="add-card">
+      <div class="add-card-title">Singer Details</div>
+      <div class="add-field">
+        <div class="add-lbl">Singer Name</div>
+        <input class="add-in" id="name-in" type="text" placeholder="e.g. Ramesh Kumar" maxlength="30" autocomplete="off">
+      </div>
+      <div class="add-field">
+        <div class="add-lbl">Song / Bhajan</div>
+        <input class="add-in" id="song-in" type="text" placeholder="e.g. Venkateswara Suprabhatam" maxlength="35" autocomplete="off">
+      </div>
+      <button class="add-btn" id="add-btn" onclick="addEntry()">+ Add to Queue</button>
+    </div>
+    <div class="add-card-title" style="padding:0 2px 6px">Queue Tools</div>
+    <div class="toolbar">
+      <button class="tool-btn" onclick="exportCSV()">Export CSV</button>
+      <button class="tool-btn" onclick="triggerImport()">Import CSV</button>
+      <button class="tool-btn danger" onclick="clearAll()">Clear All</button>
+    </div>
+    <input type="file" id="csv-in" accept=".csv" style="display:none">
+  </div>
+</div>
+
+<div class="page" id="page-all">
+  <div id="err-panel"></div>
+  <div id="hero-wrap"></div>
+  <div id="next-wrap"></div>
+  <div class="q-list" id="all-list"></div>
+</div>
+
+<div class="page" id="page-current">
+  <div id="cur-hero-wrap"></div>
+  <div id="cur-next-wrap"></div>
+  <div class="q-list" id="cur-list"></div>
+</div>
+
+<div class="page" id="page-waiting">
+  <div class="sec-hd" style="padding-top:14px">Waiting <span id="wait-count">0</span></div>
+  <div class="q-list" id="wait-list"></div>
+</div>
+
+<div class="page" id="page-done">
+  <div class="sec-hd" style="padding-top:14px">Completed <span id="done-count">0</span></div>
+  <div class="q-list" id="done-list"></div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="sh-handle"></div>
+  <div class="sh-hdr">
+    <div class="sh-title" id="sh-title">Singer</div>
+    <div class="sh-close" onclick="closeSheet()">X</div>
+  </div>
+  <div class="sh-body" id="sh-body"></div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-  // ── Auto-set GitHub token so sync always works ──
-  (function() {
-    if (!localStorage.getItem('sync_token')) {
-      try { localStorage.setItem('sync_token', atob('Z2hwX0RTSDNZY1lmTnZwWEw2Q0FtTmhra2JmdjlYazRDYlA0VHExTEw=')); } catch(e) {}
-    }
-  })();
+(function() {
+  var API = 'api.php';
+  var queue = [];
+  var activeTab = 'add';
+  var sheetId = null;
+  var toastTimer = null;
 
-  let queue = JSON.parse(localStorage.getItem('songQueue') || '[]');
-  let activeTab = 'all';
+  /* ─ INIT ─ */
+  window.addEventListener('DOMContentLoaded', function() {
+    loadLogo();
 
-  function save() {
-    localStorage.setItem('songQueue', JSON.stringify(queue));
-    if (localStorage.getItem('sync_token')) syncToRepo();
-  }
-
-  function toast(msg) {
-    const t = document.getElementById('toastEl');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
-  }
-
-  /* ââ Add ââ */
-  function addEntry() {
-    const name = document.getElementById('nameInput').value.trim();
-    const song = document.getElementById('songInput').value.trim();
-    if (!name) { toast('â ï¸ Please enter a name'); document.getElementById('nameInput').focus(); return; }
-    if (!song) { toast('â ï¸ Please enter a song'); document.getElementById('songInput').focus(); return; }
-    queue.push({ id: Date.now(), name, song, status: 'waiting' });
-    save(); render();
-    document.getElementById('nameInput').value = '';
-    document.getElementById('songInput').value = '';
-    document.getElementById('nameInput').focus();
-    toast('â Added to queue!');
-  }
-
-  /* ââ Set status â only-one-current enforced ââ */
-  function setStatus(id, status) {
-    const entry = queue.find(e => e.id === id);
-    if (!entry) return;
-    if (status === 'current') {
-      // Move any existing current back to waiting
-      queue.forEach(e => { if (e.id !== id && e.status === 'current') e.status = 'waiting'; });
-    }
-    entry.status = status;
-    save(); render();
-  }
-
-  /* ââ Promote first waiting â current ââ */
-  function promoteNext() {
-    const next = queue.find(e => e.status === 'waiting');
-    if (!next) { toast('No one in waiting list'); return; }
-    queue.forEach(e => { if (e.status === 'current') e.status = 'waiting'; });
-    next.status = 'current';
-    save(); render();
-    toast('ð¤ Now performing: ' + next.name);
-  }
-
-  /* ââ Delete ââ */
-  function deleteEntry(id) {
-    queue = queue.filter(e => e.id !== id);
-    save(); render(); toast('Removed from queue');
-  }
-
-  /* ââ Tab switch ââ */
-  function setTab(tab) { activeTab = tab; render(); }
-
-  /* ââ Move waiting entry up/down ââ */
-  function moveEntry(id, dir) {
-    const wIds = queue.filter(e => e.status === 'waiting').map(e => e.id);
-    const pos = wIds.indexOf(id);
-    if (pos < 0) return;
-    const np = pos + dir;
-    if (np < 0 || np >= wIds.length) return;
-    const iA = queue.findIndex(e => e.id === wIds[pos]);
-    const iB = queue.findIndex(e => e.id === wIds[np]);
-    [queue[iA], queue[iB]] = [queue[iB], queue[iA]];
-    save(); render();
-  }
-
-
-  /* ââ Export CSV ââ */
-  function exportCSV() {
-    if (queue.length === 0) { toast('â ï¸ Queue is empty'); return; }
-    const rows = ['id,name,song,status'];
-    queue.forEach(e => {
-      const name = '"' + String(e.name).replace(/"/g,'""') + '"';
-      const song = '"' + String(e.song).replace(/"/g,'""') + '"';
-      rows.push([e.id, name, song, e.status].join(','));
+    document.getElementById('name-in').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); document.getElementById('song-in').focus(); }
     });
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'song-queue.csv';
-    a.click();
-    toast('â CSV exported!');
+    document.getElementById('song-in').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); addEntry(); }
+    });
+    document.getElementById('csv-in').addEventListener('change', importCSV);
+    document.getElementById('backdrop').addEventListener('click', closeSheet);
+    document.getElementById('sheet').addEventListener('click', function(e) { e.stopPropagation(); });
+
+    loadQueue(false);
+    setInterval(function() { loadQueue(true); }, 8000);
+  });
+
+  function loadLogo() {
+    var img = document.getElementById('logo-img');
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'DTSlogo-black.png', true);
+    xhr.responseType = 'blob';
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        img.src = URL.createObjectURL(xhr.response);
+      }
+    };
+    xhr.send();
   }
 
-  /* ââ Import CSV ââ */
-  function importCSV(ev) {
-    const file = ev.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
+  /* ─ TABS ─ */
+  window.setTab = function(id) {
+    activeTab = id;
+    ['add','all','current','waiting','done'].forEach(function(t) {
+      var el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('active', t === id);
+    });
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    var pg = document.getElementById('page-' + id);
+    if (pg) pg.classList.add('active');
+    if (id === 'add') setTimeout(function() { document.getElementById('name-in').focus(); }, 300);
+  };
+
+  /* ─ API ─ */
+  function apiCall(action, data) {
+    data = data || {};
+    var body = JSON.parse(JSON.stringify(data));
+    body.action = action;
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', API, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = function() {
+        try {
+          var obj = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300) resolve(obj);
+          else reject(new Error('HTTP ' + xhr.status));
+        } catch(e) { reject(new Error('Bad JSON: ' + xhr.responseText.slice(0,100))); }
+      };
+      xhr.onerror = function() { reject(new Error('Network error — check api.php is uploaded')); };
+      xhr.send(JSON.stringify(body));
+    });
+  }
+
+  /* ─ LOAD ─ */
+  function loadQueue(silent) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API + '?action=get', true);
+    xhr.onload = function() {
       try {
-        const lines = e.target.result.trim().split('\n');
-        const header = lines[0].toLowerCase();
-        if (!header.includes('name') || !header.includes('song')) {
-          toast('â ï¸ Invalid CSV format'); return;
+        var data = JSON.parse(xhr.responseText);
+        if (Array.isArray(data)) {
+          queue = data;
+          setDb('ok');
+          document.getElementById('err-panel').classList.remove('on');
+          render();
+        } else {
+          setDb('error');
+          if (!silent) showErr(data.error || 'Unknown error');
         }
-        const parsed = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVLine(lines[i]);
-          if (cols.length < 3) continue;
-          const status = (cols[3] || 'waiting').trim().toLowerCase();
-          parsed.push({
-            id: parseInt(cols[0]) || Date.now() + i,
-            name: cols[1].trim(),
-            song: cols[2].trim(),
-            status: ['current','done','waiting'].includes(status) ? status : 'waiting'
-          });
-        }
-        if (parsed.length === 0) { toast('â ï¸ No valid rows found'); return; }
-        // Enforce only-one-current
-        let seenCurrent = false;
-        parsed.forEach(e => {
-          if (e.status === 'current') {
-            if (seenCurrent) e.status = 'waiting';
-            seenCurrent = true;
+      } catch(e) {
+        setDb('error');
+        if (!silent) showErr(e.message);
+      }
+    };
+    xhr.onerror = function() {
+      setDb('error');
+      if (!silent) showErr('Cannot reach api.php');
+    };
+    xhr.send();
+  }
+
+  function setDb(state) {
+    var pill = document.getElementById('db-pill');
+    var txt  = document.getElementById('db-txt');
+    pill.className = 'tb-db ' + state;
+    if (state === 'ok') {
+      txt.textContent = 'Connected';
+      pill.style.display = 'flex';
+      clearTimeout(pill._t);
+      pill._t = setTimeout(function() { pill.style.display = 'none'; }, 2000);
+    } else if (state === 'error') {
+      txt.textContent = 'API Error';
+      pill.style.display = 'flex';
+    } else {
+      pill.style.display = 'none';
+    }
+  }
+
+  function showErr(msg) {
+    var p = document.getElementById('err-panel');
+    p.innerHTML = '<strong>API Error</strong><br>' + esc(msg) + '<br><a href="api.php?action=test" target="_blank">Test api.php</a>';
+    p.classList.add('on');
+  }
+
+  /* ─ RENDER ─ */
+  function render() {
+    var cur  = queue.filter(function(e) { return e.status === 'current'; });
+    var wait = queue.filter(function(e) { return e.status === 'waiting'; });
+    var done = queue.filter(function(e) { return e.status === 'done'; });
+    var nAll = queue.length;
+
+    document.getElementById('cnt-all').textContent   = nAll;
+    document.getElementById('cnt-cur').textContent   = cur.length;
+    document.getElementById('cnt-wait').textContent  = wait.length;
+    document.getElementById('cnt-done').textContent  = done.length;
+    document.getElementById('wait-count').textContent = wait.length;
+    document.getElementById('done-count').textContent = done.length;
+    document.getElementById('tb-sub').textContent    = nAll + ' singer' + (nAll !== 1 ? 's' : '') + ' · DTS';
+
+    var heroHtml;
+    if (cur.length) {
+      heroHtml =
+        '<div class="hero">' +
+          '<div class="hero-icon">&#127908;</div>' +
+          '<div class="hero-info">' +
+            '<div class="hero-lbl">Now Performing</div>' +
+            '<div class="hero-name">' + esc(cur[0].name) + '</div>' +
+            '<div class="hero-song">' + esc(cur[0].song) + '</div>' +
+          '</div>' +
+          '<div class="hero-done-btn" onclick="setStatus(' + cur[0].id + ',\'done\')">Done</div>' +
+        '</div>';
+    } else {
+      heroHtml =
+        '<div class="hero" style="justify-content:center;flex-direction:column;gap:6px;padding:18px">' +
+          '<span style="font-size:36px">&#127908;</span>' +
+          '<span style="font-size:13px;color:rgba(255,255,255,0.75)">No one performing</span>' +
+        '</div>';
+    }
+    document.getElementById('hero-wrap').innerHTML     = heroHtml;
+    document.getElementById('cur-hero-wrap').innerHTML = heroHtml;
+
+    var nextHtml =
+      '<div class="next-row">' +
+        '<div class="next-lbl">' + (wait.length ? 'Next: ' + esc(wait[0].name) : 'No one waiting') + '</div>' +
+        '<button class="next-btn" onclick="promoteNext()"' + (!wait.length ? ' disabled' : '') + '>Next</button>' +
+      '</div>';
+    document.getElementById('next-wrap').innerHTML     = nextHtml;
+    document.getElementById('cur-next-wrap').innerHTML = nextHtml;
+
+    /* All tab grouped */
+    var allEl = document.getElementById('all-list');
+    if (!nAll) {
+      allEl.innerHTML = emptyHtml('&#127925;', 'Queue is empty', 'Go to Add tab to add singers.');
+    } else {
+      var groups = [
+        {items:cur,  status:'cur',  icon:'&#127908;', label:'On Stage',  cls:'grp-cur'},
+        {items:wait, status:'wait', icon:'&#9203;',   label:'Waiting',   cls:'grp-wait'},
+        {items:done, status:'done', icon:'&#9989;',   label:'Completed', cls:'grp-done'}
+      ];
+      var html = '';
+      var idx = 0;
+      var first = true;
+      groups.forEach(function(g) {
+        if (!g.items.length) return;
+        if (!first) html += '<div class="grp-divider"></div>';
+        first = false;
+        html += '<div class="grp-hd ' + g.cls + '">' +
+          '<span class="grp-icon">' + g.icon + '</span>' +
+          '<span class="grp-label">' + g.label + '</span>' +
+          '<span class="grp-badge">' + g.items.length + '</span>' +
+        '</div><div class="grp-block">';
+        g.items.forEach(function(e) { idx++; html += rowHtml(e, idx, g.status, wait); });
+        html += '</div>';
+      });
+      allEl.innerHTML = html;
+    }
+
+    /* Current tab */
+    var curEl = document.getElementById('cur-list');
+    curEl.innerHTML = !cur.length
+      ? emptyHtml('&#127908;', 'No one performing', 'Tap Next or tap a waiting singer.')
+      : cur.map(function(e, i) { return rowHtml(e, i+1, 'cur', wait); }).join('');
+
+    /* Waiting tab */
+    var waitEl = document.getElementById('wait-list');
+    waitEl.innerHTML = !wait.length
+      ? emptyHtml('&#9203;', 'No one waiting', 'Add singers using the Add tab.')
+      : wait.map(function(e, i) { return rowHtml(e, i+1, 'wait', wait); }).join('');
+
+    /* Done tab */
+    var doneEl = document.getElementById('done-list');
+    doneEl.innerHTML = !done.length
+      ? emptyHtml('&#9989;', 'None completed yet', 'Completed performances appear here.')
+      : done.map(function(e, i) { return rowHtml(e, i+1, 'done', wait); }).join('');
+  }
+
+  function emptyHtml(icon, title, sub) {
+    return '<div class="empty"><div class="empty-icon">' + icon + '</div><div class="empty-title">' + title + '</div><div class="empty-sub">' + sub + '</div></div>';
+  }
+
+  function rowHtml(e, idx, sc, waitList) {
+    var chipMap  = {cur:'cur', wait:'wait', done:'done'};
+    var labelMap = {cur:'On Stage', wait:'Waiting', done:'Done'};
+    var isWait   = (e.status === 'waiting');
+    var wIdx     = -1;
+    for (var i = 0; i < waitList.length; i++) { if (waitList[i].id === e.id) { wIdx = i; break; } }
+    var isFirst = (wIdx === 0);
+    var isLast  = (wIdx === waitList.length - 1);
+
+    var right;
+    if (isWait) {
+      right = '<div class="mv-wrap" onclick="event.stopPropagation()">' +
+        '<button class="mv-btn" onclick="moveRow(' + e.id + ',-1)"' + (isFirst ? ' disabled' : '') + '>▲</button>' +
+        '<button class="mv-btn" onclick="moveRow(' + e.id + ',1)"'  + (isLast  ? ' disabled' : '') + '>▼</button>' +
+        '</div>';
+    } else {
+      right = '<div class="q-chip ' + (chipMap[sc] || sc) + '">' + (labelMap[sc] || e.status) + '</div><div class="q-arrow">›</div>';
+    }
+
+    return '<div class="q-row ' + sc + '" data-id="' + e.id + '" onclick="openSheet(' + e.id + ')">' +
+      '<div class="q-num">' + idx + '</div>' +
+      '<div class="q-info"><div class="q-name">' + esc(e.name) + '</div><div class="q-song">' + esc(e.song) + '</div></div>' +
+      right +
+    '</div>';
+  }
+
+  /* ─ SHEET ─ */
+  window.openSheet = function(id) {
+    var e = null;
+    for (var i = 0; i < queue.length; i++) { if (queue[i].id === id) { e = queue[i]; break; } }
+    if (!e) return;
+    sheetId = id;
+    var wait   = queue.filter(function(q) { return q.status === 'waiting'; });
+    var isCur  = (e.status === 'current');
+    var isWait = (e.status === 'waiting');
+    var isDone = (e.status === 'done');
+    var wIdx = -1;
+    for (var j = 0; j < wait.length; j++) { if (wait[j].id === id) { wIdx = j; break; } }
+    var isFirst = (wIdx === 0);
+    var isLast  = (wIdx === wait.length - 1);
+
+    document.getElementById('sh-title').textContent = e.name;
+
+    var html =
+      '<div class="sh-singer-card">' +
+        '<div class="sh-singer-icon">&#127925;</div>' +
+        '<div><div class="sh-singer-name">' + esc(e.name) + '</div>' +
+        '<div class="sh-singer-song">' + esc(e.song) + '</div></div>' +
+      '</div>' +
+      '<div class="sh-actions-title">Change Status</div>' +
+      '<div class="sh-actions">' +
+        shBtn('sh-btn-cur', '&#127908;', isCur ? '✓ Now Performing' : 'Set as Current', isCur ? 'Currently on stage' : 'Move to stage now', "sheetSetStatus('current')") +
+        shBtn('sh-btn-done', '&#9989;', isDone ? '✓ Completed' : 'Mark as Done', 'Performance completed', "sheetSetStatus('done')") +
+        shBtn('sh-btn-wait', '&#9203;', isWait ? '✓ In Queue' : 'Move to Waiting', 'Back to waiting queue', "sheetSetStatus('waiting')") +
+      '</div>';
+
+    if (isWait) {
+      html +=
+        '<div class="sh-actions-title">Reorder Queue</div>' +
+        '<div class="sh-move-row">' +
+          '<button class="sh-move-btn" onclick="sheetMove(-1)"' + (isFirst ? ' disabled' : '') + '>▲ Move Up</button>' +
+          '<button class="sh-move-btn" onclick="sheetMove(1)"'  + (isLast  ? ' disabled' : '') + '>▼ Move Down</button>' +
+        '</div>';
+    }
+
+    html +=
+      '<div class="sh-actions">' +
+        shBtn('sh-btn-del', '&#128465;', 'Remove from Queue', 'Cannot be undone', 'sheetDelete()') +
+      '</div>';
+
+    document.getElementById('sh-body').innerHTML = html;
+    document.getElementById('backdrop').classList.add('on');
+    document.getElementById('sheet').classList.add('on');
+  };
+
+  function shBtn(cls, icon, lbl, sub, onclick) {
+    return '<button class="sh-action-btn ' + cls + '" onclick="' + onclick + '">' +
+      '<span class="sh-act-icon">' + icon + '</span>' +
+      '<div class="sh-act-info"><div class="sh-act-lbl">' + lbl + '</div><div class="sh-act-sub">' + sub + '</div></div>' +
+      '</button>';
+  }
+
+  window.closeSheet = function() {
+    document.getElementById('backdrop').classList.remove('on');
+    document.getElementById('sheet').classList.remove('on');
+    sheetId = null;
+  };
+
+  window.sheetSetStatus = function(status) {
+    var id = sheetId;
+    if (!id) return;
+    closeSheet();
+    setStatus(id, status);
+  };
+
+  window.sheetMove = function(dir) {
+    var id = sheetId;
+    if (!id) return;
+    var wait = queue.filter(function(e) { return e.status === 'waiting'; });
+    var pos  = -1;
+    for (var i = 0; i < wait.length; i++) { if (wait[i].id === id) { pos = i; break; } }
+    if (pos < 0) return;
+    var np = pos + dir;
+    if (np < 0 || np >= wait.length) return;
+    var iA = -1, iB = -1;
+    for (var j = 0; j < queue.length; j++) {
+      if (queue[j].id === wait[pos].id) iA = j;
+      if (queue[j].id === wait[np].id)  iB = j;
+    }
+    var tmp = queue[iA]; queue[iA] = queue[iB]; queue[iB] = tmp;
+    closeSheet();
+    render();
+    apiCall('reorder', {ids: queue.map(function(e) { return e.id; })})
+      .catch(function() { showToast('Reorder failed', 'err'); loadQueue(true); });
+  };
+
+  window.sheetDelete = function() {
+    var id = sheetId;
+    if (!id) return;
+    var e = null;
+    for (var i = 0; i < queue.length; i++) { if (queue[i].id === id) { e = queue[i]; break; } }
+    if (!confirm('Remove ' + (e ? e.name : 'this singer') + '?')) return;
+    closeSheet();
+    apiCall('delete', {id: id})
+      .then(function() { showToast('Removed', 'ok'); loadQueue(true); })
+      .catch(function() { showToast('Delete failed', 'err'); });
+  };
+
+  /* ─ ACTIONS ─ */
+  window.addEntry = function() {
+    var name = document.getElementById('name-in').value.trim();
+    var song = document.getElementById('song-in').value.trim();
+    if (!name) { showToast('Enter a name', 'err'); document.getElementById('name-in').focus(); return; }
+    if (!song) { showToast('Enter a song', 'err'); document.getElementById('song-in').focus(); return; }
+    var btn = document.getElementById('add-btn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    apiCall('add', {name: name, song: song})
+      .then(function() {
+        document.getElementById('name-in').value = '';
+        document.getElementById('song-in').value = '';
+        showToast('Added to queue!', 'ok');
+        loadQueue(true);
+        setTab('waiting');
+      })
+      .catch(function(err) { showToast(err.message, 'err'); })
+      .finally(function() { btn.disabled = false; btn.textContent = '+ Add to Queue'; });
+  };
+
+  window.setStatus = function(id, status) {
+    apiCall('updateStatus', {id: id, status: status})
+      .then(function() {
+        if (status === 'done') {
+          var nextWaiting = null;
+          for (var i = 0; i < queue.length; i++) {
+            if (queue[i].status === 'waiting' && queue[i].id !== id) { nextWaiting = queue[i]; break; }
           }
+          if (nextWaiting) {
+            return apiCall('updateStatus', {id: nextWaiting.id, status: 'current'})
+              .then(function() { showToast('Now: ' + nextWaiting.name, 'ok'); });
+          } else {
+            showToast('Done - no one next', '');
+          }
+        }
+      })
+      .then(function() { loadQueue(true); })
+      .catch(function() { showToast('Update failed', 'err'); });
+  };
+
+  window.promoteNext = function() {
+    apiCall('promoteNext')
+      .then(function(r) {
+        if (r.success) { showToast('Now: ' + r.name, 'ok'); loadQueue(true); }
+        else showToast('No one waiting', '');
+      })
+      .catch(function(err) { showToast(err.message, 'err'); });
+  };
+
+  window.moveRow = function(id, dir) {
+    var wait = queue.filter(function(e) { return e.status === 'waiting'; });
+    var pos  = -1;
+    for (var i = 0; i < wait.length; i++) { if (wait[i].id === id) { pos = i; break; } }
+    if (pos < 0) return;
+    var np = pos + dir;
+    if (np < 0 || np >= wait.length) return;
+    var iA = -1, iB = -1;
+    for (var j = 0; j < queue.length; j++) {
+      if (queue[j].id === wait[pos].id) iA = j;
+      if (queue[j].id === wait[np].id)  iB = j;
+    }
+    var tmp = queue[iA]; queue[iA] = queue[iB]; queue[iB] = tmp;
+    render();
+    apiCall('reorder', {ids: queue.map(function(e) { return e.id; })})
+      .catch(function() { showToast('Reorder failed', 'err'); loadQueue(true); });
+  };
+
+  window.clearAll = function() {
+    if (!confirm('Clear the entire queue?')) return;
+    apiCall('clear')
+      .then(function() { showToast('Queue cleared', 'ok'); loadQueue(true); })
+      .catch(function(err) { showToast(err.message, 'err'); });
+  };
+
+  /* ─ CSV ─ */
+  window.exportCSV = function() {
+    if (!queue.length) { showToast('Queue is empty', 'err'); return; }
+    var rows = ['id,name,song,status'];
+    queue.forEach(function(e) {
+      var n = '"' + String(e.name).replace(/"/g, '""') + '"';
+      var s = '"' + String(e.song).replace(/"/g, '""') + '"';
+      rows.push([e.id, n, s, e.status].join(','));
+    });
+    var blob = new Blob([rows.join('\n')], {type: 'text/csv'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url;
+    a.download = 'song-queue.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    showToast('CSV exported', 'ok');
+  };
+
+  window.triggerImport = function() {
+    var inp = document.getElementById('csv-in');
+    inp.value = '';
+    inp.click();
+  };
+
+  function importCSV(ev) {
+    var file = ev.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var lines = e.target.result.trim().split('\n');
+      if (lines[0].toLowerCase().indexOf('name') < 0 || lines[0].toLowerCase().indexOf('song') < 0) {
+        showToast('Invalid CSV', 'err'); return;
+      }
+      var parsed = [];
+      for (var i = 1; i < lines.length; i++) {
+        var c = parseCSVLine(lines[i]);
+        if (c.length >= 3 && c[1].trim()) parsed.push({name: c[1].trim(), song: c[2].trim()});
+      }
+      if (!parsed.length) { showToast('No valid rows', 'err'); return; }
+      apiCall('clear').then(function() {
+        var p = Promise.resolve();
+        parsed.forEach(function(row) {
+          p = p.then(function() { return apiCall('add', {name: row.name, song: row.song}); });
         });
-        queue = parsed;
-        save(); render();
-        toast('â Imported ' + parsed.length + ' entries!');
-      } catch(err) { toast('â ï¸ Import failed'); }
-      ev.target.value = '';
+        return p;
+      })
+      .then(function() { showToast('Imported ' + parsed.length, 'ok'); loadQueue(true); })
+      .catch(function() { showToast('Import failed', 'err'); });
     };
     reader.readAsText(file);
   }
 
   function parseCSVLine(line) {
-    const result = []; let cur = ''; let inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
+    var res = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
       if (c === '"') {
         if (inQ && line[i+1] === '"') { cur += '"'; i++; }
         else inQ = !inQ;
-      } else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+      } else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
       else cur += c;
     }
-    result.push(cur);
-    return result;
+    res.push(cur);
+    return res;
   }
 
-  /* ââ Render ââ */
-  function render() {
-    const nAll  = queue.length;
-    const nWait = queue.filter(e => e.status === 'waiting').length;
-    const nCur  = queue.filter(e => e.status === 'current').length;
-    const nDone = queue.filter(e => e.status === 'done').length;
-
-    // Stats bar
-    document.getElementById('stats').innerHTML = `
-      <div class="stat-pill all">Total: ${nAll}</div>
-      <div class="stat-pill cur">ð¤ ${nCur} Current</div>
-      <div class="stat-pill done">â ${nDone} Done</div>
-      <div class="stat-pill wait">â³ ${nWait} Waiting</div>`;
-
-    // Tab counts + active class
-    document.getElementById('cnt-all').textContent     = nAll;
-    document.getElementById('cnt-current').textContent = nCur;
-    document.getElementById('cnt-done').textContent    = nDone;
-    document.getElementById('cnt-waiting').textContent = nWait;
-    ['all','current','done','waiting'].forEach(t => {
-      document.getElementById('tab-'+t).className =
-        'tab-btn' + (activeTab === t ? ' active-'+t : '');
-    });
-
-    const list = document.getElementById('queueList');
-    let html = '';
-
-    /* ââââ ALL TAB ââââ */
-    if (activeTab === 'all') {
-      if (nAll === 0) {
-        list.innerHTML = `<div class="empty-state"><div class="big">ðµ</div>No entries yet.<br>Add the first singer above!</div>`;
-        return;
-      }
-      const groups = [
-        { key:'current', label:'ð¤ Currently Performing', items: queue.filter(e=>e.status==='current') },
-        { key:'waiting', label:'â³ Waiting',               items: queue.filter(e=>e.status==='waiting') },
-        { key:'done',    label:'â Done',                   items: queue.filter(e=>e.status==='done') },
-      ];
-      let idx = 0;
-      groups.forEach(g => {
-        if (!g.items.length) return;
-        html += `<div class="section-label">${g.label}</div>`;
-        g.items.forEach((e, i) => {
-          idx++;
-          const isCur  = e.status === 'current';
-          const isWait = e.status === 'waiting';
-          const isFirst = i === 0, isLast = i === g.items.length - 1;
-          const dragAttrs = isWait ? `draggable="true" ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()" ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)" ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})"` : '';
-          const dragHandle = isWait ? `<div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>` : `<div style="width:22px;flex-shrink:0"></div>`;
-          const moveBtns = isWait ? `<div class="move-btns"><button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>â²</button><button class="mv-btn" onclick="moveEntry(${e.id},1)" ${isLast?'disabled':''}>â¼</button></div>` : '';
-          html += `
-          <div class="row-card status-${e.status}" id="card-${e.id}" data-id="${e.id}" ${dragAttrs}>
-            ${dragHandle}
-            <div class="row-num">${idx}</div>
-            <div class="row-info">
-              <div class="row-name">${esc(e.name)}</div>
-              <div class="row-song">${esc(e.song)}</div>
-            </div>
-            ${moveBtns}
-            <div class="row-actions">
-              <button class="act-btn set-current${isCur?' is-current':''}" onclick="setStatus(${e.id},'current')" title="${isCur?'Currently performing':'Set as current performer'}">${isCur?'ð¤ On Stage':'ð¤ Set Current'}</button>
-            </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
-          </div>`;
-        });
-      });
-    }
-
-    /* ââââ CURRENT TAB ââââ */
-    else if (activeTab === 'current') {
-      const curItems = queue.filter(e => e.status === 'current');
-      const hasWait  = queue.some(e => e.status === 'waiting');
-      html += `
-      <div class="next-btn-bar">
-        <span>â­ Move first Waiting singer to Current</span>
-        <button class="next-btn" onclick="promoteNext()" ${!hasWait?'disabled':''}>Next â</button>
-      </div>`;
-      if (curItems.length === 0) {
-        html += `<div class="empty-state"><div class="big">ð¤</div>No one is performing right now.<br>Use "Set Current" in All tab or click Next â</div>`;
-      } else {
-        curItems.forEach((e, i) => {
-          html += `
-          <div class="row-card status-current" id="card-${e.id}" data-id="${e.id}">
-            <div class="row-num">${i+1}</div>
-            <div class="row-info">
-              <div class="row-name">${esc(e.name)}</div>
-              <div class="row-song">${esc(e.song)}</div>
-            </div>
-            <div class="row-actions">
-              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">â Done</button>
-              <button class="act-btn to-waiting" onclick="setStatus(${e.id},'waiting')" title="Back to Waiting">â³ Waiting</button>
-            </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
-          </div>`;
-        });
-      }
-    }
-
-    /* ââââ DONE TAB ââââ */
-    else if (activeTab === 'done') {
-      const doneItems = queue.filter(e => e.status === 'done');
-      if (doneItems.length === 0) {
-        html = `<div class="empty-state"><div class="big">â</div>No completed performances yet.</div>`;
-      } else {
-        doneItems.forEach((e, i) => {
-          html += `
-          <div class="row-card status-done" id="card-${e.id}" data-id="${e.id}">
-            <div class="row-num">${i+1}</div>
-            <div class="row-info">
-              <div class="row-name">${esc(e.name)}</div>
-              <div class="row-song">${esc(e.song)}</div>
-            </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
-          </div>`;
-        });
-      }
-    }
-
-    /* ââââ WAITING TAB ââââ */
-    else if (activeTab === 'waiting') {
-      const waitItems = queue.filter(e => e.status === 'waiting');
-      if (waitItems.length === 0) {
-        html = `<div class="empty-state"><div class="big">â³</div>No one waiting.<br>Add singers above!</div>`;
-      } else {
-        waitItems.forEach((e, i) => {
-          const isFirst = i === 0, isLast = i === waitItems.length - 1;
-          html += `
-          <div class="row-card status-waiting" id="card-${e.id}" data-id="${e.id}"
-            draggable="true"
-            ondragstart="onDragStart(event,${e.id})" ondragend="onDragEnd()"
-            ondragover="onDragOver(event,${e.id})" ondrop="onDrop(event,${e.id})" ondragleave="onDragLeave(event)"
-            ontouchstart="onTouchStart(event,${e.id})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event,${e.id})">
-            <div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>
-            <div class="row-num">${i+1}</div>
-            <div class="row-info">
-              <div class="row-name">${esc(e.name)}</div>
-              <div class="row-song">${esc(e.song)}</div>
-            </div>
-            <div class="move-btns">
-              <button class="mv-btn" onclick="moveEntry(${e.id},-1)" ${isFirst?'disabled':''}>â²</button>
-              <button class="mv-btn" onclick="moveEntry(${e.id},1)"  ${isLast?'disabled':''}>â¼</button>
-            </div>
-            <div class="row-actions">
-              <button class="act-btn to-current" onclick="setStatus(${e.id},'current')" title="Set as Current">ð¤ Current</button>
-              <button class="act-btn to-done"    onclick="setStatus(${e.id},'done')"    title="Mark as Done">â Done</button>
-            </div>
-            <button class="del-btn" onclick="deleteEntry(${e.id})" title="Remove">â</button>
-          </div>`;
-        });
-      }
-    }
-
-    list.innerHTML = html;
+  /* ─ UTILS ─ */
+  function showToast(msg, type) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'on';
+    el.style.background = type === 'ok' ? 'rgba(30,100,10,0.93)' : type === 'err' ? 'rgba(180,20,10,0.93)' : 'rgba(26,8,0,0.93)';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { el.classList.remove('on'); }, 2800);
   }
 
-  /* ââ Drag & Drop (desktop) ââ */
-  let dragId = null;
-  function onDragStart(ev, id) {
-    dragId = id; ev.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => { const el = document.getElementById('card-'+id); if(el) el.classList.add('dragging'); }, 0);
-  }
-  function onDragEnd() {
-    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('dragging','drag-over'));
-    dragId = null;
-  }
-  function onDragOver(ev, overId) {
-    ev.preventDefault();
-    if (dragId === overId) return;
-    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over'));
-    const el = document.getElementById('card-'+overId);
-    if (el) el.classList.add('drag-over');
-  }
-  function onDragLeave(ev) { ev.currentTarget.classList.remove('drag-over'); }
-  function onDrop(ev, overId) {
-    ev.preventDefault();
-    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over','dragging'));
-    if (!dragId || dragId === overId) return;
-    reorderWaiting(dragId, overId); dragId = null;
-  }
-
-  function reorderWaiting(fromId, toId) {
-    const fi = queue.findIndex(e => e.id === fromId);
-    const ti = queue.findIndex(e => e.id === toId);
-    if (fi < 0 || ti < 0) return;
-    const item = queue.splice(fi, 1)[0];
-    const newTi = queue.findIndex(e => e.id === toId);
-    queue.splice(newTi, 0, item);
-    save(); render();
-  }
-
-  /* ââ Touch drag (mobile) ââ */
-  let touchId = null, touchClone = null, touchOverId = null;
-  function onTouchStart(ev, id) {
-    if (ev.touches.length !== 1) return;
-    touchId = id;
-    const card = document.getElementById('card-'+id);
-    card.classList.add('dragging');
-    const rect = card.getBoundingClientRect();
-    touchClone = card.cloneNode(true);
-    touchClone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.82;z-index:9999;pointer-events:none;border-radius:13px;`;
-    document.body.appendChild(touchClone);
-  }
-  function onTouchMove(ev) {
-    if (!touchId || !touchClone) return;
-    ev.preventDefault();
-    const t = ev.touches[0];
-    const w = parseFloat(touchClone.style.width);
-    touchClone.style.left = (t.clientX - w/2) + 'px';
-    touchClone.style.top  = (t.clientY - 28) + 'px';
-    touchClone.style.display = 'none';
-    const el = document.elementFromPoint(t.clientX, t.clientY);
-    touchClone.style.display = '';
-    const card = el ? el.closest('.row-card[data-id]') : null;
-    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('drag-over'));
-    if (card && card.dataset.id && parseInt(card.dataset.id) !== touchId) {
-      card.classList.add('drag-over');
-      touchOverId = parseInt(card.dataset.id);
-    } else { touchOverId = null; }
-  }
-  function onTouchEnd(ev, id) {
-    if (touchClone) { touchClone.remove(); touchClone = null; }
-    document.querySelectorAll('.row-card').forEach(c => c.classList.remove('dragging','drag-over'));
-    if (touchId && touchOverId && touchId !== touchOverId) reorderWaiting(touchId, touchOverId);
-    touchId = null; touchOverId = null;
-  }
+  window.toast = showToast; /* alias */
 
   function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
-  document.addEventListener('keydown', ev => {
-    if (ev.key === 'Enter' && (document.activeElement.id === 'nameInput' || document.activeElement.id === 'songInput'))
-      addEntry();
-  });
-
-  // ââ Cloud Sync (GitHub repo queue-data branch) ââ
-  const _REPO   = 'dallastatvamasis/dallastatvamasis.com';
-  const _BRANCH = 'queue-data';
-  const _FILE   = 'song-queue.json';
-  const _CLOUD_URL = 'https://api.github.com/repos/' + _REPO + '/contents/' + _FILE + '?ref=' + _BRANCH;
-
-  function openSyncModal() {
-    document.getElementById('syncTokenInput').value = localStorage.getItem('sync_token') || '';
-    document.getElementById('syncResult').textContent = '';
-    refreshSyncUrlUI();
-    document.getElementById('syncModalBg').classList.add('open');
-  }
-  function closeSyncModal() {
-    document.getElementById('syncModalBg').classList.remove('open');
-  }
-  function refreshSyncUrlUI() {
-    const token = localStorage.getItem('sync_token');
-    const sec = document.getElementById('syncUrlSection');
-    if (token) {
-      sec.style.display = '';
-      document.getElementById('syncUrlDisplay').value = location.origin + '/song-queue-display.html';
-    } else {
-      sec.style.display = 'none';
-    }
-    const pill = document.getElementById('syncPill');
-    if (token) {
-      pill.textContent = 'â Cloud Synced'; pill.className = 'sync-pill synced';
-    } else {
-      pill.textContent = 'âï¸ Cloud Sync'; pill.className = 'sync-pill';
-    }
-  }
-  function copyCloudUrl() {
-    const v = document.getElementById('syncUrlDisplay').value;
-    if (!v) return;
-    navigator.clipboard.writeText(v).then(() => {
-      const btn = document.querySelector('.copy-url-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
-    });
-  }
-  async function saveSyncSettings() {
-    const token = document.getElementById('syncTokenInput').value.trim();
-    if (!token) { document.getElementById('syncResult').textContent = 'â ï¸ Enter a GitHub token'; return; }
-    localStorage.setItem('sync_token', token);
-    document.getElementById('syncResult').textContent = 'Syncingâ¦';
-    const r = await syncToRepo();
-    if (r.ok) {
-      document.getElementById('syncResult').textContent = 'â Synced! Cloud URL is ready â copy it for OBS.';
-      refreshSyncUrlUI();
-    } else {
-      document.getElementById('syncResult').textContent = 'â Failed: ' + r.msg;
-    }
-  }
-  function setPillStatus(s) {
-    const pill = document.getElementById('syncPill');
-    if (s === 'syncing') {
-      pill.className = 'sync-pill syncing'; pill.textContent = 'â³ Syncingâ¦';
-    } else if (s === 'ok') {
-      pill.className = 'sync-pill synced'; pill.textContent = 'â Synced';
-      setTimeout(() => refreshSyncUrlUI(), 2500);
-    } else if (s === 'error') {
-      pill.className = 'sync-pill error'; pill.textContent = 'â Sync Error';
-    }
-  }
-  async function syncToRepo() {
-    const token = localStorage.getItem('sync_token');
-    if (!token) return { ok: false, msg: 'No token configured' };
-    setPillStatus('syncing');
-    try {
-      // Get current SHA of the file (needed for updates)
-      const shaRes = await fetch('https://api.github.com/repos/' + _REPO + '/contents/' + _FILE + '?ref=' + _BRANCH + '&_t=' + Date.now(), {
-        headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
-      });
-      const sha = shaRes.ok ? (await shaRes.json()).sha : null;
-      // Encode queue as base64
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(queue))));
-      const body = { message: 'Queue update', content, branch: _BRANCH };
-      if (sha) body.sha = sha;
-      const res = await fetch('https://api.github.com/repos/' + _REPO + '/contents/' + _FILE, {
-        method: 'PUT',
-        headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (res.ok) { setPillStatus('ok'); return { ok: true }; }
-      else { setPillStatus('error'); return { ok: false, msg: data.message || 'API error ' + res.status }; }
-    } catch(e) {
-      setPillStatus('error');
-      return { ok: false, msg: e.message };
-    }
-  }
-
-  // ââ Google Sheets tab functions ââ
-  function switchSyncTab(tab) {
-    const isGS = tab === 'gsheets';
-    document.getElementById('panelGSheets').style.display = isGS ? '' : 'none';
-    document.getElementById('panelGitHub').style.display  = isGS ? 'none' : '';
-    const tabGS = document.getElementById('tabGSheets');
-    const tabGH = document.getElementById('tabGitHub');
-    if (isGS) {
-      tabGS.style.background = 'var(--saffron)'; tabGS.style.color = '#1a0a00'; tabGS.style.fontWeight = '700';
-      tabGH.style.background = 'transparent'; tabGH.style.color = 'var(--muted)'; tabGH.style.fontWeight = 'normal';
-    } else {
-      tabGH.style.background = 'var(--saffron)'; tabGH.style.color = '#1a0a00'; tabGH.style.fontWeight = '700';
-      tabGS.style.background = 'transparent'; tabGS.style.color = 'var(--muted)'; tabGS.style.fontWeight = 'normal';
-    }
-  }
-
-  function saveGsheetsSettings() {
-    const url = document.getElementById('gsheetsUrlInput').value.trim();
-    const res = document.getElementById('gsheetsResult');
-    if (!url) { res.textContent = 'â ï¸ Paste a Google Sheets CSV URL first'; return; }
-    if (!url.includes('docs.google.com') && !url.includes('output=csv') && !url.match(/\.csv(\?|$)/i)) {
-      res.textContent = 'â ï¸ URL doesn\'t look like a published CSV. Make sure to use File â Share â Publish to web â CSV.';
-      return;
-    }
-    localStorage.setItem('gsheetsUrl', url);
-    // Build shareable display URL
-    const base = location.origin + '/song-queue-display.html';
-    const shareUrl = base + '?cloud=' + encodeURIComponent(url);
-    document.getElementById('gsheetsShareUrl').value = shareUrl;
-    document.getElementById('gsheetsShareSection').style.display = '';
-    res.textContent = 'â Saved! Copy the Display URL and open it on any device.';
-    // Also update the sync pill
-    const pill = document.getElementById('syncPill');
-    pill.textContent = 'ð Sheets Sync'; pill.className = 'sync-pill synced';
-  }
-
-  function copyGsheetsUrl() {
-    const v = document.getElementById('gsheetsShareUrl').value;
-    if (!v) return;
-    navigator.clipboard.writeText(v).then(() => {
-      const btn = document.querySelector('#gsheetsShareSection .copy-url-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
-    });
-  }
-
-  function exportCsv() {
-    const rows = [['name', 'song', 'status']];
-    queue.forEach(e => rows.push([
-      (e.name  || '').replace(/,/g, ' '),
-      (e.song  || '').replace(/,/g, ' '),
-      (e.status|| 'waiting')
-    ]));
-    const csv = rows.map(r => r.join(',')).join('\r\n');
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = 'song-queue.csv';
-    a.click();
-  }
-
-  // ââ Hardcoded default Google Sheets CSV URL ââ
-  const _DEFAULT_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZOdG13xDvoXyaszj9V1LFJv2JLATORblA_YqwEVjfjxZq_4bFsllbJryXHSYSREQatjmbsIEYVywG/pub?output=csv';
-  if (!localStorage.getItem('gsheetsUrl')) {
-    localStorage.setItem('gsheetsUrl', _DEFAULT_CSV);
-  }
-
-  // ââ Restore Google Sheets URL on modal open ââ
-  const _origOpenSyncModal = openSyncModal;
-  openSyncModal = function() {
-    _origOpenSyncModal();
-    const saved = localStorage.getItem('gsheetsUrl') || _DEFAULT_CSV;
-    document.getElementById('gsheetsUrlInput').value = saved;
-    if (saved) {
-      const base = location.origin + '/song-queue-display.html';
-      document.getElementById('gsheetsShareUrl').value = base + '?cloud=' + encodeURIComponent(saved);
-      document.getElementById('gsheetsShareSection').style.display = '';
-    }
-    switchSyncTab('github');
-  };
-
-  // ── Auto-set sync token if missing ──
-  if (!localStorage.getItem('sync_token')) {
-    localStorage.setItem('sync_token', atob('Z2hwX0RTSDNZY1lmTnZwWEw2Q0FtTmhra2JmdjlYazRDYlA0VHExTEw='));
-  }
-
-  // Init cloud pill state
-  refreshSyncUrlUI();
-  // Show Sheets pill if gsheetsUrl is saved
-  if (localStorage.getItem('gsheetsUrl') && !localStorage.getItem('sync_token')) {
-    const pill = document.getElementById('syncPill');
-    pill.textContent = 'ð Sheets Sync'; pill.className = 'sync-pill synced';
-  }
-
-  render();
+})();
 </script>
 </body>
 </html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Overlay – Ayyappan Monthly Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── CANVAS WATERMARK ── */
+  .watermark {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none; user-select: none;
+  }
+  .wm-main {
+    font-family: 'Cinzel', serif; font-size: 96px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.04); white-space: nowrap;
+  }
+  .wm-sub {
+    font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600;
+    letter-spacing: 0.38em; text-transform: uppercase;
+    color: rgba(255,255,255,0.025); margin-top: 8px; white-space: nowrap;
+  }
+
+  /* ── TICKER BAR — fixed at absolute bottom of the 1080px canvas ── */
+  .ticker-bar {
+    background: rgba(0,0,0,0.95);
+    border-top: 2px solid rgba(255,107,26,0.4);
+    height: 48px;
+    display: none;
+    align-items: center; overflow: hidden;
+  }
+  .ticker-bar.visible { display: flex; }
+
+  .ticker-label {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FF6B1A, #FF8C42);
+    height: 100%; padding: 0 26px;
+    display: flex; align-items: center; gap: 10px;
+    border-right: 2px solid rgba(255,209,102,0.35);
+  }
+  .ticker-label-icon { font-size: 18px; }
+  .ticker-label-text {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: #FFFFFF; white-space: nowrap;
+  }
+
+  .ticker-track { flex: 1; overflow: hidden; height: 100%; position: relative; }
+  .ticker-inner  { position: relative; width: 100%; height: 100%; }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 0 48px;
+  }
+  .ticker-sep { font-size: 16px; color: #FF6B1A; text-shadow: 0 0 8px rgba(255,107,26,0.6); }
+  .ticker-text {
+    font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 500;
+    color: #FFD166; letter-spacing: 0.04em;
+  }
+
+
+
+  /* ── PANEL ── */
+  .panel { position: absolute; bottom: 0; left: 0; right: 0; }
+
+  .panel-fade {
+    height: 60px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+  }
+
+  /* ── MAIN INFO ROW ── */
+  .main-row {
+    background: rgba(0,0,0,0.88);
+    border-top: 3px solid #FF6B1A;
+    padding: 22px 60px;
+    display: flex; align-items: center; gap: 0;
+  }
+
+  /* LEFT – current singer */
+  .singer-block {
+    flex: 0 0 600px;
+    display: flex; align-items: center; gap: 18px;
+    padding-right: 48px;
+    border-right: 2px solid rgba(255,107,26,0.4);
+  }
+  .s-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+  .s-mic { font-size: 38px; }
+  .s-tag {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; color: #FF8C42; white-space: nowrap;
+  }
+  .s-divider {
+    width: 1px; height: 64px; flex-shrink: 0;
+    background: linear-gradient(180deg, transparent, rgba(255,107,26,0.5), transparent);
+  }
+  .s-text { flex: 1; min-width: 0; }
+  .s-name {
+    font-family: 'Cinzel', serif; font-size: 58px; font-weight: 700;
+    color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.1; letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .s-name.anim { animation: nameIn 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes nameIn { from{opacity:0;transform:translateX(-14px)} to{opacity:1;transform:translateX(0)} }
+  .s-song {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 28px; font-weight: 500; color: #FFB366;
+    margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .s-song::before { content: '♪  '; font-style: normal; font-size: 22px; }
+  .s-empty {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 32px; color: rgba(255,255,255,0.3);
+  }
+
+  /* CENTER – event title */
+  .event-block { flex: 1; text-align: center; padding: 0 44px; min-width: 0; }
+  .e-eyebrow {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.32em; text-transform: uppercase;
+    color: rgba(255,179,102,0.7); margin-bottom: 7px;
+  }
+  .e-title {
+    font-family: 'Cinzel', serif; font-size: 46px; font-weight: 700;
+    letter-spacing: 0.06em; color: #FFD166; line-height: 1.1; white-space: nowrap;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+  }
+  .e-month {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 26px; font-weight: 500;
+    color: rgba(255,209,102,0.65); margin-top: 5px; letter-spacing: 0.1em;
+  }
+
+  /* RIGHT – date & time */
+  .dt-block {
+    flex: 0 0 340px; text-align: right;
+    padding-left: 48px;
+    border-left: 2px solid rgba(255,107,26,0.4);
+  }
+  .dt-time-row { display: flex; align-items: baseline; justify-content: flex-end; gap: 6px; }
+  .dt-time {
+    font-family: 'Cinzel', serif; font-size: 54px; font-weight: 700;
+    color: #FFFFFF; letter-spacing: 0.04em; line-height: 1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+  .dt-ampm {
+    font-family: 'Cinzel', serif; font-size: 19px; font-weight: 600;
+    color: #FF8C42; letter-spacing: 0.12em; padding-bottom: 5px;
+  }
+  .dt-sep { height: 1px; margin: 6px 0 5px; background: rgba(255,107,26,0.4); }
+  .dt-date {
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
+    color: #FFB366; letter-spacing: 0.08em;
+  }
+
+  /* ── DIVIDER RULE ── */
+  .rule {
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%, rgba(255,107,26,0.4) 8%, #FF6B1A 22%,
+      #FFD166 50%, #FF6B1A 78%, rgba(255,107,26,0.4) 92%, transparent 100%);
+    position: relative;
+  }
+  .rule::before {
+    content: '◆'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 11px; color: #FFD166; text-shadow: 0 0 8px rgba(255,200,80,0.9);
+  }
+
+  /* ── UP NEXT ROW ── */
+  .up-row {
+    background: rgba(0,0,0,0.92);
+    padding: 10px 60px 12px;
+    display: flex; align-items: center; min-height: 82px; overflow: hidden;
+  }
+  .up-label {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: #FF8C42; white-space: nowrap; margin-right: 26px; flex-shrink: 0;
+  }
+  .up-list { display: flex; align-items: center; flex: 1; min-width: 0; }
+  .up-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 30px 0 0; animation: upFade 0.4s ease both;
+  }
+  @keyframes upFade { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  .up-item + .up-item { border-left: 1px solid rgba(255,107,26,0.3); padding-left: 30px; }
+  .up-num {
+    font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700;
+    width: 26px; text-align: center; flex-shrink: 0;
+  }
+  .up-item.first  .up-num { color: #FFD166; }
+  .up-item.second .up-num { color: rgba(255,180,80,0.6); }
+  .up-info { min-width: 0; }
+  .up-name {
+    font-family: 'Cinzel', serif; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
+  }
+  .up-item.first  .up-name { color: #FFFFFF; font-size: 32px; }
+  .up-item.second .up-name { color: rgba(255,255,255,0.65); font-size: 27px; }
+  .up-song {
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px;
+    margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .up-song::before { content: '♪ '; font-style: normal; font-size: 14px; }
+  .up-item.first  .up-song { color: #FFB366; }
+  .up-item.second .up-song { color: rgba(255,150,80,0.55); }
+  .up-more {
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+    color: rgba(255,140,50,0.5); letter-spacing: 0.06em;
+    margin-left: 22px; white-space: nowrap; flex-shrink: 0;
+  }
+  .up-empty {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 19px; color: rgba(255,255,255,0.25);
+  }
+
+  /* ── UP-ROW STATS ── */
+  .up-stats {
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0; margin-left: 24px;
+    border-left: 1px solid rgba(255,107,26,0.2); padding-left: 24px;
+  }
+  .ustat {
+    display: flex; align-items: center; gap: 7px;
+    padding: 0 20px 0 0; margin-right: 20px;
+    border-right: 1px solid rgba(255,107,26,0.18);
+  }
+  .ustat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+  .ustat-icon { font-size: 20px; line-height: 1; }
+  .ustat-label {
+    font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap;
+  }
+  .ustat.done    .ustat-label { color: rgba(74,224,128,0.8); }
+  .ustat.waiting .ustat-label { color: rgba(255,179,102,0.8); }
+  .ustat-val {
+    font-family: 'Cinzel', serif; font-size: 30px; font-weight: 900;
+    white-space: nowrap; line-height: 1;
+  }
+  .ustat-of { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.4); }
+  .ustat.done    .ustat-val { color: #4AE080; text-shadow: 0 0 12px rgba(74,224,128,0.5); }
+  .ustat.waiting .ustat-val { color: #FFB366; text-shadow: 0 0 12px rgba(255,179,102,0.5); }
+
+  .ustat.refresh { gap: 8px; }
+  .br-track {
+    width: 70px; height: 4px; border-radius: 4px;
+    background: rgba(255,255,255,0.08); overflow: hidden;
+  }
+  .br-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, #FF6B1A, #FFD166);
+    transition: width 0.9s linear; width: 100%;
+  }
+  .br-sec {
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
+    color: #FF8C42; min-width: 18px; text-align: right;
+  }
+
+
+</style>
+</head>
+<body>
+
+<!-- Watermark -->
+<div class="watermark">
+  <div class="wm-main">DTS Media Live</div>
+  <div class="wm-sub">Dallas Tatvamasi Sangam</div>
+</div>
+
+<!-- ── BOTTOM PANEL ── -->
+<div class="panel">
+  <div class="panel-fade"></div>
+
+  <div class="main-row">
+
+    <div class="singer-block">
+      <div class="s-icon">
+        <div class="s-mic">🎤</div>
+        <div class="s-tag">Now</div>
+      </div>
+      <div class="s-divider"></div>
+      <div class="s-text" id="singerText">
+        <div class="s-empty">Waiting to begin…</div>
+      </div>
+    </div>
+
+    <div class="event-block">
+      <div class="e-eyebrow">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
+      <div class="e-title">Ayyappan Poojai</div>
+      <div class="e-month" id="eventMonth"></div>
+    </div>
+
+    <div class="dt-block">
+      <div class="dt-time-row">
+        <div class="dt-time" id="dtTime">--:--</div>
+        <div class="dt-ampm" id="dtAmPm">--</div>
+      </div>
+      <div class="dt-sep"></div>
+      <div class="dt-date" id="dtDate">--- --, ----</div>
+    </div>
+
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="up-row">
+    <div class="up-label">Up Next</div>
+    <div class="up-list" id="upList">
+      <div class="up-empty">Queue is empty</div>
+    </div>
+    <div class="up-stats">
+      <div class="ustat done">
+        <span class="ustat-icon">✅</span>
+        <span class="ustat-label">Completed</span>
+        <span class="ustat-val"><span id="statDone">0</span><span class="ustat-val" id="statDoneOf">/0</span></span>
+      </div>
+      <div class="ustat waiting">
+        <span class="ustat-icon">⏳</span>
+        <span class="ustat-label">Waiting</span>
+        <span class="ustat-val" id="statWait">0</span>
+      </div>
+      <div class="ustat refresh">
+        <div class="br-track"><div class="br-fill" id="progFill"></div></div>
+        <span class="br-sec" id="refreshSec">10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TICKER (bottom of panel, replaces bottom bar) ── -->
+  <div class="ticker-bar" id="tickerBar">
+    <div class="ticker-label">
+      <span class="ticker-label-icon">📢</span>
+      <span class="ticker-label-text">Announcements</span>
+    </div>
+    <div class="ticker-track">
+      <div class="ticker-inner" id="tickerInner"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API_URL       = 'api.php';
+  const TICKER_URL    = 'https://dallastatvamasis.com/ticker.txt';
+  const REFRESH_SEC   = 10;
+  const TICKER_RELOAD = 30000;
+
+  let lastHash  = '';
+  let countdown = REFRESH_SEC;
+  let queue     = [];
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const WDAYS  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  // ── Clock ─────────────────────────────────────────────────────────────
+  function updateClock() {
+    const n = new Date();
+    let h = n.getHours(), m = n.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    const hh = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    document.getElementById('dtTime').textContent     = hh;
+    document.getElementById('dtAmPm').textContent     = ap;
+    document.getElementById('dtDate').textContent     =
+      WDAYS[n.getDay()] + ', ' + MONTHS[n.getMonth()] + ' ' + n.getDate() + ', ' + n.getFullYear();
+    document.getElementById('eventMonth').textContent =
+      MONTHS[n.getMonth()] + ' ' + n.getFullYear();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Ticker ────────────────────────────────────────────────────────────
+  // Two spans scroll left together. When one exits the left edge it
+  // immediately queues behind the other — zero gap, infinite seamless loop.
+  let rafId   = null;
+  let posA    = 0;
+  let posB    = 0;
+  let spanW   = 0;
+  let running = false;
+  let lastT   = null;
+  const SPEED = 120; // px/sec — increase to scroll faster
+
+  function stopTicker() {
+    running = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  function tickerStep(ts) {
+    if (!running) return;
+    if (lastT === null) lastT = ts;
+    const d = (ts - lastT) / 1000;
+    lastT = ts;
+    posA -= SPEED * d;
+    posB -= SPEED * d;
+    // Span fully off left → place it directly behind the other span (no gap)
+    if (posA + spanW < 0) posA = posB + spanW;
+    if (posB + spanW < 0) posB = posA + spanW;
+    const a = document.getElementById('tickerA');
+    const b = document.getElementById('tickerB');
+    if (a) a.style.left = posA + 'px';
+    if (b) b.style.left = posB + 'px';
+    rafId = requestAnimationFrame(tickerStep);
+  }
+
+  function startTicker() {
+    const track = document.querySelector('.ticker-track');
+    const a     = document.getElementById('tickerA');
+    if (!track || !a) return;
+    const trW = track.offsetWidth;
+    spanW = a.offsetWidth;
+    posA  = trW;           // A: just off right edge
+    posB  = posA + spanW;  // B: immediately behind A, no gap
+    lastT = null;
+    running = true;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tickerStep);
+  }
+
+  function renderTicker(lines) {
+    const bar = document.getElementById('tickerBar');
+    const el  = document.getElementById('tickerInner');
+    if (!lines.length) {
+      bar.classList.remove('visible');
+      document.body.classList.remove('ticker-on');
+      stopTicker();
+      return;
+    }
+    const items = lines.map(l =>
+      `<span style="display:inline-flex;align-items:center;gap:14px;padding:0 60px 0 0;">` +
+        `<span style="font-size:16px;color:#FF6B1A;padding-right:14px;">✦</span>` +
+        `<span style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:500;color:#FFD166;letter-spacing:0.04em;">${esc(l)}</span>` +
+      `</span>`
+    ).join('');
+    stopTicker();
+    el.innerHTML =
+      `<span id="tickerA" style="position:absolute;top:0;left:0;height:100%;white-space:nowrap;display:inline-flex;align-items:center;">${items}</span>` +
+      `<span id="tickerB" style="position:absolute;top:0;left:0;height:100%;white-space:nowrap;display:inline-flex;align-items:center;">${items}</span>`;
+    bar.classList.add('visible');
+    document.body.classList.add('ticker-on');
+    requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(startTicker)));
+  }
+
+  async function loadTicker() {
+    try {
+      const res   = await fetch(TICKER_URL + '?t=' + Date.now());
+      const text  = await res.text();
+      const lines = text
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l.length > 0 && !l.startsWith('#'));
+      renderTicker(lines);
+    } catch (err) {}
+  }
+
+  // ── Queue ─────────────────────────────────────────────────────────────
+  async function loadQueue() {
+    try {
+      const data = await fetch(API_URL + '?action=get').then(r => r.json());
+      if (Array.isArray(data)) { queue = data; refreshQueue(); }
+    } catch (err) {}
+  }
+
+  function refreshQueue() {
+    const cur   = queue.filter(e => e.status === 'current');
+    const wait  = queue.filter(e => e.status === 'waiting');
+    const done  = queue.filter(e => e.status === 'done');
+    const total = queue.length;
+
+    document.getElementById('statDone').textContent   = done.length;
+    document.getElementById('statDoneOf').textContent = '/' + total;
+    document.getElementById('statWait').textContent   = wait.length;
+
+    const h = JSON.stringify(queue);
+    if (h === lastHash) return;
+    lastHash = h;
+    renderSinger(cur[0] || null);
+    renderUpcoming(wait.slice(0, 2), wait.length);
+  }
+
+  function renderSinger(e) {
+    const el = document.getElementById('singerText');
+    if (!e) { el.innerHTML = '<div class="s-empty">Waiting to begin\u2026</div>'; return; }
+    el.innerHTML =
+      '<div class="s-name anim">' + esc(e.name) + '</div>' +
+      '<div class="s-song">'      + esc(e.song) + '</div>';
+  }
+
+  function renderUpcoming(up, total) {
+    const el = document.getElementById('upList');
+    if (!up.length) { el.innerHTML = '<div class="up-empty">No one queued</div>'; return; }
+    let html = up.map((e, i) =>
+      '<div class="up-item ' + (i===0?'first':'second') + '" style="animation-delay:' + (i*0.1) + 's">' +
+        '<div class="up-num">' + (i+1) + '</div>' +
+        '<div class="up-info">' +
+          '<div class="up-name">' + esc(e.name) + '</div>' +
+          '<div class="up-song">' + esc(e.song) + '</div>' +
+        '</div></div>'
+    ).join('');
+    const more = total - up.length;
+    if (more > 0) html += '<div class="up-more">+' + more + ' more</div>';
+    el.innerHTML = html;
+  }
+
+  // ── Main tick ─────────────────────────────────────────────────────────
+  function tick() {
+    updateClock();
+    countdown--;
+    if (countdown <= 0) {
+      countdown = REFRESH_SEC;
+      loadQueue();
+    }
+    const pct = Math.max(0, (countdown / REFRESH_SEC) * 100);
+    document.getElementById('progFill').style.width   = pct + '%';
+    document.getElementById('refreshSec').textContent = countdown;
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  updateClock();
+  loadQueue();
+  loadTicker();
+  setInterval(tick, 1000);
+  setInterval(loadTicker, TICKER_RELOAD);
+</script>
+</body>
+</html>

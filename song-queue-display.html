@@ -59,7 +59,7 @@
   .divider { width: 100px; height: 1px; margin: 0.9rem auto 0; background: linear-gradient(90deg, transparent, var(--saffron), transparent); }
   .divider-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--saffron); margin: -3px auto 0; }
 
-  /* ── Source bar ── */
+  /* ── Source/status bar ── */
   .source-bar {
     display: flex; align-items: center; justify-content: center; gap: 0.7rem;
     flex-wrap: wrap;
@@ -72,53 +72,11 @@
     font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
     border: 1.5px solid;
   }
-  .source-badge.local  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
-  .source-badge.csv    { background: var(--done-bg);       border-color: var(--done-border); color: #7DDB95; }
-  .source-badge.none   { background: rgba(255,255,255,0.04); border-color: var(--border); color: var(--muted); }
+  .source-badge.live  { background: var(--saffron-glow); border-color: var(--saffron); color: var(--saffron-light); }
+  .source-badge.error { background: rgba(224,64,48,0.10); border-color: #E04030; color: #F08080; }
+  .source-badge.none  { background: rgba(255,255,255,0.04); border-color: var(--border); color: var(--muted); }
   .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #E8671A; animation: pulse 1.8s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-
-  /* ── CSV Upload area ── */
-  .upload-zone {
-    max-width: 560px; margin: 1rem auto 0;
-    padding: 0 1rem;
-  }
-  .upload-drop {
-    border: 2px dashed var(--border);
-    border-radius: 14px;
-    padding: 1.2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: rgba(255,255,255,0.02);
-    position: relative;
-  }
-  .upload-drop:hover, .upload-drop.drag-over {
-    border-color: var(--saffron);
-    background: var(--saffron-glow);
-  }
-  .upload-drop input[type=file] {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    opacity: 0; cursor: pointer;
-  }
-  .upload-icon { font-size: 1.6rem; margin-bottom: 0.35rem; }
-  .upload-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
-  .upload-hint { font-size: 0.72rem; color: var(--muted); }
-  .upload-hint span { color: var(--saffron-light); }
-
-  .upload-actions {
-    display: flex; gap: 0.5rem; margin-top: 0.6rem;
-  }
-  .upload-action-btn {
-    flex: 1; background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 0.75rem; font-weight: 600; border-radius: 9px;
-    padding: 0.45rem 0.7rem; cursor: pointer; transition: all 0.18s;
-    display: flex; align-items: center; justify-content: center; gap: 0.3rem;
-  }
-  .upload-action-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
-  .upload-action-btn.danger:hover { border-color: #E04030; color: #E04030; background: rgba(224,64,48,0.08); }
-  .upload-action-btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
 
   /* ── Main ── */
   .main { max-width: 560px; margin: 0 auto; padding: 1.4rem 1rem 3rem; }
@@ -214,7 +172,6 @@
   .row.done    .status-badge { background: var(--done-bg);    border-color: var(--done-border); color: #7DDB95; }
   .row.waiting .status-badge { background: var(--waiting-bg); border-color: var(--waiting-border); color: #9AB4EE; }
 
-
   /* ── Up Next emphasis ── */
   .row.upcoming-1 {
     border-color: rgba(100,130,210,0.55);
@@ -250,50 +207,6 @@
   }
   #countdown { color: var(--saffron-light); font-weight: 600; min-width: 14px; }
 
-  /* ── Cloud URL input ── */
-  .cloud-row {
-    max-width: 560px; margin: 0 auto 0.8rem; padding: 0 0.9rem;
-    display: flex; gap: 0.5rem; align-items: center;
-  }
-  .cloud-input {
-    flex: 1; background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
-    font-size: 0.8rem; padding: 0.52rem 0.8rem; outline: none;
-    transition: border-color 0.2s;
-  }
-  .cloud-input::placeholder { color: var(--muted); opacity: 0.5; }
-  .cloud-input:focus { border-color: var(--saffron); }
-  .cloud-set-btn {
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem; font-weight: 600; border-radius: 10px;
-    padding: 0.52rem 0.85rem; cursor: pointer; white-space: nowrap;
-    transition: all 0.18s;
-  }
-  .cloud-set-btn:hover { border-color: var(--saffron); color: var(--saffron-light); background: var(--saffron-glow); }
-  .cloud-set-btn.active { border-color: #4AE080; color: #4AE080; background: rgba(74,224,128,0.08); }
-
-  /* ── Settings toggle & panel ── */
-  .settings-toggle {
-    position: fixed; top: 0.85rem; right: 0.85rem; z-index: 200;
-    background: rgba(16,8,0,0.82); border: 1.5px solid rgba(232,103,26,0.22);
-    border-radius: 50%; width: 34px; height: 34px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 0.92rem; opacity: 0.35;
-    transition: all 0.22s; backdrop-filter: blur(6px); color: var(--text);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-  }
-  .settings-toggle:hover, .settings-toggle.open {
-    opacity: 1; border-color: var(--saffron);
-    box-shadow: 0 0 12px var(--saffron-glow);
-  }
-  .settings-panel {
-    overflow: hidden; max-height: 0;
-    transition: max-height 0.35s ease, opacity 0.25s ease;
-    opacity: 0;
-  }
-  .settings-panel.open { max-height: 320px; opacity: 1; }
-
   /* ── No data ── */
   .no-data {
     text-align: center; padding: 3rem 1rem; color: var(--muted);
@@ -311,290 +224,63 @@
   <div class="subtitle">Live Queue · View Only</div>
   <div class="divider"></div>
   <div class="divider-dot"></div>
-  <div class="source-bar" id="sourceBar"></div>
+  <div class="source-bar" id="sourceBar">
+    <div class="source-badge none">Connecting to database…</div>
+  </div>
 </header>
-
-<!-- Gear settings button (always visible but subtle) -->
-<button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()" title="Settings">⚙</button>
-
-<!-- Settings panel (hidden when auto-connected to cloud) -->
-<div class="settings-panel" id="settingsPanel">
-  <!-- Cloud URL input -->
-  <div class="cloud-row">
-    <input class="cloud-input" type="url" id="cloudUrlInput"
-      placeholder="☁️ GitHub API URL or CSV link"
-      oninput="onCloudUrlInput(this.value)">
-    <button class="cloud-set-btn" id="cloudSetBtn" onclick="toggleCloud()">Connect</button>
-  </div>
-
-  <!-- CSV Upload -->
-  <div class="upload-zone">
-    <div class="upload-drop" id="dropZone">
-      <input type="file" id="csvInput" accept=".csv" onchange="handleFile(event)">
-      <div class="upload-icon">📂</div>
-      <div class="upload-title">Load CSV File</div>
-      <div class="upload-hint">Drop a <span>song-queue.csv</span> here · also syncs to OBS overlay</div>
-    </div>
-    <div class="upload-actions">
-      <button class="upload-action-btn" onclick="reloadCSV()" id="reloadBtn" disabled>↻ Reload Last CSV</button>
-      <button class="upload-action-btn" onclick="useLocalStorage()" id="lsBtn">⚡ Use Live Queue</button>
-      <button class="upload-action-btn danger" onclick="clearData()" id="clearBtn" disabled>✕ Clear</button>
-    </div>
-  </div>
-</div>
 
 <!-- Board -->
 <div class="main" id="main"></div>
 
 <script>
-  // ── State ──
-  let dataSource = 'local'; // 'local' | 'csv' | 'cloud'
-  let csvData    = null;    // raw CSV text for reload
-  let queueData  = [];
-  const _DEFAULT_CLOUD = 'https://api.github.com/repos/dallastatvamasis/dallastatvamasis.com/contents/song-queue.json?ref=queue-data';
-  let cloudUrl   = localStorage.getItem('cloudUrl') || _DEFAULT_CLOUD;
-  let cloudData  = null;
+  // ── API endpoint ──────────────────────────────────────────────────────
+  const API_URL = 'api.php';
+  const REFRESH_SEC = 5;
 
-  // ── Cloud URL setup ──
-  function onCloudUrlInput(v) { cloudUrl = v.trim(); }
+  let queue = [];
+  let tick  = REFRESH_SEC;
 
-  function toggleCloud() {
-    const input = document.getElementById('cloudUrlInput');
-    const btn   = document.getElementById('cloudSetBtn');
-    if (dataSource === 'cloud') {
-      // Disconnect
-      cloudUrl = '';
-      localStorage.removeItem('cloudUrl');
-      cloudData = null;
-      dataSource = 'local';
-      input.value = '';
-      btn.textContent = 'Connect';
-      btn.classList.remove('active');
-      updateButtons(); renderBoard();
-    } else {
-      const url = input.value.trim();
-      if (!url) { alert('Paste a Cloud URL first'); return; }
-      cloudUrl = url;
-      localStorage.setItem('cloudUrl', url);
-      dataSource = 'cloud';
-      btn.textContent = '✓ Connected';
-      btn.classList.add('active');
-      fetchCloud().then(() => { updateButtons(); renderBoard(); });
-    }
-  }
-
-  // Detect if a URL points to a plain CSV (Google Sheets, raw GitHub, .csv link)
-  function isCsvUrl(url) {
-    return url.includes('docs.google.com/spreadsheets') ||
-           url.includes('output=csv') || url.includes('format=csv') ||
-           url.match(/\.csv(\?|$)/i);
-  }
-
-  // Parse CSV text → array of queue objects
-  function parseCsv(text) {
-    const lines = text.trim().split(/\r?\n/);
-    if (!lines.length) return [];
-    // Detect header row
-    const first = lines[0].toLowerCase();
-    const hasHeader = first.includes('name') || first.includes('song') || first.includes('status');
-    const dataLines = hasHeader ? lines.slice(1) : lines;
-    return dataLines.map((line, i) => {
-      const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-      // Support: id,name,song,status  OR  name,song,status
-      if (cols.length >= 4) {
-        return { id: cols[0] || i + 1, name: cols[1], song: cols[2], status: cols[3] || 'waiting' };
-      } else if (cols.length >= 2) {
-        return { id: i + 1, name: cols[0], song: cols[1], status: cols[2] || 'waiting' };
-      }
-      return null;
-    }).filter(Boolean);
-  }
-
-  async function fetchCloud() {
-    if (!cloudUrl) return;
+  // ── Fetch queue from MySQL ────────────────────────────────────────────
+  async function loadQueue() {
     try {
-      if (isCsvUrl(cloudUrl)) {
-        // ── Plain CSV (Google Sheets, raw GitHub, any public CSV) ──
-        const sep = cloudUrl.includes('?') ? '&' : '?';
-        const res = await fetch(cloudUrl + sep + '_t=' + Date.now(), { cache: 'no-store' });
-        if (res.ok) {
-          const text = await res.text();
-          cloudData = parseCsv(text);
-          if (dataSource === 'cloud') { queueData = cloudData; }
-        }
+      const data = await fetch(API_URL + '?action=get').then(r => r.json());
+      if (Array.isArray(data)) {
+        queue = data;
+        renderBoard(true);
       } else {
-        // ── GitHub Contents API (JSON, needs token) ──
-        const token = localStorage.getItem('sync_token') || '';
-        const sep = cloudUrl.includes('?') ? '&' : '?';
-        const headers = { 'Accept': 'application/vnd.github.v3+json' };
-        if (token) headers['Authorization'] = 'token ' + token;
-        const res = await fetch(cloudUrl + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          cloudData = data.content
-            ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
-            : data;
-          if (dataSource === 'cloud') { queueData = cloudData; }
-        }
+        throw new Error(data.error || 'Invalid response');
       }
-    } catch(e) { /* keep last cloud data */ }
-  }
-
-  // ── Auto-connect from URL param ?cloud=<url> (zero-config sharing) ──
-  const _urlParam = new URLSearchParams(location.search).get('cloud');
-  if (_urlParam) {
-    cloudUrl = decodeURIComponent(_urlParam);
-    localStorage.setItem('cloudUrl', cloudUrl);
-  }
-
-  // Restore cloud URL on load and auto-connect
-  if (cloudUrl) {
-    document.getElementById('cloudUrlInput').value = cloudUrl;
-    dataSource = 'cloud';
-    const btn = document.getElementById('cloudSetBtn');
-    btn.textContent = '✓ Connected';
-    btn.classList.add('active');
-  }
-
-  // ── Load from localStorage ──
-  function loadLocal() {
-    try { return JSON.parse(localStorage.getItem('songQueue') || '[]'); }
-    catch { return []; }
-  }
-
-  // ── Parse CSV text → array of objects ──
-  function parseCSV(text) {
-    const lines = text.trim().split('\n').filter(l => l.trim());
-    if (lines.length < 2) return [];
-    // skip header
-    const result = [];
-    for (let i = 1; i < lines.length; i++) {
-      const cols = parseCSVLine(lines[i]);
-      if (cols.length < 3) continue;
-      const status = (cols[3] || 'waiting').trim().toLowerCase();
-      result.push({
-        id:     parseInt(cols[0]) || (Date.now() + i),
-        name:   cols[1].trim(),
-        song:   cols[2].trim(),
-        status: ['current','done','waiting'].includes(status) ? status : 'waiting'
-      });
+    } catch (err) {
+      document.getElementById('sourceBar').innerHTML =
+        `<div class="source-badge error">✗ DB Error – ${esc(err.message)}</div>`;
     }
-    // enforce only-one-current
-    let seenCur = false;
-    result.forEach(e => {
-      if (e.status === 'current') { if (seenCur) e.status = 'waiting'; seenCur = true; }
-    });
-    return result;
   }
 
-  function parseCSVLine(line) {
-    const result = []; let cur = ''; let inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
-      else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
-      else cur += c;
-    }
-    result.push(cur);
-    return result;
-  }
-
-  // ── Handle file drop/pick ──
-  function handleFile(ev) {
-    const file = ev.target.files[0];
-    if (!file) return;
-    readFile(file);
-    ev.target.value = '';
-  }
-
-  function readFile(file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      csvData = e.target.result;
-      dataSource = 'csv';
-      queueData = parseCSV(csvData);
-      // Write to localStorage so OBS overlay picks it up automatically
-      localStorage.setItem('songQueue', JSON.stringify(queueData));
-      updateButtons();
-      renderBoard();
-    };
-    reader.readAsText(file);
-  }
-
-  // ── Reload last CSV ──
-  function reloadCSV() {
-    if (!csvData) return;
-    queueData = parseCSV(csvData);
-    localStorage.setItem('songQueue', JSON.stringify(queueData));
-    renderBoard();
-  }
-
-  // ── Switch to localStorage ──
-  function useLocalStorage() {
-    dataSource = 'local';
-    csvData = null;
-    updateButtons();
-    renderBoard();
-  }
-
-  // ── Clear ──
-  function clearData() {
-    dataSource = 'local';
-    csvData = null;
-    queueData = [];
-    localStorage.removeItem('songQueue');
-    updateButtons();
-    renderBoard();
-  }
-
-  function updateButtons() {
-    document.getElementById('reloadBtn').disabled = !csvData;
-    document.getElementById('clearBtn').disabled  = !csvData && dataSource === 'local';
-    document.getElementById('lsBtn').disabled     = dataSource === 'local' && !csvData;
-  }
-
-  // ── Drag-over drop zone ──
-  const dz = document.getElementById('dropZone');
-  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith('.csv')) readFile(file);
-  });
-
-  // ── Render board ──
-  function renderBoard() {
-    const queue = dataSource === 'csv' ? queueData
-                : dataSource === 'cloud' ? (cloudData || [])
-                : loadLocal();
-
-    // Source badge
-    const srcEl = document.getElementById('sourceBar');
-    if (dataSource === 'cloud') {
-      srcEl.innerHTML = `<div class="source-badge local"><div class="live-dot"></div> ☁️ Cloud Sync · ${queue.length} entries</div>`;
-    } else if (dataSource === 'csv') {
-      srcEl.innerHTML = `<div class="source-badge csv"><span>📄</span> CSV File loaded · ${queue.length} entries</div>`;
-    } else if (queue.length > 0) {
-      srcEl.innerHTML = `<div class="source-badge local"><div class="live-dot"></div> Live Queue · ${queue.length} entries</div>`;
-    } else {
-      srcEl.innerHTML = `<div class="source-badge none">No data loaded</div>`;
-    }
-
+  // ── Render board ─────────────────────────────────────────────────────
+  function renderBoard(fresh) {
+    const srcEl   = document.getElementById('sourceBar');
     const current = queue.filter(e => e.status === 'current');
     const done    = queue.filter(e => e.status === 'done');
     const waiting = queue.filter(e => e.status === 'waiting');
-    const main    = document.getElementById('main');
 
+    if (queue.length > 0) {
+      srcEl.innerHTML = `<div class="source-badge live"><div class="live-dot"></div> MySQL Live · ${queue.length} entries</div>`;
+    } else {
+      srcEl.innerHTML = `<div class="source-badge none">Queue is empty</div>`;
+    }
+
+    const main = document.getElementById('main');
     if (queue.length === 0) {
-      const hint = dataSource === 'cloud'
-        ? 'Queue is empty — add singers from the Manager page.'
-        : 'Click ⚙ to connect to a Cloud URL, or load a CSV file.';
       main.innerHTML = `
         <div class="no-data">
           <div class="nd-icon">🎵</div>
           <h3>No Queue Data</h3>
-          <p>${hint}</p>
+          <p>Add singers in the <strong>Song Queue Manager</strong><br>and they will appear here automatically.</p>
+        </div>
+        <div class="refresh-bar">
+          <span>Auto-refreshes every</span>
+          <span id="countdown">${REFRESH_SEC}</span>
+          <span>seconds</span>
         </div>`;
       return;
     }
@@ -614,7 +300,7 @@
     }
 
     // Waiting — max 2 shown
-    const upNext  = waiting.slice(0, 2);
+    const upNext    = waiting.slice(0, 2);
     const moreCount = waiting.length - upNext.length;
     html += `<div class="section">
       <div class="section-head waiting">
@@ -668,62 +354,29 @@
     }
     html += `</div></div>`;
 
-    // Refresh notice (only for live mode)
-    if (dataSource === 'local') {
-      html += `<div class="refresh-bar">
-        <span>Auto-refreshes every</span>
-        <span id="countdown">5</span>
-        <span>seconds</span>
-      </div>`;
-    }
+    html += `<div class="refresh-bar">
+      <span>Auto-refreshes every</span>
+      <span id="countdown">${tick}</span>
+      <span>seconds</span>
+    </div>`;
 
     main.innerHTML = html;
   }
 
-  // ── Auto-refresh countdown (local + cloud mode) ──
-  let tick = 5;
+  // ── Countdown + auto-refresh ──────────────────────────────────────────
   function updateCountdown() {
-    if (dataSource !== 'local' && dataSource !== 'cloud') return;
     const el = document.getElementById('countdown');
     if (el) el.textContent = tick;
     tick--;
-    if (tick < 0) {
-      tick = 5;
-      if (dataSource === 'cloud') {
-        fetchCloud().then(renderBoard);
-      } else {
-        renderBoard();
-      }
-    }
+    if (tick < 0) { tick = REFRESH_SEC; loadQueue(); }
   }
 
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ── Settings panel toggle ──
-  function toggleSettings() {
-    const panel  = document.getElementById('settingsPanel');
-    const toggle = document.getElementById('settingsToggle');
-    const isOpen = panel.classList.toggle('open');
-    toggle.classList.toggle('open', isOpen);
-    toggle.textContent = isOpen ? '✕' : '⚙';
-  }
-
   // Init
-  updateButtons();
-  if (cloudUrl) {
-    // Auto-connected — keep settings panel hidden for clean display
-    fetchCloud().then(() => { updateButtons(); renderBoard(); });
-  } else {
-    // Not connected — show settings so user can connect
-    const panel  = document.getElementById('settingsPanel');
-    const toggle = document.getElementById('settingsToggle');
-    panel.classList.add('open');
-    toggle.classList.add('open');
-    toggle.textContent = '✕';
-    renderBoard();
-  }
+  loadQueue();
   setInterval(updateCountdown, 1000);
 </script>
 </body>

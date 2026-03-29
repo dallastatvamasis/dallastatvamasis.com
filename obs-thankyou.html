@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Thank You – Ayyappan Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: transparent; font-family: 'DM Sans', sans-serif; }
+
+  .glow-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 1500px; height: 800px; background: radial-gradient(ellipse at center, rgba(255,107,26,0.11) 0%, rgba(255,180,60,0.05) 40%, transparent 70%); pointer-events: none; }
+  .rule-top, .rule-bottom { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(255,107,26,0.3) 8%, #FF6B1A 22%, #FFD166 50%, #FF6B1A 78%, rgba(255,107,26,0.3) 92%, transparent 100%); }
+  .rule-top { top: 60px; } .rule-bottom { bottom: 60px; }
+  .rule-top::before, .rule-bottom::before { content: '◆'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 10px; color: #FFD166; text-shadow: 0 0 8px rgba(255,200,80,0.9); }
+  .corner { position: absolute; width: 60px; height: 60px; pointer-events: none; }
+  .corner.tl { top: 40px; left: 60px; border-top: 2px solid rgba(255,107,26,0.5); border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.tr { top: 40px; right: 60px; border-top: 2px solid rgba(255,107,26,0.5); border-right: 2px solid rgba(255,107,26,0.5); }
+  .corner.bl { bottom: 40px; left: 60px; border-bottom: 2px solid rgba(255,107,26,0.5); border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.br { bottom: 40px; right: 60px; border-bottom: 2px solid rgba(255,107,26,0.5); border-right: 2px solid rgba(255,107,26,0.5); }
+  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; user-select: none; }
+  .wm-main { font-family: 'Cinzel', serif; font-size: 96px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.03); white-space: nowrap; }
+  .wm-sub  { font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(255,255,255,0.02); margin-top: 8px; white-space: nowrap; }
+
+  /* Two column layout */
+  .layout {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    display: flex; align-items: center; gap: 0; width: 1680px;
+  }
+
+  /* LEFT: main message */
+  .left-col {
+    flex: 1; display: flex; flex-direction: column; align-items: flex-start;
+    padding-right: 80px; border-right: 2px solid rgba(255,107,26,0.3);
+  }
+  .org-name { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(255,179,102,0.7); animation: fadeUp 1s 0.2s cubic-bezier(0.22,1,0.36,1) both; }
+  .flame { font-size: 60px; margin: 16px 0 8px; animation: fadeUp 1s 0.35s cubic-bezier(0.22,1,0.36,1) both; filter: drop-shadow(0 0 18px rgba(255,140,40,0.7)); }
+  .ty-title { font-family: 'Cinzel', serif; font-size: 96px; font-weight: 900; letter-spacing: 0.07em; color: #FFD166; line-height: 1; text-shadow: 0 0 60px rgba(255,180,40,0.3), 0 4px 24px rgba(0,0,0,0.9); animation: fadeUp 1s 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  .ty-event { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 38px; font-weight: 500; color: rgba(255,255,255,0.5); margin-top: 8px; letter-spacing: 0.06em; animation: fadeUp 1s 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+
+  .gem-line { display: flex; align-items: center; gap: 14px; margin: 24px 0 20px; animation: fadeUp 1s 0.78s cubic-bezier(0.22,1,0.36,1) both; }
+  .gem-line::after { content: ''; display: block; width: 160px; height: 1px; background: linear-gradient(90deg, #FFD166, rgba(255,107,26,0.6), transparent); }
+  .gem { font-size: 14px; color: #FFD166; text-shadow: 0 0 10px rgba(255,200,80,0.8); }
+
+  .saranam { font-family: 'Cinzel', serif; font-size: 44px; font-weight: 900; letter-spacing: 0.14em; color: #FF8C42; text-shadow: 0 0 28px rgba(255,140,40,0.4); animation: fadeUp 1s 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* RIGHT: info cards */
+  .right-col {
+    flex: 0 0 560px; display: flex; flex-direction: column; gap: 0;
+    padding-left: 80px;
+    animation: fadeUp 1s 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .info-card {
+    padding: 22px 0;
+    border-bottom: 1px solid rgba(255,107,26,0.2);
+    display: flex; align-items: center; gap: 20px;
+  }
+  .info-card:last-child { border-bottom: none; }
+  .ic-icon { font-size: 32px; flex-shrink: 0; width: 44px; text-align: center; }
+  .ic-body {}
+  .ic-label { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #FF8C42; margin-bottom: 4px; }
+  .ic-value { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 500; color: #FFFFFF; }
+  .ic-value.gold { color: #FFD166; font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
+
+  .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.92); border-top: 3px solid #FF6B1A; height: 52px; display: flex; align-items: center; justify-content: center; }
+  .bar-center { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(255,150,60,0.5); white-space: nowrap; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="glow-center"></div>
+<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+<div class="rule-top"></div><div class="rule-bottom"></div>
+<div class="watermark"><div class="wm-main">DTS Media Live</div><div class="wm-sub">Dallas Tatvamasi Sangam</div></div>
+
+<div class="layout">
+
+  <!-- LEFT -->
+  <div class="left-col">
+    <div class="org-name">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
+    <div class="flame">🪔</div>
+    <div class="ty-title">Thank You</div>
+    <div class="ty-event">for being with us today</div>
+    <div class="gem-line"><span class="gem">◆</span></div>
+    <div class="saranam">🙏 &nbsp; Swamy Saranam</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+    <div class="info-card">
+      <div class="ic-icon">📺</div>
+      <div class="ic-body">
+        <div class="ic-label">YouTube Channel</div>
+        <div class="ic-value gold">DTS Media Live</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🔔</div>
+      <div class="ic-body">
+        <div class="ic-label">Stay Connected</div>
+        <div class="ic-value">Like · Share · Subscribe</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">📅</div>
+      <div class="ic-body">
+        <div class="ic-label">Next Ayyappan Poojai</div>
+        <div class="ic-value gold" id="nextEvent">-- ----</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🏠</div>
+      <div class="ic-body">
+        <div class="ic-label">Organized By</div>
+        <div class="ic-value">Dallas Tatvamasi Sangam</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🙏</div>
+      <div class="ic-body">
+        <div class="ic-label">Blessings of</div>
+        <div class="ic-value gold">Ayyappa Swamy</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-bar"><div class="bar-center">DTS Media Live &nbsp;·&nbsp; Swamy Saranam</div></div>
+
+<script>
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const n = new Date();
+  const nx = new Date(n.getFullYear(), n.getMonth() + 1, 1);
+  document.getElementById('nextEvent').textContent = MONTHS[nx.getMonth()] + ' ' + nx.getFullYear();
+</script>
+</body>
+</html>

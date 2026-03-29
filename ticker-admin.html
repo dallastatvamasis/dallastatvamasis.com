@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DTS Ticker Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    padding: 0 0 40px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: rgba(0,0,0,0.95);
+    border-bottom: 3px solid #FF6B1A;
+    padding: 18px 20px 16px;
+    display: flex; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-icon { font-size: 28px; }
+  .header-text {}
+  .header-title {
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: #FFD166;
+  }
+  .header-sub {
+    font-size: 11px; color: rgba(255,179,102,0.6);
+    letter-spacing: 0.08em; margin-top: 2px;
+  }
+  .header-clock {
+    margin-left: auto;
+    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
+    color: #FF8C42; letter-spacing: 0.06em;
+  }
+
+  /* ── BODY ── */
+  .body { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
+
+  /* ── STATUS PILL ── */
+  .status-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 10px;
+    margin-bottom: 18px; font-size: 14px; font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  .status-bar.idle    { background: rgba(255,107,26,0.1); border: 1px solid rgba(255,107,26,0.3); color: rgba(255,179,102,0.7); }
+  .status-bar.saving  { background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.4); color: #FFD166; }
+  .status-bar.success { background: rgba(74,224,128,0.1); border: 1px solid rgba(74,224,128,0.4); color: #4AE080; }
+  .status-bar.error   { background: rgba(255,59,48,0.1);  border: 1px solid rgba(255,59,48,0.4);  color: #FF3B30; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-bar.idle    .status-dot { background: rgba(255,107,26,0.5); }
+  .status-bar.saving  .status-dot { background: #FFD166; animation: blink 0.6s ease infinite alternate; }
+  .status-bar.success .status-dot { background: #4AE080; }
+  .status-bar.error   .status-dot { background: #FF3B30; }
+  @keyframes blink { from{opacity:1} to{opacity:0.2} }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: #FF8C42; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,107,26,0.25); }
+
+  /* ── TEXTAREA ── */
+  .ticker-textarea {
+    width: 100%; min-height: 280px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,107,26,0.35);
+    border-radius: 12px;
+    padding: 16px;
+    color: #FFD166;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.7;
+    resize: vertical; outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .ticker-textarea:focus { border-color: #FF6B1A; background: rgba(255,255,255,0.06); }
+  .ticker-textarea::placeholder { color: rgba(255,179,102,0.3); }
+
+  .hint {
+    font-size: 12px; color: rgba(255,255,255,0.3);
+    margin-top: 8px; line-height: 1.5;
+  }
+  .hint span { color: rgba(255,107,26,0.6); }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+
+  .btn {
+    flex: 1; padding: 16px 10px; border-radius: 12px; border: none;
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-save {
+    background: linear-gradient(135deg, #FF6B1A, #FF8C42);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(255,107,26,0.35);
+  }
+  .btn-save:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(255,107,26,0.2); }
+  .btn-save:disabled { opacity: 0.5; pointer-events: none; }
+
+  .btn-reload {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,107,26,0.3);
+    color: #FFB366; flex: 0 0 56px;
+  }
+  .btn-reload:active { transform: scale(0.95); }
+  .btn-default {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,107,26,0.3);
+    color: #FFB366; flex: 0 0 auto; padding: 7px 18px;
+  }
+  .btn-default:active { transform: scale(0.95); }
+
+  /* ── PREVIEW ── */
+  .preview-wrap {
+    margin-top: 26px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,107,26,0.2);
+    border-radius: 12px; overflow: hidden;
+  }
+  .preview-header {
+    background: rgba(255,107,26,0.12);
+    border-bottom: 1px solid rgba(255,107,26,0.2);
+    padding: 10px 16px;
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; color: #FF8C42;
+  }
+  .preview-list { padding: 6px 0; }
+  .preview-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+  .preview-item:last-child { border-bottom: none; }
+  .preview-item.comment { opacity: 0.3; }
+  .preview-num {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    color: #FF6B1A; min-width: 22px; margin-top: 2px;
+  }
+  .preview-text { font-size: 15px; color: #FFD166; line-height: 1.4; }
+  .preview-text.comment-text { color: rgba(255,255,255,0.3); font-style: italic; font-size: 13px; }
+  .preview-empty { padding: 20px 16px; text-align: center; color: rgba(255,255,255,0.25); font-style: italic; font-size: 14px; }
+
+  /* ── QUICK ADD CHIPS ── */
+  .chips-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    background: rgba(255,107,26,0.1); border: 1px solid rgba(255,107,26,0.3);
+    border-radius: 20px; padding: 7px 14px;
+    font-size: 13px; color: #FFB366; cursor: pointer;
+    transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .chip:active { background: rgba(255,107,26,0.25); transform: scale(0.96); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px; margin: 22px 0;
+    background: linear-gradient(90deg, transparent, rgba(255,107,26,0.3), transparent);
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-icon">📢</div>
+  <div class="header-text">
+    <div class="header-title">Ticker Admin</div>
+    <div class="header-sub">DTS Media Live · dallastatvamasis.com</div>
+  </div>
+  <div class="header-clock" id="clock">--:--</div>
+</div>
+
+<div class="body">
+
+  <!-- Status -->
+  <div class="status-bar idle" id="statusBar">
+    <div class="status-dot"></div>
+    <span id="statusText">Ready to update ticker</span>
+  </div>
+
+  <!-- Editor -->
+  <div class="section-label">✦ Announcements</div>
+  <textarea class="ticker-textarea" id="tickerArea"
+    placeholder="Type one announcement per line…
+Lines starting with # are comments (ignored)
+Example:
+🙏 Welcome to Ayyappan Poojai
+Like & Subscribe to DTS Media Live"></textarea>
+
+  <div class="hint">
+    One line = one ticker item &nbsp;·&nbsp;
+    <span># comment lines are skipped</span> &nbsp;·&nbsp;
+    Emoji supported 🪔
+  </div>
+
+  <!-- Quick add chips -->
+  <div class="section-label" style="margin-top:16px">⚡ Quick Add</div>
+  <div class="chips-wrap">
+    <div class="chip" onclick="addLine('🙏 Swamy Saranam — Ayyappa Swamy Ki Jai!')">🙏 Swamy Saranam</div>
+    <div class="chip" onclick="addLine('Like, Share & Subscribe to DTS Media Live on YouTube')">📺 Subscribe</div>
+    <div class="chip" onclick="addLine('🎤 To join singing queue speak to our volunteers')">🎤 Queue info</div>
+    <div class="chip" onclick="addLine('Short break — bhajans resume shortly 🪔')">☕ Short break</div>
+    <div class="chip" onclick="addLine('🙏 Welcome to Ayyappan Monthly Poojai')">👋 Welcome</div>
+    <div class="chip" onclick="addLine('Ayyappa Swamy Ki Jai! 🔥')">🔥 Jai</div>
+    <div class="chip" onclick="addLine('All devotees are welcome to participate')">🤝 All welcome</div>
+    <div class="chip" onclick="addLine('📅 Next Poojai — ' + nextMonth())">📅 Next Poojai</div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-reload" onclick="loadTicker()" title="Reload from server">🔄</button>
+    <button class="btn btn-default" onclick="loadDefault()" title="Load default announcements">↺ Default</button>
+    <button class="btn btn-save" id="saveBtn" onclick="saveTicker()">
+      <span>💾</span> Save &amp; Publish
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Live preview -->
+  <div class="section-label">👁 Live Preview</div>
+  <div class="preview-wrap">
+    <div class="preview-header">Ticker will scroll these items ↓</div>
+    <div class="preview-list" id="previewList">
+      <div class="preview-empty">Start typing above to preview…</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────────────
+  const SAVE_URL = 'ticker-save.php';   // PHP script on same server
+  const LOAD_URL = 'ticker.txt';
+
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+
+  function nextMonth() {
+    const d = new Date(); return MONTHS[new Date(d.getFullYear(), d.getMonth()+1, 1).getMonth()] + ' ' + new Date(d.getFullYear(), d.getMonth()+1, 1).getFullYear();
+  }
+
+  // ── Clock ─────────────────────────────────────────────────────────────
+  function tickClock() {
+    const n = new Date(); let h = n.getHours(), m = n.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+    document.getElementById('clock').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' ' + ap;
+  }
+  tickClock(); setInterval(tickClock, 1000);
+
+  // ── Status helper ─────────────────────────────────────────────────────
+  function setStatus(type, msg) {
+    const bar = document.getElementById('statusBar');
+    bar.className = 'status-bar ' + type;
+    document.getElementById('statusText').textContent = msg;
+  }
+
+  // ── Live preview ──────────────────────────────────────────────────────
+  document.getElementById('tickerArea').addEventListener('input', updatePreview);
+
+  function updatePreview() {
+    const lines = document.getElementById('tickerArea').value
+      .split('\n').map(l => l.trim());
+    const active = lines.filter(l => l.length > 0);
+    const el = document.getElementById('previewList');
+
+    if (!active.length) {
+      el.innerHTML = '<div class="preview-empty">Start typing above to preview…</div>';
+      return;
+    }
+
+    let num = 0;
+    el.innerHTML = active.map(line => {
+      const isComment = line.startsWith('#');
+      if (!isComment) num++;
+      return `<div class="preview-item ${isComment ? 'comment' : ''}">
+        <div class="preview-num">${isComment ? '#' : num}</div>
+        <div class="preview-text ${isComment ? 'comment-text' : ''}">${esc(line)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Quick add chip ────────────────────────────────────────────────────
+  function addLine(text) {
+    const ta = document.getElementById('tickerArea');
+    const val = ta.value;
+    ta.value = val + (val.length && !val.endsWith('\n') ? '\n' : '') + text + '\n';
+    ta.focus();
+    ta.scrollTop = ta.scrollHeight;
+    updatePreview();
+  }
+
+  // ── Load default announcements ────────────────────────────────────────
+  const DEFAULT_TICKER = `# DTS Media Live — Ticker Announcements
+# Lines starting with # are ignored
+# One announcement per line
+# Edit this file from your iPhone via Hostinger File Manager
+# Changes appear on screen within 30 seconds
+🙏 Welcome to Ayyappan Monthly Poojai — Hosted by Dallas Tatvamasi Sangam
+Like, Share & Subscribe to DTS Media Live on YouTube
+🎤 To join the singing queue please speak to our volunteers
+All devotees are welcome to participate — Swamy Saranam!
+Ayyappa Swamy Ki Jai! 🪔 Thank you for joining us today
+Stay connected with Dallas Tatvamasi Sangam for upcoming events`;
+
+  function loadDefault() {
+    document.getElementById('tickerArea').value = DEFAULT_TICKER;
+    updatePreview();
+    setStatus('idle', 'Default announcements loaded — tap Save & Publish to go live');
+  }
+
+  // ── Load ticker.txt from server ───────────────────────────────────────
+  async function loadTicker() {
+    setStatus('saving', 'Loading from server…');
+    try {
+      const res  = await fetch(LOAD_URL + '?t=' + Date.now());
+      const text = await res.text();
+      document.getElementById('tickerArea').value = text;
+      updatePreview();
+      setStatus('success', '✅ Loaded from server');
+      setTimeout(() => setStatus('idle', 'Ready to update ticker'), 2500);
+    } catch (e) {
+      setStatus('error', '❌ Could not load ticker.txt');
+    }
+  }
+
+  // ── Save ticker.txt to server via PHP ─────────────────────────────────
+  async function saveTicker() {
+    const content = document.getElementById('tickerArea').value;
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    setStatus('saving', 'Saving to server…');
+
+    try {
+      const res = await fetch(SAVE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'content=' + encodeURIComponent(content)
+      });
+      const text = await res.text();
+      if (res.ok && text.trim() === 'OK') {
+        setStatus('success', '✅ Saved! Ticker updates within 30 seconds');
+        setTimeout(() => setStatus('idle', 'Ready to update ticker'), 4000);
+      } else {
+        setStatus('error', '❌ Save failed: ' + text);
+      }
+    } catch (e) {
+      setStatus('error', '❌ Network error — check connection');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // Init — load on page open
+  loadTicker();
+</script>
+</body>
+</html>

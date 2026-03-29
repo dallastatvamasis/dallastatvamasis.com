@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Intermission – Ayyappan Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: transparent; font-family: 'DM Sans', sans-serif; }
+
+  .glow-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 1400px; height: 700px; background: radial-gradient(ellipse at center, rgba(255,107,26,0.1) 0%, rgba(255,180,60,0.05) 40%, transparent 70%); pointer-events: none; }
+  .rule-top, .rule-bottom { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(255,107,26,0.3) 8%, #FF6B1A 22%, #FFD166 50%, #FF6B1A 78%, rgba(255,107,26,0.3) 92%, transparent 100%); }
+  .rule-top { top: 60px; } .rule-bottom { bottom: 60px; }
+  .rule-top::before, .rule-bottom::before { content: '◆'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 10px; color: #FFD166; text-shadow: 0 0 8px rgba(255,200,80,0.9); }
+  .corner { position: absolute; width: 60px; height: 60px; pointer-events: none; }
+  .corner.tl { top: 40px; left: 60px; border-top: 2px solid rgba(255,107,26,0.5); border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.tr { top: 40px; right: 60px; border-top: 2px solid rgba(255,107,26,0.5); border-right: 2px solid rgba(255,107,26,0.5); }
+  .corner.bl { bottom: 40px; left: 60px; border-bottom: 2px solid rgba(255,107,26,0.5); border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.br { bottom: 40px; right: 60px; border-bottom: 2px solid rgba(255,107,26,0.5); border-right: 2px solid rgba(255,107,26,0.5); }
+  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; user-select: none; }
+  .wm-main { font-family: 'Cinzel', serif; font-size: 96px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.03); white-space: nowrap; }
+  .wm-sub  { font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(255,255,255,0.02); margin-top: 8px; white-space: nowrap; }
+
+  .stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-54%); text-align: center; display: flex; flex-direction: column; align-items: center; }
+
+  .org-name { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(255,179,102,0.7); animation: fadeDown 1s 0.2s cubic-bezier(0.22,1,0.36,1) both; }
+  .icon { font-size: 56px; margin: 18px 0 8px; animation: fadeDown 1s 0.35s cubic-bezier(0.22,1,0.36,1) both; filter: drop-shadow(0 0 16px rgba(255,140,40,0.6)); }
+  .inter-label { font-family: 'Cinzel', serif; font-size: 100px; font-weight: 900; letter-spacing: 0.08em; color: #FFD166; line-height: 1; text-shadow: 0 0 60px rgba(255,180,40,0.3), 0 4px 24px rgba(0,0,0,0.9); animation: fadeDown 1s 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  .inter-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 38px; font-weight: 500; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; margin-top: 8px; animation: fadeDown 1s 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+
+  .gem-line { display: flex; align-items: center; gap: 18px; margin: 28px 0 24px; animation: fadeDown 1s 0.78s cubic-bezier(0.22,1,0.36,1) both; }
+  .gem-line::before { content: ''; display: block; width: 200px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,107,26,0.6), #FFD166); }
+  .gem-line::after  { content: ''; display: block; width: 200px; height: 1px; background: linear-gradient(90deg, #FFD166, rgba(255,107,26,0.6), transparent); }
+  .gem { font-size: 16px; color: #FFD166; text-shadow: 0 0 10px rgba(255,200,80,0.8); }
+
+  /* Countdown ring */
+  .countdown-wrap { position: relative; display: flex; align-items: center; justify-content: center; animation: fadeDown 1s 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+  .countdown-svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .ring-bg  { fill: none; stroke: rgba(255,107,26,0.15); stroke-width: 6; }
+  .ring-fill{ fill: none; stroke: url(#ringGrad); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.9s linear; }
+  .countdown-inner { width: 220px; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cd-label { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #FF8C42; margin-bottom: 4px; }
+  .cd-num   { font-family: 'Cinzel', serif; font-size: 88px; font-weight: 900; color: #FFFFFF; line-height: 1; text-shadow: 0 0 30px rgba(255,180,60,0.3); }
+  .cd-sec   { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; color: rgba(255,179,102,0.6); letter-spacing: 0.2em; text-transform: uppercase; }
+
+  .resume-note { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: rgba(255,255,255,0.35); margin-top: 20px; animation: fadeDown 1s 1.05s cubic-bezier(0.22,1,0.36,1) both; }
+
+  .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.92); border-top: 3px solid #FF6B1A; height: 52px; display: flex; align-items: center; justify-content: center; }
+  .bar-center { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(255,150,60,0.5); white-space: nowrap; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="glow-center"></div>
+<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+<div class="rule-top"></div><div class="rule-bottom"></div>
+<div class="watermark"><div class="wm-main">DTS Media Live</div><div class="wm-sub">Dallas Tatvamasi Sangam</div></div>
+
+<div class="stage">
+  <div class="org-name">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
+  <div class="icon">🙏</div>
+  <div class="inter-label">Intermission</div>
+  <div class="inter-sub">Short break — bhajans resume shortly</div>
+  <div class="gem-line"><span class="gem">◆</span></div>
+
+  <div class="countdown-wrap">
+    <svg class="countdown-svg" width="220" height="220" viewBox="0 0 220 220">
+      <defs>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#FF6B1A"/>
+          <stop offset="100%" stop-color="#FFD166"/>
+        </linearGradient>
+      </defs>
+      <circle class="ring-bg"   cx="110" cy="110" r="100"/>
+      <circle class="ring-fill" id="ringFill" cx="110" cy="110" r="100"
+        stroke-dasharray="628" stroke-dashoffset="0"/>
+    </svg>
+    <div class="countdown-inner">
+      <div class="cd-label">Resumes In</div>
+      <div class="cd-num" id="cdNum">05</div>
+      <div class="cd-sec">min</div>
+    </div>
+  </div>
+
+  <div class="resume-note" id="resumeNote">Resuming in 5:00</div>
+</div>
+
+<div class="bottom-bar"><div class="bar-center">DTS Media Live &nbsp;·&nbsp; Swamy Saranam</div></div>
+
+<script>
+  const TOTAL_SEC = 5 * 60; // 5 minutes — change as needed
+  const CIRC = 2 * Math.PI * 100; // 628.3
+  let remaining = TOTAL_SEC;
+
+  function updateCountdown() {
+    if (remaining < 0) remaining = 0;
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    document.getElementById('cdNum').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    document.getElementById('resumeNote').textContent = 'Resuming in ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    const pct = remaining / TOTAL_SEC;
+    document.getElementById('ringFill').style.strokeDashoffset = CIRC * (1 - pct);
+    if (remaining > 0) remaining--;
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>

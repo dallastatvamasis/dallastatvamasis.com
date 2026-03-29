@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DTS Media Live — Welcome Page Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --saffron:     #FF6B00;
+  --saffron-lt:  #FFA040;
+  --gold:        #D4A017;
+  --gold-lt:     #F0C843;
+  --brown:       #1E0A00;
+  --brown-mid:   #2E1200;
+  --brown-lt:    #4A2000;
+  --cream:       #FFF8EE;
+  --cream-70:    rgba(255,248,238,0.7);
+  --cream-40:    rgba(255,248,238,0.4);
+  --cream-15:    rgba(255,248,238,0.15);
+  --border:      rgba(212,160,23,0.25);
+  --border-hi:   rgba(212,160,23,0.7);
+  --success:     #4CAF50;
+  --error:       #FF5252;
+  --sidebar-w:   360px;
+  --header-h:    64px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: var(--brown);
+  color: var(--cream);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+header {
+  height: var(--header-h);
+  background: linear-gradient(to right, var(--brown-mid), #3A1800, var(--brown-mid));
+  border-bottom: 1.5px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+.header-left {
+  display: flex; align-items: center; gap: 14px;
+}
+.header-om {
+  width: 40px; height: 40px;
+  background: radial-gradient(circle, var(--gold-lt), var(--saffron));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--brown);
+  box-shadow: 0 0 14px rgba(212,160,23,0.5);
+  flex-shrink: 0;
+}
+.header-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px; font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+}
+.header-title small {
+  display: block;
+  font-size: 10px; font-weight: 400;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  padding: 9px 18px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--saffron), var(--gold));
+  color: var(--brown);
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(255,107,0,0.35);
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-secondary {
+  background: var(--cream-15);
+  color: var(--cream);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--border-hi); background: rgba(255,248,238,0.1); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--border-hi);
+}
+.btn-outline:hover { background: rgba(212,160,23,0.12); }
+
+.btn-icon {
+  width: 36px; height: 36px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  border-radius: 50%;
+}
+
+/* ══════════════════════════════════════════════
+   LAYOUT: SIDEBAR + MAIN
+══════════════════════════════════════════════ */
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  height: calc(100vh - var(--header-h));
+}
+
+/* ══════════════════════════════════════════════
+   LEFT SIDEBAR — FORM
+══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--brown-mid);
+  border-right: 1.5px solid var(--border);
+  overflow-y: auto;
+  padding: 0;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+/* section */
+.section {
+  border-bottom: 1px solid var(--border);
+}
+.section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.section-header:hover { background: rgba(255,248,238,0.04); }
+.section-icon {
+  font-size: 18px; width: 24px; text-align: center; flex-shrink: 0;
+}
+.section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+  flex: 1;
+}
+.section-chevron {
+  color: var(--cream-40);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.section-header.open .section-chevron { transform: rotate(180deg); }
+
+.section-body {
+  padding: 6px 20px 18px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.section-body.collapsed { display: none; }
+
+/* form fields */
+.field {
+  display: flex; flex-direction: column; gap: 5px;
+}
+.field-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--cream-40);
+  text-transform: uppercase;
+}
+.field-hint {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cream-40);
+  line-height: 1.5;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+select,
+textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--cream);
+  padding: 9px 11px;
+  font-size: 13px;
+  font-family: 'EB Garamond', Georgia, serif;
+  border-radius: 3px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 2px rgba(255,107,0,0.15);
+}
+textarea {
+  height: 80px; resize: vertical;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.6;
+}
+input[type="datetime-local"] { color-scheme: dark; }
+select option { background: var(--brown-mid); }
+
+/* counter chip */
+.url-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  background: rgba(212,160,23,0.12);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 10px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* inline row */
+.row { display: flex; gap: 10px; }
+.row .field { flex: 1; }
+
+/* divider */
+.or-divider {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px; letter-spacing: 0.2em;
+  color: var(--cream-40);
+}
+.or-divider::before, .or-divider::after {
+  content:''; flex:1; height:1px;
+  background: var(--border);
+}
+
+/* photo grid preview (small thumbnails) */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+.photo-thumb {
+  aspect-ratio: 4/3;
+  border-radius: 2px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--brown-lt);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.photo-thumb:hover { border-color: var(--gold); transform: scale(1.04); z-index: 1; }
+.photo-thumb.error { opacity: 0.3; }
+.photo-thumb .num {
+  position: absolute; bottom: 2px; right: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; color: rgba(255,255,255,0.6);
+  line-height: 1;
+}
+
+/* status bar inside sidebar */
+.sidebar-status {
+  padding: 10px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--saffron-lt);
+  background: rgba(255,107,0,0.06);
+  border-top: 1px solid var(--border);
+  min-height: 36px;
+  display: flex; align-items: center; gap: 8px;
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--saffron); flex-shrink: 0;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100% { opacity:1; } 50% { opacity:0.3; }
+}
+
+/* generate URL box */
+.url-box {
+  margin: 14px 20px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-hi);
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.url-box-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.url-box-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--cream-70);
+  word-break: break-all;
+  line-height: 1.5;
+  max-height: 56px;
+  overflow: hidden;
+}
+.url-box-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ══════════════════════════════════════════════
+   RIGHT MAIN — PREVIEW
+══════════════════════════════════════════════ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0D0400;
+}
+
+.preview-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.preview-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px; letter-spacing: 0.2em;
+  color: var(--cream-40);
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.preview-badge {
+  background: rgba(255,107,0,0.15);
+  border: 1px solid rgba(255,107,0,0.4);
+  color: var(--saffron-lt);
+  font-size: 9px; letter-spacing: 0.15em;
+  padding: 2px 8px; border-radius: 10px;
+  text-transform: uppercase;
+  font-family: 'Cinzel', serif;
+}
+.preview-dims {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--cream-40);
+}
+
+/* iframe wrapper — maintains 16:9 within available space */
+.preview-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+  background: #080200;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px,
+    transparent 1px, transparent 16px
+  );
+}
+
+.preview-frame-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  /* 16:9 aspect ratio */
+  aspect-ratio: 16/9;
+  max-height: 100%;
+  box-shadow: 0 0 0 2px var(--border-hi), 0 20px 60px rgba(0,0,0,0.8);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#preview-iframe {
+  width: 1920px;
+  height: 1080px;
+  border: none;
+  transform-origin: top left;
+  display: block;
+}
+
+/* corner label on preview */
+.preview-corner-label {
+  position: absolute;
+  top: 8px; left: 8px;
+  background: rgba(0,0,0,0.7);
+  color: var(--gold);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--brown-mid);
+  border: 1px solid var(--border-hi);
+  border-radius: 6px;
+  padding: 12px 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+  z-index: 9999;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { border-color: rgba(76,175,80,0.6); }
+#toast.error   { border-color: rgba(255,82,82,0.6); }
+
+/* ══════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════ */
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.section-body { animation: fadeIn 0.2s ease both; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="header-om">ॐ</div>
+    <div class="header-title">
+      DTS Media Live
+      <small>Welcome Page Setup</small>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-secondary" onclick="resetToDefaults()">↺ Reset</button>
+    <button class="btn btn-outline" onclick="openPreviewFull()">⛶ Open Full Screen</button>
+    <button class="btn btn-primary" onclick="generateAndCopy()">📋 Copy OBS URL</button>
+  </div>
+</header>
+
+<!-- ═══════════════════════ LAYOUT ═══════════════════════ -->
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+
+    <!-- ① EVENT INFO -->
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="section-icon">🪔</span>
+        <span class="section-label">Event Info</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label class="field-label">Event Name (Main Title)</label>
+          <input type="text" id="f-event" value="Ayyappan Poojai" oninput="liveUpdate()">
+        </div>
+        <div class="field">
+          <label class="field-label">Subtitle / Tagline</label>
+          <input type="text" id="f-sub" value="DTS Media Live" oninput="liveUpdate()">
+        </div>
+        <div class="field">
+          <label class="field-label">Live Start Date &amp; Time</label>
+          <input type="datetime-local" id="f-datetime" onchange="liveUpdate()">
+        </div>
+      </div>
+    </div>
+
+    <!-- ② TICKER -->
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="section-icon">📜</span>
+        <span class="section-label">Ticker Bar</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label class="field-label">Ticker Messages</label>
+          <textarea id="f-ticker" oninput="liveUpdate()">DTS Media Live  ·  Swamy Saranam|Ayyappan Poojai – Live Streaming|Dallas Tatvamasi Sangam|Subscribe &amp; Share ✦</textarea>
+          <span class="field-hint">Separate items with  |</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ PHOTOS -->
+    <div class="section">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="section-icon">📸</span>
+        <span class="section-label">Google Photos Album</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label class="field-label">Shared Album URL</label>
+          <input type="text" id="f-album" placeholder="https://photos.app.goo.gl/…" oninput="liveUpdate()">
+        </div>
+        <button class="btn btn-secondary" style="font-size:11px;padding:8px;" onclick="fetchAlbum()">⬇ Fetch Photos from Album</button>
+
+        <div class="or-divider">or paste URLs directly</div>
+
+        <div class="field">
+          <label class="field-label">Direct Image URLs <span id="url-count" class="url-counter">27 loaded</span></label>
+          <textarea id="f-urls" style="height:110px;" oninput="onUrlsChange()" placeholder="https://lh3.googleusercontent.com/pw/…"></textarea>
+        </div>
+
+        <!-- thumbnail grid -->
+        <div class="photo-grid" id="photo-grid"></div>
+
+        <div class="row">
+          <div class="field">
+            <label class="field-label">Seconds per Photo</label>
+            <input type="number" id="f-dur" value="8" min="3" max="60" oninput="liveUpdate()">
+          </div>
+          <div class="field">
+            <label class="field-label">Order</label>
+            <select id="f-order" onchange="liveUpdate()">
+              <option value="random">Random shuffle</option>
+              <option value="seq">Sequential</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ OBS URL OUTPUT -->
+    <div class="url-box">
+      <div class="url-box-label">🔗 Generated OBS URL</div>
+      <div class="url-box-value" id="url-preview">Click "Copy OBS URL" to generate…</div>
+      <div class="url-box-actions">
+        <button class="btn btn-primary" style="flex:1;font-size:11px;padding:8px;" onclick="generateAndCopy()">📋 Copy URL</button>
+        <button class="btn btn-secondary" style="font-size:11px;padding:8px;" onclick="openObsUrl()">↗ Open</button>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="sidebar-status" id="sidebar-status">
+      <div class="status-dot"></div>
+      <span id="status-msg">Ready — 27 photos loaded</span>
+    </div>
+
+    <!-- OBS INSTRUCTIONS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-icon">📺</span>
+        <span class="section-label">OBS Instructions</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body collapsed">
+        <div class="field-hint" style="line-height:1.8;">
+          1. Fill in the form and click <strong style="color:var(--gold)">Copy OBS URL</strong><br>
+          2. In OBS → <strong style="color:var(--gold)">Add Source → Browser</strong><br>
+          3. Paste the copied URL<br>
+          4. Set Width: <strong style="color:var(--gold)">1920</strong>, Height: <strong style="color:var(--gold)">1080</strong><br>
+          5. ✅ <em>Refresh browser when scene becomes active</em><br>
+          6. ✅ <em>Shutdown source when not visible</em><br><br>
+          The welcome page auto-starts the slideshow — no extra config needed inside OBS.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ── MAIN PREVIEW ── -->
+  <div class="main">
+    <div class="preview-topbar">
+      <div class="preview-label">
+        Live Preview
+        <span class="preview-badge">Auto-updates</span>
+      </div>
+      <div class="preview-dims">1920 × 1080 (scaled to fit)</div>
+    </div>
+
+    <div class="preview-stage" id="preview-stage">
+      <div class="preview-frame-wrap" id="preview-frame-wrap">
+        <div class="preview-corner-label">OBS Browser Source Preview</div>
+        <iframe id="preview-iframe" src="obs-welcome.html" scrolling="no" title="Welcome Page Preview"></iframe>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   HARDCODED DEFAULT PHOTOS (Ayyappan Poojai Mar'26)
+══════════════════════════════════════════════ */
+const DEFAULT_PHOTOS = [
+  'https://lh3.googleusercontent.com/pw/AP1GczONwRTGH1qmj0CEBuQbzECYHSBBtLfPTzsN1XiUouNwGGKui2dQtfbEAI5NPcj8ILCiKXmwldC55tssOjN6Xd6nUtYg1RbboAO92jwUVm4iMTcCYvU=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPgO8yKuy6OAmSyKV8E231Rp_b7t729dPXRMPJbO4NLfS2_rf0SRkZgsFuih5cfm2tOYA3VX71EiZwn0IBNWvrYLLJluaNT38bEceoZd2XeaFNLcXs=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczM4JPx65uoFpnCgSgV_WPMlhLrg8mzD7aulIoqhC5e23Oc2gIf7xi7Gf-Rbk93Vhi7J5WrCtVPAA7gh1pvgIcOfl3L6RfwKzZY0b6FhVNys6ctvbM8=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczO5B6bqyIsZ1w8-IIjEx-7hqJsBzV7G484gvNguj6OnU9Tp2pu5MebFh14_DeXgVMjqD7NRM3gv4iP4W5jENNUTQV5FAE3s1sfFV1NrTpagq2vO6to=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMgxl3rmUoQp03Q9qvuact2HzJ_pnLFFdV04CdziDn8QN29Dc0C4OERhOe1AUsNQKHkotGy3pst01RiaDb5ElkTEpp1cztQrd8S1Vtxm9TI70m8OK4=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMawkVQJDsTzU17AfcS-E2TIQvXsgwMoxFo0nv4ZT_8owj73K6vhP1i_a5lz2HhTMcRwm__RwJJ--9K0JEOB6JlaVMz4tJQrbifgdnR_ngE4D8qx3o=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczN3PUv_dlftxpwiuBreRXbyRA7_Z6OxL96zEKhR79HuyPaHawdzGyyzS_5QoUOvelEiiehzFRlhIhTQLkmjVtbeVcy5Zq-N6GaAxs8ItLCDVLQsh3c=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczN-Ht_gc1LluGKrLIMFEJ0C_CLexAZ3tsSPaYI3DlcaLI2pTSnuU5Uzv7n8kLkWUhTXRJDyRlcFE2XO6NaXtIcrONPHF8xXU5-eHNz5ny0hFmpT1ZU=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPpZ9_6ZamG5faYIpMCk_IJVgce8FuAM06LcEUbQtP_e3n3OKdjP0A1-10yqHKG37dOmfV6vLYEGrAVPlRXWEiQG04mh74zbjlev0tY3sbtR6hc7AY=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOpOKXIG8lDqg2Nxbjr5IYSnHg2kdLaEvBUFaD1vd36JESWNNzYxPM695zx9WTHFiEXF8-HBynqmfTovO1YA4cJYMSe-G56Cypxlqt9q-4T1xN-luk=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczN2Ma5aAh5T4_Y0AiMdVFnbMUcqUo7K3MzO-myoscUSOHJv2t7s0kXIROhL8os0-tXLaO2HX8fm-IPf-qrNV2YBsOCLpK4PBphV1-O0uIUe5pXKfYA=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMtIERwF6aGgpd0LTWUhVAL0Err4GDvmyLNc8KTntQqxmnoEiBSyGsOwGPY4ooebs3SHYIvMB2M4FIIYMuSYT2k_ps8Whg8kxDaL1k7IuOHb-ICMjI=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNya9crKz923BEpiAbPoRyvo_fPCld8oef900kIwnYacyxao3YTHRRoGyFv0SJyeCXR2adPbcypVKmJ_XTJ0jOppWC6WnZ14V2KDJ7ilimR-GJOb6c=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczO3_B05SiacZtPRDgkB_m4S_aLmTIaBPS0HGEVZkMDzmS-NRRbiySJ8L_1_vTRol6xLmo5InTnDqbx-xeS32nAAARb92Yr5tU0MR2meaUHiEApA5Ws=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMfKxBG6Wq3ifwkQq1o3ODT4wLv6g3vE9n1KVyzsPsaUhBbzo937lT9Ic3SM2m8MnqZF2t9GFtixQxTc1pWXFB-u10I1zTyig4u9tsMrkKPfWq5omQ=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNeDv76udjx9QABbjLYbxvnC_9D1iNcHEeAiCxLzM83cGPPlKvtfrHA483eOSOkxYeO7JxN8taWN5H3dxybPZb8jJCSXYWnWYUem1uXKtBWdII9I2Y=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOkcW2ouvbEMP0g2NJx2bWL7IQvQViFDuCbjUAulFSPVrsxmE5I66Ddefho6lTrWBO5zliCgp2WjI-xq-NPs197Iy7RLGDrNfPw91SX5LBKx4WYxyc=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNhxuVehVwDHOqSpvJL1oT0bx8UmVjnDqKqMg_mJZOrdUutZQdHj10ZMoCtmkMiNSQ8MFPj0ES__1zrGFCCPC1uKSXpnrLi8AeyPQLwP1gQePrsEwo=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNSw3tXmthLfwv4Z7M9nvNeh3ORHsEc1-xFQLS3eyvwuvDINDUNYZrVz_oTVUmxMz5TphRrUKr2g7YHnRugxmK57i6Rnvw-wE3Lw76Z2yYmMPzz4VY=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOmfo8-xONjAdnySZ4TgygR3ZMtDFHIQLouY98E5o-1vhItlgrglNFvvuDO2xXqVTFppz7s39U4h10Jrl0VqrBzToPbmGJvjMB41FhcSovVJp1RCGU=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPQX787oKeSkzpNQnEPBRd0_I_rxaL9dwHbXm7wLBQdF6aFrbPv_eUdyyEc_Hp9VGPMr_KiglZUERBv_QHu3CXxzrDQlqWMT-aJwUDBQPfiPKKIjvE=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczPW7SrfXXiDx3fdazrFTV4gbl-W54nBBJ0HDtY4wp-M06wZOKh388Izh876539pV1Z_0PQqljgtKjqBNwoeuekOG6hjhJVhCxHBRidQiXX18zbnYWc=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNqK6e3U4N-vzRQWijVL_fxNTL6upqJAFkJ-D5_S4HXsFbtubueBw2AHtnc3fjKagIhYgyIDVFK0ika6ec85Wq3UrBA82BhUHrA1vJ8VHD4hYKxCoc=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczMdLPWxX_UbTgJPOUl-n84pOqJrjK_28YxSvP06TGZjl6-KsHruZEkJpie6Wbyr_4MopndekLRntQI2QkR-RZNfRe4hHYT8I5rPmngYa8iI0Or53EY=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczM__UVNOxBdInV6iNI6MtXTAfZ23H9kw79Gyn2xHR3qXUV4dsZyIlzSTiTpBjjtNmBOiHQy2Cfwf2Dqw04L4ZgNKyukFKCUAR5Dp4vx3DbVKR1VEsA=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczOTO0TweufEcWj4FXJtNlAtawnV7oLez0baPkObccUAgeYeNopPAs59hHa-U_y5jQhDcXZZV4igX5yBfmZ_N5JARnsLYrIg134cNDfmXZ4oiGlbTew=w1920-h1080-rj',
+  'https://lh3.googleusercontent.com/pw/AP1GczNNnTc1eArwaGmB9xz15la7QNJ_sHj_JH6Mng0J3rsrHQhC9Is_VDtBbgNdeZ7QETxtHXY7uo6Ir6EG8hcaYm9HpMBzWPcGBDtSWRuLhrWg_6bNG7s=w1920-h1080-rj'
+];
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  // set default datetime to 1h from now
+  const soon = new Date(Date.now() + 3600000);
+  soon.setSeconds(0,0);
+  document.getElementById('f-datetime').value = toLocal(soon);
+
+  // populate URL textarea with defaults
+  document.getElementById('f-urls').value = DEFAULT_PHOTOS.join('\n');
+  onUrlsChange();
+
+  scaleIframe();
+  window.addEventListener('resize', scaleIframe);
+
+  // initial preview URL generation (silent)
+  updateUrlPreview();
+});
+
+/* ══════════════════════════════════════════════
+   IFRAME SCALING
+══════════════════════════════════════════════ */
+function scaleIframe() {
+  const wrap = document.getElementById('preview-frame-wrap');
+  const iframe = document.getElementById('preview-iframe');
+  const w = wrap.clientWidth;
+  const scale = w / 1920;
+  iframe.style.transform = `scale(${scale})`;
+  wrap.style.height = (1080 * scale) + 'px';
+}
+
+/* ══════════════════════════════════════════════
+   LIVE UPDATE — debounced iframe refresh
+══════════════════════════════════════════════ */
+let debounceTimer = null;
+function liveUpdate() {
+  updateUrlPreview();
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(refreshIframe, 900);
+}
+
+function refreshIframe() {
+  const iframe = document.getElementById('preview-iframe');
+  iframe.src = buildObsUrl();
+  scaleIframe();
+}
+
+/* ══════════════════════════════════════════════
+   BUILD OBS URL
+══════════════════════════════════════════════ */
+function buildObsUrl() {
+  // Point to obs-welcome.html in the same directory
+  const base = location.href.replace(/\/[^/]*$/, '/') + 'obs-welcome.html';
+  const urls = document.getElementById('f-urls').value.trim();
+  const q = new URLSearchParams({
+    obs:    '1',
+    event:  document.getElementById('f-event').value,
+    sub:    document.getElementById('f-sub').value,
+    ticker: document.getElementById('f-ticker').value,
+    dur:    document.getElementById('f-dur').value,
+    order:  document.getElementById('f-order').value,
+    dt:     document.getElementById('f-datetime').value,
+    urls:   urls,
+    album:  document.getElementById('f-album').value,
+  });
+  return `${base}?${q}`;
+}
+
+function updateUrlPreview() {
+  const url = buildObsUrl();
+  const el = document.getElementById('url-preview');
+  el.textContent = url.length > 300 ? url.substring(0, 280) + '…' : url;
+}
+
+/* ══════════════════════════════════════════════
+   PHOTO URL MANAGEMENT
+══════════════════════════════════════════════ */
+function onUrlsChange() {
+  const urls = parseUrls();
+  document.getElementById('url-count').textContent = urls.length + ' loaded';
+  renderThumbs(urls);
+  updateUrlPreview();
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(refreshIframe, 1200);
+}
+
+function parseUrls() {
+  return document.getElementById('f-urls').value
+    .split('\n').map(u => u.trim()).filter(Boolean);
+}
+
+function renderThumbs(urls) {
+  const grid = document.getElementById('photo-grid');
+  // Show max 12 thumbnails
+  const sample = urls.slice(0, 12);
+  // Use smaller size for thumbnails to avoid rate limiting
+  grid.innerHTML = sample.map((u, i) => {
+    const thumb = u.replace(/=w\d+-h\d+/, '=w400-h300-rj');
+    return `<div class="photo-thumb" style="background-image:url('${thumb}')"
+              title="Photo ${i+1}" onclick="previewPhoto('${u}')">
+              <span class="num">${i+1}</span>
+            </div>`;
+  }).join('');
+  if (urls.length > 12) {
+    grid.innerHTML += `<div class="photo-thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;color:var(--cream-40);">+${urls.length-12}<br>more</div>`;
+  }
+}
+
+function previewPhoto(url) {
+  // Swap in a temp iframe that just shows the photo
+  window.open(url, '_blank');
+}
+
+/* ══════════════════════════════════════════════
+   ALBUM FETCH
+══════════════════════════════════════════════ */
+async function fetchAlbum() {
+  const albumUrl = document.getElementById('f-album').value.trim();
+  if (!albumUrl) { showToast('⚠ Paste a Google Photos album URL first', 'error'); return; }
+
+  setStatus('⏳ Fetching album via proxy…');
+  showToast('⏳ Fetching photos…');
+
+  try {
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(albumUrl)}`;
+    const r = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+    const d = await r.json();
+    const html = d.contents || '';
+    const re = /https:\/\/lh3\.googleusercontent\.com\/pw\/[^"'\s=]+/g;
+    let matches = [...new Set(html.match(re) || [])];
+    // Normalise: strip any existing size param, append -rj (forces JPEG even from video thumbnails)
+    matches = matches.map(u => u.replace(/=(w\d+(-h\d+)?(-[a-z]+)*)$/, '') + '=w1920-h1080-rj');
+    // Keep only /pw/ paths (photos); /af/ are video stream URLs that return mp4 not jpeg
+    matches = matches.filter(u => u.includes('/pw/') && !u.includes('/a/'));
+
+    if (matches.length === 0) throw new Error('No photos found in response');
+
+    document.getElementById('f-urls').value = matches.join('\n');
+    onUrlsChange();
+    setStatus(`✅ Fetched ${matches.length} photos`);
+    showToast(`✅ ${matches.length} photos fetched!`, 'success');
+  } catch(e) {
+    setStatus('⚠ Fetch failed — paste URLs manually');
+    showToast('⚠ Could not fetch album. Paste URLs directly.', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════
+   GENERATE & COPY OBS URL
+══════════════════════════════════════════════ */
+function generateAndCopy() {
+  const url = buildObsUrl();
+  updateUrlPreview();
+  navigator.clipboard.writeText(url)
+    .then(() => showToast('✅ OBS URL copied to clipboard!', 'success'))
+    .catch(() => {
+      prompt('Copy this OBS Browser Source URL:', url);
+    });
+}
+
+function openObsUrl() {
+  window.open(buildObsUrl(), '_blank');
+}
+
+function openPreviewFull() {
+  window.open(buildObsUrl(), '_blank');
+}
+
+/* ══════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════ */
+function resetToDefaults() {
+  if (!confirm('Reset all fields to defaults?')) return;
+  document.getElementById('f-event').value  = 'Ayyappan Poojai';
+  document.getElementById('f-sub').value    = 'DTS Media Live';
+  document.getElementById('f-album').value  = '';
+  document.getElementById('f-ticker').value = 'DTS Media Live  ·  Swamy Saranam|Ayyappan Poojai – Live Streaming|Dallas Tatvamasi Sangam|Subscribe & Share ✦';
+  document.getElementById('f-dur').value    = '8';
+  document.getElementById('f-order').value  = 'random';
+  const soon = new Date(Date.now() + 3600000);
+  soon.setSeconds(0,0);
+  document.getElementById('f-datetime').value = toLocal(soon);
+  document.getElementById('f-urls').value   = DEFAULT_PHOTOS.join('\n');
+  onUrlsChange();
+  liveUpdate();
+  showToast('↺ Reset to defaults', 'success');
+}
+
+/* ══════════════════════════════════════════════
+   SECTION TOGGLE
+══════════════════════════════════════════════ */
+function toggleSection(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('collapsed');
+}
+
+/* ══════════════════════════════════════════════
+   STATUS / TOAST
+══════════════════════════════════════════════ */
+function setStatus(msg) {
+  document.getElementById('status-msg').textContent = msg;
+}
+
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+function toLocal(d) {
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+</script>
+</body>
+</html>

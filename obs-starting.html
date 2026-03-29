@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Starting Now – Ayyappan Poojai</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: transparent; font-family: 'DM Sans', sans-serif; }
+
+  .glow-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 1400px; height: 700px; background: radial-gradient(ellipse at center, rgba(255,107,26,0.13) 0%, rgba(255,180,60,0.06) 40%, transparent 70%); pointer-events: none; }
+  .rule-top, .rule-bottom { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(255,107,26,0.3) 8%, #FF6B1A 22%, #FFD166 50%, #FF6B1A 78%, rgba(255,107,26,0.3) 92%, transparent 100%); }
+  .rule-top { top: 60px; } .rule-bottom { bottom: 60px; }
+  .rule-top::before, .rule-bottom::before { content: '◆'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 10px; color: #FFD166; text-shadow: 0 0 8px rgba(255,200,80,0.9); }
+  .corner { position: absolute; width: 60px; height: 60px; pointer-events: none; }
+  .corner.tl { top: 40px; left: 60px; border-top: 2px solid rgba(255,107,26,0.5); border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.tr { top: 40px; right: 60px; border-top: 2px solid rgba(255,107,26,0.5); border-right: 2px solid rgba(255,107,26,0.5); }
+  .corner.bl { bottom: 40px; left: 60px; border-bottom: 2px solid rgba(255,107,26,0.5); border-left: 2px solid rgba(255,107,26,0.5); }
+  .corner.br { bottom: 40px; right: 60px; border-bottom: 2px solid rgba(255,107,26,0.5); border-right: 2px solid rgba(255,107,26,0.5); }
+  .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; user-select: none; }
+  .wm-main { font-family: 'Cinzel', serif; font-size: 96px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.03); white-space: nowrap; }
+  .wm-sub  { font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(255,255,255,0.02); margin-top: 8px; white-space: nowrap; }
+
+  .stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; display: flex; flex-direction: column; align-items: center; }
+
+  .org-name { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(255,179,102,0.7); animation: fadeDown 1s 0.1s cubic-bezier(0.22,1,0.36,1) both; }
+  .starting-label { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 52px; font-weight: 500; color: rgba(255,255,255,0.55); letter-spacing: 0.1em; margin-top: 20px; animation: fadeDown 1s 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+  .event-title { font-family: 'Cinzel', serif; font-size: 86px; font-weight: 900; letter-spacing: 0.06em; color: #FFD166; line-height: 1; text-shadow: 0 0 50px rgba(255,180,40,0.3), 0 4px 20px rgba(0,0,0,0.9); animation: fadeDown 1s 0.45s cubic-bezier(0.22,1,0.36,1) both; margin-top: 6px; }
+
+  .gem-line { display: flex; align-items: center; gap: 18px; margin: 28px 0 22px; animation: fadeDown 1s 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+  .gem-line::before { content: ''; display: block; width: 220px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,107,26,0.6), #FFD166); }
+  .gem-line::after  { content: ''; display: block; width: 220px; height: 1px; background: linear-gradient(90deg, #FFD166, rgba(255,107,26,0.6), transparent); }
+  .gem { font-size: 16px; color: #FFD166; text-shadow: 0 0 10px rgba(255,200,80,0.8); }
+
+  /* Big countdown number */
+  .cd-wrap { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; animation: fadeDown 1s 0.75s cubic-bezier(0.22,1,0.36,1) both; }
+  .cd-svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .ring-bg   { fill: none; stroke: rgba(255,107,26,0.12); stroke-width: 6; }
+  .ring-fill { fill: none; stroke: url(#rg2); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.85s linear; }
+  .cd-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cd-sublabel { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: #FF8C42; margin-bottom: 2px; }
+  .cd-number { font-family: 'Cinzel', serif; font-size: 160px; font-weight: 900; color: #FFFFFF; line-height: 1; text-shadow: 0 0 60px rgba(255,180,60,0.4), 0 4px 28px rgba(0,0,0,0.9); transition: transform 0.15s ease, opacity 0.15s ease; }
+  .cd-number.pop { animation: numPop 0.35s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes numPop { 0%{transform:scale(1.3);opacity:0.5} 100%{transform:scale(1);opacity:1} }
+
+  /* LIVE flash */
+  .live-flash { font-family: 'Cinzel', serif; font-size: 52px; font-weight: 900; letter-spacing: 0.22em; color: #FF3B30; text-shadow: 0 0 30px rgba(255,59,48,0.7); display: none; animation: livePulse 0.6s ease infinite alternate; }
+  @keyframes livePulse { from{opacity:1} to{opacity:0.4} }
+
+  .go-wrap { display: none; flex-direction: column; align-items: center; }
+  .go-icon { font-size: 72px; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(255,140,40,0.8)); }
+  .go-text { font-family: 'Cinzel', serif; font-size: 120px; font-weight: 900; letter-spacing: 0.1em; color: #FFD166; text-shadow: 0 0 80px rgba(255,200,40,0.5), 0 4px 28px rgba(0,0,0,0.9); animation: goAnim 0.6s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes goAnim { from{transform:scale(0.6);opacity:0} to{transform:scale(1);opacity:1} }
+
+  .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.92); border-top: 3px solid #FF6B1A; height: 52px; display: flex; align-items: center; justify-content: center; }
+  .bar-center { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(255,150,60,0.5); white-space: nowrap; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="glow-center"></div>
+<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+<div class="rule-top"></div><div class="rule-bottom"></div>
+<div class="watermark"><div class="wm-main">DTS Media Live</div><div class="wm-sub">Dallas Tatvamasi Sangam</div></div>
+
+<div class="stage">
+  <div class="org-name">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
+  <div class="starting-label">Starting Now —</div>
+  <div class="event-title">Ayyappan Poojai</div>
+  <div class="gem-line"><span class="gem">◆</span></div>
+
+  <!-- Countdown ring + number -->
+  <div class="cd-wrap" id="cdWrap">
+    <svg class="cd-svg" width="280" height="280" viewBox="0 0 280 280">
+      <defs>
+        <linearGradient id="rg2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#FF6B1A"/>
+          <stop offset="100%" stop-color="#FFD166"/>
+        </linearGradient>
+      </defs>
+      <circle class="ring-bg"   cx="140" cy="140" r="128"/>
+      <circle class="ring-fill" id="ringFill" cx="140" cy="140" r="128" stroke-dasharray="804" stroke-dashoffset="0"/>
+    </svg>
+    <div class="cd-inner">
+      <div class="cd-sublabel">Starting In</div>
+      <div class="cd-number" id="cdNum">10</div>
+    </div>
+  </div>
+
+  <!-- LIVE flash -->
+  <div class="live-flash" id="liveFlash">🔴 &nbsp; LIVE</div>
+
+  <!-- GO screen -->
+  <div class="go-wrap" id="goWrap">
+    <div class="go-icon">🪔</div>
+    <div class="go-text">Swamy Saranam!</div>
+  </div>
+</div>
+
+<div class="bottom-bar"><div class="bar-center">DTS Media Live &nbsp;·&nbsp; Swamy Saranam</div></div>
+
+<script>
+  const TOTAL = 10;
+  const CIRC  = 2 * Math.PI * 128;
+  let count   = TOTAL;
+
+  const cdWrap   = document.getElementById('cdWrap');
+  const cdNum    = document.getElementById('cdNum');
+  const ringFill = document.getElementById('ringFill');
+  const liveFlash= document.getElementById('liveFlash');
+  const goWrap   = document.getElementById('goWrap');
+
+  function tick() {
+    if (count < 0) return;
+    if (count === 0) {
+      cdWrap.style.display    = 'none';
+      liveFlash.style.display = 'none';
+      goWrap.style.display    = 'flex';
+      return;
+    }
+    cdNum.textContent = count;
+    cdNum.classList.remove('pop');
+    void cdNum.offsetWidth; // reflow
+    cdNum.classList.add('pop');
+    const pct = count / TOTAL;
+    ringFill.style.strokeDashoffset = CIRC * (1 - pct);
+    if (count <= 3) liveFlash.style.display = 'block';
+    count--;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

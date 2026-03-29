@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,12 +23,12 @@
     text-align: center; pointer-events: none; user-select: none;
   }
   .wm-main {
-    font-family: 'Cinzel', serif; font-size: 86px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 96px; font-weight: 700;
     letter-spacing: 0.2em; text-transform: uppercase;
     color: rgba(255,255,255,0.04); white-space: nowrap;
   }
   .wm-sub {
-    font-family: 'Cinzel', serif; font-size: 26px; font-weight: 600;
+    font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600;
     letter-spacing: 0.38em; text-transform: uppercase;
     color: rgba(255,255,255,0.025); margin-top: 8px; white-space: nowrap;
   }
@@ -51,7 +52,7 @@
 
   /* LEFT – current singer */
   .singer-block {
-    flex: 0 0 580px;
+    flex: 0 0 600px;
     display: flex; align-items: center; gap: 18px;
     padding-right: 48px;
     border-right: 2px solid rgba(255,107,26,0.4);
@@ -59,9 +60,9 @@
   .s-icon {
     display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0;
   }
-  .s-mic { font-size: 34px; }
+  .s-mic { font-size: 38px; }
   .s-tag {
-    font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
     letter-spacing: 0.2em; text-transform: uppercase; color: #FF8C42;
     white-space: nowrap;
   }
@@ -71,7 +72,7 @@
   }
   .s-text { flex: 1; min-width: 0; }
   .s-name {
-    font-family: 'Cinzel', serif; font-size: 50px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 58px; font-weight: 700;
     color: #FFFFFF;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     line-height: 1.1; letter-spacing: 0.02em;
@@ -81,14 +82,14 @@
   @keyframes nameIn { from{opacity:0;transform:translateX(-14px)} to{opacity:1;transform:translateX(0)} }
   .s-song {
     font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 24px; font-weight: 500;
+    font-size: 28px; font-weight: 500;
     color: #FFB366;
     margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .s-song::before { content: '♪  '; font-style: normal; font-size: 18px; }
+  .s-song::before { content: '♪  '; font-style: normal; font-size: 22px; }
   .s-empty {
     font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 28px; color: rgba(255,255,255,0.3);
+    font-size: 32px; color: rgba(255,255,255,0.3);
   }
 
   /* CENTER – event title */
@@ -96,42 +97,42 @@
     flex: 1; text-align: center; padding: 0 44px; min-width: 0;
   }
   .e-eyebrow {
-    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
     letter-spacing: 0.32em; text-transform: uppercase;
     color: rgba(255,179,102,0.7); margin-bottom: 7px;
   }
   .e-title {
-    font-family: 'Cinzel', serif; font-size: 40px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 46px; font-weight: 700;
     letter-spacing: 0.06em; color: #FFD166;
     line-height: 1.1; white-space: nowrap;
     text-shadow: 0 2px 16px rgba(0,0,0,0.7);
   }
   .e-month {
     font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 22px; font-weight: 500;
+    font-size: 26px; font-weight: 500;
     color: rgba(255,209,102,0.65); margin-top: 5px; letter-spacing: 0.1em;
   }
 
   /* RIGHT – date & time */
   .dt-block {
-    flex: 0 0 320px;
+    flex: 0 0 340px;
     text-align: right;
     padding-left: 48px;
     border-left: 2px solid rgba(255,107,26,0.4);
   }
   .dt-time-row { display: flex; align-items: baseline; justify-content: flex-end; gap: 6px; }
   .dt-time {
-    font-family: 'Cinzel', serif; font-size: 46px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 54px; font-weight: 700;
     color: #FFFFFF; letter-spacing: 0.04em; line-height: 1;
     text-shadow: 0 2px 12px rgba(0,0,0,0.8);
   }
   .dt-ampm {
-    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600;
+    font-family: 'Cinzel', serif; font-size: 19px; font-weight: 600;
     color: #FF8C42; letter-spacing: 0.12em; padding-bottom: 5px;
   }
   .dt-sep { height: 1px; margin: 6px 0 5px; background: rgba(255,107,26,0.4); }
   .dt-date {
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
     color: #FFB366; letter-spacing: 0.08em;
   }
 
@@ -151,7 +152,7 @@
   .rule::before {
     content: '◆'; position: absolute; top: 50%; left: 50%;
     transform: translate(-50%,-50%);
-    font-size: 9px; color: #FFD166;
+    font-size: 11px; color: #FFD166;
     text-shadow: 0 0 8px rgba(255,200,80,0.9);
   }
 
@@ -159,10 +160,10 @@
   .up-row {
     background: rgba(0,0,0,0.92);
     padding: 10px 60px 12px;
-    display: flex; align-items: center; min-height: 74px; overflow: hidden;
+    display: flex; align-items: center; min-height: 82px; overflow: hidden;
   }
   .up-label {
-    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
     letter-spacing: 0.24em; text-transform: uppercase;
     color: #FF8C42; white-space: nowrap;
     margin-right: 26px; flex-shrink: 0;
@@ -179,8 +180,8 @@
     padding-left: 30px;
   }
   .up-num {
-    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
-    width: 22px; text-align: center; flex-shrink: 0;
+    font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700;
+    width: 26px; text-align: center; flex-shrink: 0;
   }
   .up-item.first  .up-num { color: #FFD166; }
   .up-item.second .up-num { color: rgba(255,180,80,0.6); }
@@ -189,23 +190,23 @@
     font-family: 'Cinzel', serif; font-weight: 600;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
   }
-  .up-item.first  .up-name { color: #FFFFFF; font-size: 28px; }
-  .up-item.second .up-name { color: rgba(255,255,255,0.65); font-size: 23px; }
+  .up-item.first  .up-name { color: #FFFFFF; font-size: 32px; }
+  .up-item.second .up-name { color: rgba(255,255,255,0.65); font-size: 27px; }
   .up-song {
-    font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px;
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px;
     margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .up-song::before { content: '♪ '; font-style: normal; font-size: 12px; }
+  .up-song::before { content: '♪ '; font-style: normal; font-size: 14px; }
   .up-item.first  .up-song { color: #FFB366; }
   .up-item.second .up-song { color: rgba(255,150,80,0.55); }
   .up-more {
-    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
     color: rgba(255,140,50,0.5); letter-spacing: 0.06em;
     margin-left: 22px; white-space: nowrap; flex-shrink: 0;
   }
   .up-empty {
     font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 16px; color: rgba(255,255,255,0.25);
+    font-size: 19px; color: rgba(255,255,255,0.25);
   }
 
   /* ── UP-ROW STATS (right side of up-next row) ── */
@@ -221,22 +222,24 @@
     border-right: 1px solid rgba(255,107,26,0.18);
   }
   .ustat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
-  .ustat-icon  { font-size: 14px; line-height: 1; }
+  .ustat-icon  { font-size: 20px; line-height: 1; }
   .ustat-label {
-    font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: rgba(255,150,60,0.5); white-space: nowrap;
+    font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    white-space: nowrap;
   }
+  .ustat.done    .ustat-label { color: rgba(74,224,128,0.8); }
+  .ustat.waiting .ustat-label { color: rgba(255,179,102,0.8); }
   .ustat-val {
-    font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 30px; font-weight: 900;
     white-space: nowrap; line-height: 1;
   }
   .ustat-of {
-    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
-    color: rgba(255,255,255,0.35);
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600;
+    color: rgba(255,255,255,0.4);
   }
-  .ustat.done    .ustat-val { color: #4AE080; }
-  .ustat.waiting .ustat-val { color: #FFB366; }
+  .ustat.done    .ustat-val { color: #4AE080; text-shadow: 0 0 12px rgba(74,224,128,0.5); }
+  .ustat.waiting .ustat-val { color: #FFB366; text-shadow: 0 0 12px rgba(255,179,102,0.5); }
 
   /* refresh mini inside up-stats */
   .ustat.refresh { gap: 8px; }
@@ -250,27 +253,21 @@
     transition: width 0.9s linear; width: 100%;
   }
   .br-sec {
-    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
     color: #FF8C42; min-width: 18px; text-align: right;
   }
 
-  /* ── BOTTOM BAR (just watermark + progress line) ── */
+  /* ── BOTTOM BAR ── */
   .bottom-bar {
     background: rgba(0,0,0,0.97);
     border-top: 1px solid rgba(255,107,26,0.15);
     padding: 0 60px;
     display: flex; align-items: center;
-    height: 28px; overflow: hidden;
-    position: relative;
-  }
-  .prog-line {
-    position: absolute; top: 0; left: 0; height: 2px;
-    background: linear-gradient(90deg, #FF6B1A, #FFD166);
-    transition: width 0.9s linear; width: 100%;
+    height: 30px; overflow: hidden;
   }
   .bar-center {
     flex: 1; text-align: center;
-    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
     letter-spacing: 0.28em; text-transform: uppercase;
     color: rgba(255,150,60,0.38); white-space: nowrap;
   }
@@ -291,7 +288,7 @@
   <!-- Main row: Singer | Event | DateTime -->
   <div class="main-row">
 
-    <!-- LEFT: Current singer (only shown once here) -->
+    <!-- LEFT: Current singer -->
     <div class="singer-block">
       <div class="s-icon">
         <div class="s-mic">🎤</div>
@@ -306,7 +303,7 @@
     <!-- CENTER: Event title -->
     <div class="event-block">
       <div class="e-eyebrow">✦ &nbsp; Dallas Tatvamasi Sangam &nbsp; ✦</div>
-      <div class="e-title">Ayyappan Monthly Poojai</div>
+      <div class="e-title">Ayyappan Poojai</div>
       <div class="e-month" id="eventMonth"></div>
     </div>
 
@@ -325,7 +322,7 @@
   <!-- Divider -->
   <div class="rule"></div>
 
-  <!-- Up Next row — with stats pills and refresh on right -->
+  <!-- Up Next row -->
   <div class="up-row">
     <div class="up-label">Up Next</div>
     <div class="up-list" id="upList">
@@ -334,8 +331,8 @@
     <div class="up-stats">
       <div class="ustat done">
         <span class="ustat-icon">✅</span>
-        <span class="ustat-label">Done</span>
-        <span class="ustat-val"><span id="statDone">0</span><span class="ustat-of" id="statDoneOf">/0</span></span>
+        <span class="ustat-label">Completed</span>
+        <span class="ustat-val"><span id="statDone">0</span><span class="ustat-val" id="statDoneOf">/0</span></span>
       </div>
       <div class="ustat waiting">
         <span class="ustat-icon">⏳</span>
@@ -351,67 +348,18 @@
 
   <!-- Bottom strip -->
   <div class="bottom-bar">
-    <div class="prog-line" id="progLine"></div>
     <div class="bar-center">DTS Media Live &nbsp;·&nbsp; Swamy Saranam</div>
   </div>
 
 </div>
 
 <script>
+  const API_URL   = 'api.php';
   const REFRESH_SEC = 10;
-  let lastHash = '', countdown = REFRESH_SEC;
 
-  // ── Cloud sync: read ?cloud=URL&token=TOKEN from address bar ──
-  const _DEFAULT_CLOUD = 'https://api.github.com/repos/dallastatvamasis/dallastatvamasis.com/contents/song-queue.json?ref=queue-data';
-  const _params  = new URLSearchParams(location.search);
-  const CLOUD_URL = (_params.get('cloud') || _DEFAULT_CLOUD).trim();
-  const CLOUD_TOKEN = (_params.get('token') || '').trim();
-  let _cloudData = null;
-
-  function isCsvUrl(url) {
-    return url.includes('docs.google.com/spreadsheets') ||
-           url.includes('output=csv') || url.includes('format=csv') ||
-           url.match(/\.csv(\?|$)/i);
-  }
-
-  function parseCsv(text) {
-    const lines = text.trim().split(/\r?\n/);
-    if (!lines.length) return [];
-    const first = lines[0].toLowerCase();
-    const hasHeader = first.includes('name') || first.includes('song') || first.includes('status');
-    const dataLines = hasHeader ? lines.slice(1) : lines;
-    return dataLines.map((line, i) => {
-      const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-      if (cols.length >= 4) {
-        return { id: cols[0] || i + 1, name: cols[1], song: cols[2], status: cols[3] || 'waiting' };
-      } else if (cols.length >= 2) {
-        return { id: i + 1, name: cols[0], song: cols[1], status: cols[2] || 'waiting' };
-      }
-      return null;
-    }).filter(Boolean);
-  }
-
-  async function fetchCloud() {
-    if (!CLOUD_URL) return;
-    try {
-      const sep = CLOUD_URL.includes('?') ? '&' : '?';
-      if (isCsvUrl(CLOUD_URL)) {
-        const res = await fetch(CLOUD_URL + sep + '_t=' + Date.now(), { cache: 'no-store' });
-        if (res.ok) { _cloudData = parseCsv(await res.text()); }
-      } else {
-        const token = CLOUD_TOKEN || localStorage.getItem('sync_token') || '';
-        const headers = { 'Accept': 'application/vnd.github.v3+json' };
-        if (token) headers['Authorization'] = 'token ' + token;
-        const res = await fetch(CLOUD_URL + sep + '_t=' + Date.now(), { headers, cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          _cloudData = data.content
-            ? JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))))
-            : data;
-        }
-      }
-    } catch(e) { /* keep last data on failure */ }
-  }
+  let lastHash  = '';
+  let countdown = REFRESH_SEC;
+  let queue     = [];
 
   const MONTHS = ['January','February','March','April','May','June',
                   'July','August','September','October','November','December'];
@@ -431,24 +379,27 @@
       MONTHS[n.getMonth()] + ' ' + n.getFullYear();
   }
 
-  function loadQueue() {
-    if (CLOUD_URL && _cloudData !== null) return _cloudData;
-    try { return JSON.parse(localStorage.getItem('songQueue') || '[]'); }
-    catch { return []; }
+  async function loadQueue() {
+    try {
+      const data = await fetch(API_URL + '?action=get').then(r => r.json());
+      if (Array.isArray(data)) {
+        queue = data;
+        refresh();
+      }
+    } catch (err) {}
   }
 
   function refresh() {
-    const q = loadQueue();
-    const cur   = q.filter(e => e.status === 'current');
-    const wait  = q.filter(e => e.status === 'waiting');
-    const done  = q.filter(e => e.status === 'done');
-    const total = q.length;
-    // Always update stats (no early return)
+    const cur   = queue.filter(e => e.status === 'current');
+    const wait  = queue.filter(e => e.status === 'waiting');
+    const done  = queue.filter(e => e.status === 'done');
+    const total = queue.length;
+
     document.getElementById('statDone').textContent   = done.length;
     document.getElementById('statDoneOf').textContent = '/' + total;
     document.getElementById('statWait').textContent   = wait.length;
-    // Only re-render queue if data changed
-    const h = JSON.stringify(q);
+
+    const h = JSON.stringify(queue);
     if (h === lastHash) return;
     lastHash = h;
     renderSinger(cur[0] || null);
@@ -497,16 +448,15 @@
     countdown--;
     if (countdown <= 0) {
       countdown = REFRESH_SEC;
-      if (CLOUD_URL) { fetchCloud().then(refresh); } else { refresh(); }
+      loadQueue();
     }
     const pct = Math.max(0, (countdown / REFRESH_SEC) * 100);
     document.getElementById('progFill').style.width  = pct + '%';
-    document.getElementById('progLine').style.width  = pct + '%';
     document.getElementById('refreshSec').textContent = countdown;
   }
 
   updateClock();
-  if (CLOUD_URL) { fetchCloud().then(refresh); } else { refresh(); }
+  loadQueue();
   setInterval(tick, 1000);
 </script>
 </body>
