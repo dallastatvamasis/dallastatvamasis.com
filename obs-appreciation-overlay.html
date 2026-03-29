@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>OBS Appreciation – DTS Media Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; font-family: 'DM Sans', sans-serif; }
+
+/* ══ BACKGROUND ══ */
+body {
+  background:
+    radial-gradient(ellipse at 10% 50%, rgba(0,100,160,0.55) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 25%, rgba(10,130,100,0.45) 0%, transparent 38%),
+    radial-gradient(ellipse at 55% 88%, rgba(30,10,80,0.5)  0%, transparent 45%),
+    linear-gradient(150deg, #040d1e 0%, #08152a 40%, #060f1c 100%);
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 7%  9%,  rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 19% 4%,  rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 33% 14%, rgba(255,245,180,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 52% 6%,  rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 67% 11%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 81% 7%,  rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 94% 18%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 3%  35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 96% 40%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 14% 68%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 77% 72%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 44% 55%, rgba(255,245,180,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 82%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 28% 88%, rgba(255,255,255,0.3) 0%, transparent 100%);
+}
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 15% 45%, rgba(0,200,150,0.10) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 30%, rgba(0,160,210,0.09) 0%, transparent 35%),
+    radial-gradient(ellipse at 60% 15%, rgba(60,20,160,0.07) 0%, transparent 30%);
+}
+
+/* ══ GOLD BORDER ══ */
+.frame       { position:fixed;top:8px;left:8px;right:8px;bottom:8px;border:2px solid rgba(180,130,20,0.55);pointer-events:none;z-index:200; }
+.frame-inner { position:fixed;top:16px;left:16px;right:16px;bottom:16px;border:1px solid rgba(180,130,20,0.2);pointer-events:none;z-index:200; }
+.cg { position:fixed;font-size:22px;color:#C49A14;z-index:201;filter:drop-shadow(0 0 8px rgba(196,154,20,0.9)); }
+.cg.tl{top:4px;left:5px;} .cg.tr{top:4px;right:5px;} .cg.bl{bottom:4px;left:5px;} .cg.br{bottom:4px;right:5px;}
+.top-rule,.bot-rule { position:fixed;left:32px;right:32px;height:2px;z-index:200; background:linear-gradient(90deg,transparent,rgba(180,130,20,0.35) 8%,#B88A14 25%,#FFD166 50%,#B88A14 75%,rgba(180,130,20,0.35) 92%,transparent); }
+.top-rule { top:17px; } .bot-rule { bottom:17px; }
+.top-rule::after { content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;color:#FFD166;background:#070f1e;padding:0 8px;text-shadow:0 0 8px rgba(255,210,100,0.9); }
+
+/* ══ OUTER WRAP ══ */
+.wrap { position:absolute;top:26px;bottom:52px;left:26px;right:26px;display:flex;flex-direction:column; }
+
+/* ── HEADER ── */
+.hdr { text-align:center;padding:6px 0 3px;flex-shrink:0; }
+.eyebrow { font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:0.34em;text-transform:uppercase;color:rgba(200,160,55,0.8);display:flex;align-items:center;justify-content:center;gap:14px; }
+.e-lamp  { font-size:16px;filter:drop-shadow(0 0 7px rgba(255,190,40,0.9)); }
+.arrow   { font-size:16px;color:rgba(200,160,55,0.6);text-align:center;margin:-2px 0 1px; }
+.main-title { font-family:'DM Sans',sans-serif;font-size:66px;font-weight:300;font-style:italic;color:#FFFFFF;line-height:1;text-shadow:0 2px 20px rgba(0,0,0,0.8); }
+
+/* ── DIVIDER ── */
+.rule { display:flex;align-items:center;gap:12px;margin:5px 0;flex-shrink:0; }
+.rule-line { flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(180,130,20,0.5),#C49A14,rgba(180,130,20,0.5),transparent); }
+.rule-gem  { font-size:10px;color:#C49A14; }
+
+/* ── GURU ROW ── */
+.guru-row { display:flex;align-items:center;justify-content:center;gap:40px;flex-shrink:0;margin-bottom:6px; }
+.guru-card {
+  display:flex;align-items:center;gap:18px;
+  background:linear-gradient(135deg,rgba(50,18,5,0.95),rgba(35,12,3,0.98));
+  border:1.5px solid #7A5008;border-radius:6px;padding:10px 32px 10px 20px;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 24px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,215,80,0.1);
+}
+.guru-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7A5008,#D4A020,#FFD166,#D4A020,#7A5008); }
+.g-lamp { font-size:28px;filter:drop-shadow(0 0 10px rgba(255,190,40,0.9)); }
+.g-role { font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.26em;text-transform:uppercase;color:rgba(180,130,40,0.65);margin-bottom:2px; }
+.g-name { font-family:'Cinzel',serif;font-size:26px;font-weight:900;color:#FFD166;letter-spacing:0.04em;text-shadow:0 0 20px rgba(255,215,70,0.4); }
+.g-sub  { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:rgba(200,170,90,0.4);margin-top:1px; }
+.guru-sep { width:1px;height:58px;background:linear-gradient(180deg,transparent,rgba(180,130,20,0.5),transparent); }
+
+/* ══ 5-COLUMN GRID ══ */
+.cols { flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 270px;gap:14px;overflow:hidden;min-height:0; }
+
+/* ── DARK PANEL (cols 1-4) ── */
+.panel {
+  background:rgba(5,14,36,0.82);
+  border:1px solid rgba(70,110,170,0.28);
+  border-radius:8px;overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:inset 0 0 30px rgba(0,0,0,0.4);
+  position:relative;
+}
+
+/* panel header */
+.ph {
+  padding:10px 14px 8px;border-bottom:1px solid rgba(70,110,170,0.2);
+  flex-shrink:0;position:relative;
+  background:linear-gradient(180deg,rgba(18,38,90,0.65),rgba(8,20,52,0.45));
+}
+.ph-row { display:flex;align-items:flex-start;justify-content:space-between; }
+.ph-title { font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(210,180,90,0.9); }
+.ph-count { font-size:10px;color:rgba(140,180,230,0.45);margin-top:2px; }
+.ph-deco  { font-size:30px;opacity:0.5;filter:drop-shadow(0 0 8px rgba(200,150,30,0.5));margin-top:-2px;flex-shrink:0; }
+
+/* scroll */
+.pscroll { flex:1;overflow:hidden;position:relative;
+  mask-image:linear-gradient(180deg,transparent 0%,black 6%,black 94%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,black 6%,black 94%,transparent 100%);
+}
+.plist { padding:4px 0;animation:scrollUp var(--dur,16s) linear infinite; }
+.plist:hover { animation-play-state:paused; }
+@keyframes scrollUp { 0%{transform:translateY(0)} 100%{transform:translateY(-50%)} }
+
+.prow { padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.04); }
+.prow:hover { background:rgba(255,255,255,0.025); }
+
+/* text styles */
+.t1 { font-family:'DM Sans',sans-serif;font-size:18px;font-weight:400;color:rgba(220,235,255,0.9); }
+.t2 { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;font-weight:500;color:rgba(215,195,135,0.92); }
+.t3 { font-family:'DM Sans',sans-serif;font-size:17px;font-weight:400;color:rgba(185,215,255,0.88); }
+.t3p{ font-size:10px;color:rgba(180,150,60,0.35);margin-left:8px;font-family:'Cinzel',serif; }
+.t4 { font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:rgba(240,205,100,0.9);letter-spacing:0.03em; }
+
+/* ══ GOLD PARCHMENT SCROLL (col 5) ══ */
+.scroll { display:flex;flex-direction:column;border-radius:8px 8px 26px 26px;overflow:hidden;box-shadow:4px 0 30px rgba(0,0,0,0.5); }
+
+/* curl top */
+.s-top {
+  height:38px;flex-shrink:0;
+  background:linear-gradient(180deg,#5A3204 0%,#8A5810 35%,#B88018 70%,#A07010 100%);
+  border-radius:8px 8px 0 0;
+  box-shadow:0 5px 14px rgba(0,0,0,0.55);
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  position:relative;
+}
+.s-top::before,.s-top::after { content:'';position:absolute;top:50%;width:26%;height:5px;background:rgba(60,32,4,0.55);border-radius:3px;transform:translateY(-50%); }
+.s-top::before{left:10px;} .s-top::after{right:10px;}
+.s-diya { font-size:16px;filter:drop-shadow(0 0 7px rgba(255,190,40,0.9));position:relative;z-index:1; }
+.s-gem  { font-size:13px;color:rgba(70,35,4,0.7);position:relative;z-index:1; }
+
+/* body */
+.s-body {
+  flex:1;
+  background:
+    repeating-linear-gradient(180deg,transparent 0px,transparent 25px,rgba(0,0,0,0.045) 25px,rgba(0,0,0,0.045) 26px),
+    radial-gradient(ellipse at 50% 0%,  rgba(255,255,255,0.16) 0%,transparent 52%),
+    radial-gradient(ellipse at 0%  50%, rgba(0,0,0,0.09) 0%,transparent 38%),
+    radial-gradient(ellipse at 100% 50%,rgba(0,0,0,0.09) 0%,transparent 38%),
+    linear-gradient(180deg,#D0A01C 0%,#EAC030 5%,#F4CC3C 12%,#EAB828 25%,#E0A818 40%,#EAB828 55%,#F4CC3C 70%,#EAB828 82%,#D4A018 94%,#C08E10 100%);
+}
+.s-inner { padding:12px 18px 10px;display:flex;flex-direction:column;height:100%; }
+.s-heading {
+  font-family:'Cinzel',serif;font-size:11px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;color:rgba(60,26,4,0.78);
+  text-align:center;margin-bottom:10px;padding-bottom:8px;
+  border-bottom:1px solid rgba(110,62,8,0.38);
+}
+.s-blocks { flex:1;display:flex;flex-direction:column;justify-content:space-between; }
+
+.s-block { display:flex;flex-direction:column;align-items:center;text-align:center;flex:1;justify-content:center;gap:5px;padding:4px 2px; }
+.s-icon  { font-size:28px;filter:drop-shadow(0 0 8px rgba(130,65,8,0.55)); }
+.s-drow  { display:flex;align-items:center;gap:8px;justify-content:center; }
+.s-dlamp { font-size:15px;opacity:0.55;filter:drop-shadow(0 0 4px rgba(255,190,40,0.6)); }
+.s-title { font-family:'Cinzel',serif;font-size:12px;font-weight:900;letter-spacing:0.13em;text-transform:uppercase;color:rgba(55,22,4,0.94); }
+.s-msg   { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:rgba(50,20,4,0.72);line-height:1.52; }
+.s-saranam { font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.2em;color:rgba(65,28,5,0.6);text-transform:uppercase; }
+
+.s-div {
+  height:1px;margin:2px 6px;flex-shrink:0;
+  background:linear-gradient(90deg,transparent,rgba(110,62,8,0.55),rgba(150,95,10,0.75),rgba(110,62,8,0.55),transparent);
+  position:relative;
+}
+.s-div::after { content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;color:rgba(110,62,8,0.72);background:#E8BA2A;padding:0 5px; }
+
+/* curl bottom */
+.s-bot {
+  height:38px;flex-shrink:0;
+  background:linear-gradient(180deg,#A07010 0%,#8A5810 50%,#5A3204 100%);
+  border-radius:0 0 26px 26px;
+  box-shadow:0 -4px 14px rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  position:relative;
+}
+.s-bot::before,.s-bot::after { content:'';position:absolute;bottom:8px;width:18%;height:4px;background:rgba(60,32,4,0.45);border-radius:2px; }
+.s-bot::before{left:14px;} .s-bot::after{right:14px;}
+
+/* ── BOTTOM BAR ── */
+.btmbar { position:fixed;bottom:0;left:0;right:0;height:48px;background:linear-gradient(180deg,rgba(4,12,28,0.96),rgba(2,8,20,0.99));border-top:2px solid rgba(155,110,16,0.55);display:flex;align-items:center;justify-content:center;z-index:50; }
+.btm-txt { font-family:'Cinzel',serif;font-size:13px;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:rgba(185,138,38,0.52);display:flex;align-items:center;gap:20px; }
+.bl { font-size:14px;filter:drop-shadow(0 0 6px rgba(255,190,40,0.7)); }
+.bd { width:4px;height:4px;border-radius:50%;background:rgba(185,138,38,0.4); }
+</style>
+</head>
+<body>
+
+<div class="frame"></div>
+<div class="frame-inner"></div>
+<span class="cg tl">✦</span><span class="cg tr">✦</span>
+<span class="cg bl">✦</span><span class="cg br">✦</span>
+<div class="top-rule"></div>
+<div class="bot-rule"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="eyebrow"><span class="e-lamp">🪔</span>DALLAS TATVAMASI SANGAM<span class="e-lamp">🪔</span></div>
+    <div class="arrow">▲</div>
+    <div class="main-title">With Gratitude</div>
+  </div>
+
+  <div class="rule"><div class="rule-line"></div><span class="rule-gem">✦</span><div class="rule-line"></div></div>
+
+  <!-- GURU ROW -->
+  <div class="guru-row">
+    <div class="guru-card">
+      <div class="g-lamp">🪔</div>
+      <div><div class="g-role">DTS Guru Swami</div><div class="g-name">Venkat Swami</div><div class="g-sub">Spiritual Guide · Dallas Tatvamasi Sangam</div></div>
+    </div>
+    <div class="guru-sep"></div>
+    <div class="guru-card">
+      <div class="g-lamp">🪔</div>
+      <div><div class="g-role">DMT Guru Swami</div><div class="g-name">Subbu Swami</div><div class="g-sub">Spiritual Guide · Dallas Tatvamasi Sangam</div></div>
+    </div>
+  </div>
+
+  <div class="rule" style="margin-bottom:8px"><div class="rule-line"></div><span class="rule-gem">✦</span><div class="rule-line"></div></div>
+
+  <!-- 5 COLUMNS -->
+  <div class="cols" id="cols"></div>
+
+</div>
+
+<div class="btmbar">
+  <div class="btm-txt"><span class="bl">🪔</span>DTS MEDIA LIVE<span class="bd"></span>AYYAPPAN POOJAI<span class="bd"></span>SWAMY SARANAM<span class="bl">🪔</span></div>
+</div>
+
+<script>
+(function(){
+  var DEMO=[
+    {singer:'Ayyappa',  maligai:'Maaligaipuram', kids:['Manikanda'], ayyappa:'Ayyappa'},
+    {singer:'Rajesh',   maligai:'Priya',          kids:['Arun','Divya'], ayyappa:'Rajesh'},
+    {singer:'Suresh',   maligai:'Lakshmi',        kids:['Kiran'], ayyappa:'Suresh'},
+    {singer:'Manoj',    maligai:'Anita',          kids:['Rahul','Meena','Sneha'], ayyappa:'Manoj'},
+    {singer:'Karthik',  maligai:'Sundar',         kids:['Deepa','Arjun'], ayyappa:'Karthik'},
+    {singer:'Venkat',   maligai:'Kamala',         kids:['Preethi'], ayyappa:'Venkat'},
+    {singer:'Srinivas', maligai:'Padma',          kids:['Sathish','Revathi'], ayyappa:'Srinivas'},
+    {singer:'Ramesh',   maligai:'Nalini',         kids:['Vijay'], ayyappa:'Ramesh'}
+  ];
+
+  function panel(title, count, decoEmoji, dur, rowsHtml){
+    return '<div class="panel">'
+      +'<div class="ph"><div class="ph-row">'
+        +'<div><div class="ph-title">'+title+'</div><div class="ph-count">'+count+' members</div></div>'
+        +'<div class="ph-deco">'+decoEmoji+'</div>'
+      +'</div></div>'
+      +'<div class="pscroll"><div class="plist" style="--dur:'+dur+'s">'+rowsHtml+rowsHtml+'</div></div>'
+    +'</div>';
+  }
+
+  function render(data){
+    var singers  = data.map(function(d){return d.singer;});
+    var maligais = data.map(function(d){return d.maligai;});
+    var kids=[]; data.forEach(function(d){d.kids.forEach(function(k){kids.push({name:k,p:d.singer});});});
+    var ayyappas = data.map(function(d){return d.ayyappa;});
+
+    /* ── Col 1: Bhajan Singers ── */
+    var r1 = singers.map(function(n){ return '<div class="prow"><span class="t1">'+n+'</span></div>'; }).join('');
+    var c1 = panel('BHAJAN SINGERS', singers.length, '🪘', Math.max(12, singers.length*2.4), r1);
+
+    /* ── Col 2: Maaligaipuram ── */
+    var r2 = maligais.map(function(n){ return '<div class="prow"><span class="t2">'+n+'</span></div>'; }).join('');
+    var c2 = panel('MAALIGAIPURAM', maligais.length, '🌸', Math.max(12, maligais.length*2.4), r2);
+
+    /* ── Col 3: Manikanda (Kids) ── */
+    var r3 = kids.map(function(it){ return '<div class="prow"><span class="t3">'+it.name+'</span><span class="t3p">'+it.p+'</span></div>'; }).join('');
+    var c3 = panel('MANIKANDA', kids.length, '\uD83D\uDC66\uD83D\uDC67', Math.max(12, kids.length*2.2), r3);
+
+    /* ── Col 4: Ayyappas ── */
+    var r4 = ayyappas.map(function(n){ return '<div class="prow"><span class="t4">'+n+'</span></div>'; }).join('');
+    var c4 = panel('AYYAPPAS', ayyappas.length, '☸️', Math.max(12, ayyappas.length*2.4), r4);
+
+    /* ── Col 5: Golden Scroll ── */
+    var c5 = '<div class="scroll">'
+      /* curl top */
+      +'<div class="s-top">'
+        +'<span class="s-diya">🪔</span>'
+        +'<span class="s-gem">✦</span>'
+        +'<span class="s-diya">🪔</span>'
+      +'</div>'
+      /* parchment body */
+      +'<div class="s-body"><div class="s-inner">'
+        +'<div class="s-heading">With Heartfelt Appreciation:</div>'
+        +'<div class="s-blocks">'
+
+          /* Block 1 — Thank You For Joining */
+          +'<div class="s-block">'
+            +'<div class="s-icon">🌺</div>'
+            +'<div class="s-title">THANK YOU FOR JOINING</div>'
+            +'<div class="s-msg">Your presence graced this sacred gathering and filled our hearts with divine joy.</div>'
+          +'</div>'
+
+          +'<div class="s-div"></div>'
+
+          /* Block 2 — For Your Contribution */
+          +'<div class="s-block">'
+            +'<div class="s-icon">⭐</div>'
+            +'<div class="s-title">FOR YOUR CONTRIBUTION</div>'
+            +'<div class="s-msg">Every Bhajan sang, every seva offered — your devotion made this poojai truly divine.</div>'
+          +'</div>'
+
+          +'<div class="s-div"></div>'
+
+          /* Block 3 — Our Little Devotees */
+          +'<div class="s-block">'
+            +'<div class="s-drow"><span class="s-dlamp">🪔</span><span class="s-icon">🧒🎵</span><span class="s-dlamp">🪔</span></div>'
+            +'<div class="s-title">OUR LITTLE DEVOTEES</div>'
+            +'<div class="s-msg">The little ones who sang with joy — you are Ayyappa\'s greatest gift!</div>'
+            +'<div class="s-saranam">Swamy Saranam 🙏</div>'
+          +'</div>'
+
+        +'</div>'
+      +'</div></div>'
+      /* curl bottom */
+      +'<div class="s-bot">'
+        +'<span class="s-diya">🪔</span>'
+        +'<span class="s-diya">🪔</span>'
+      +'</div>'
+    +'</div>';
+
+    document.getElementById('cols').innerHTML = c1+c2+c3+c4+c5;
+  }
+
+  function parseCSV(t){
+    var rows=[];
+    t.trim().split('\n').forEach(function(line){
+      if(!line.trim())return;
+      var f=[],c='',q=false;
+      for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){f.push(c.trim());c='';}else c+=ch;}
+      f.push(c.trim());rows.push(f);
+    });
+    return rows;
+  }
+
+  function buildFromCSV(text){
+    var rows=parseCSV(text);
+    var data=rows.map(function(r){
+      var kRaw=(r[2]||'').trim();
+      var kList=kRaw?kRaw.split(',').map(function(s){return s.trim();}).filter(Boolean):[];
+      return {singer:(r[0]||'').trim(),maligai:(r[1]||'').trim(),kids:kList,ayyappa:(r[0]||'').trim()};
+    }).filter(function(d){return d.singer;});
+    if(data.length) render(data);
+  }
+
+  window.addEventListener('message',function(e){if(e.data&&e.data.type==='DTS_CSV')buildFromCSV(e.data.csv);});
+  var param=new URLSearchParams(location.search).get('data');
+  if(param){try{buildFromCSV(atob(param));}catch(e){}}
+  else{render(DEMO);}
+})();
+</script>
+</body>
+</html>
